@@ -1,0 +1,34 @@
+{
+  "name": "openchemlib-extended",
+  "version": "0.0.0",
+  "description": "Openchemlib extended",
+  "keywords": [
+    "openchemlib",
+    "ocl"
+  ],
+  "author": "Michaël Zasso",
+  "repository": "cheminfo-js/openchemlib-extended",
+  "bugs": {
+    "url": "https://github.com/cheminfo-js/openchemlib-extended/issues"
+  },
+  "homepage": "https://github.com/cheminfo-js/openchemlib-extended",
+  "license": "MIT",
+  "main": "./src/index.js",
+  "directories": {
+    "lib": "src",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha --require should --reporter mocha-better-spec-reporter --recursive",
+    "build": "cheminfo build"
+  },
+  "devDependencies": {
+    "cheminfo-tools": "^1.3.1",
+    "mocha": "^2.3.3",
+    "mocha-better-spec-reporter": "^2.1.2",
+    "should": "^7.1.0"
+  },
+  "dependencies": {
+    "openchemlib": "^3.0.0"
+  }
+}
