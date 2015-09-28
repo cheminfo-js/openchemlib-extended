@@ -29,6 +29,9 @@
     "should": "^7.1.0"
   },
   "dependencies": {
-    "openchemlib": "^3.0.0"
+    "extend": "^3.0.0",
+    "openchemlib": "^3.0.0",
+    "papaparse": "^4.1.2",
+    "sdf-parser": "^1.0.0"
   }
 }

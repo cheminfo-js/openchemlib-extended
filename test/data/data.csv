@@ -1,0 +1,6 @@
+name	smiles	str	num
+Methane	C	str1	1
+Ethane	CC	str2	1.5
+
+Propane	CCC	str3	3
+Butane	CCCC	str4	6.36
