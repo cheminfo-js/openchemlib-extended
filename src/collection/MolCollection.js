@@ -8,24 +8,16 @@ var extend = require('extend');
 var moleculeCreator = require('./moleculeCreator');
 
 var defaultCollectionOptions = {
+    length: 0,
     computeProperties: false
 };
 
-function MolCollection(molecules, data, stats, options) {
-    if (molecules === undefined) molecules = 0;
-    if (typeof molecules === 'number') {
-        options = data;
-        this.data = new Array(molecules);
-        this.molecules = new Array(molecules);
-        this.statistics = null;
-        this.currentIndex = 0;
-    } else {
-        this.data = molecules;
-        this.molecules = data;
-        this.statistics = stats;
-        this.currentIndex = this.data.length;
-    }
+function MolCollection(options) {
     options = extend({}, defaultCollectionOptions, options);
+    this.data = new Array(options.length);
+    this.molecules = new Array(options.length);
+    this.statistics = null;
+    this.length = 0;
     this.computeProperties = !!options.computeProperties;
 }
 
@@ -35,9 +27,9 @@ MolCollection.parseSDF = function (sdf, options) {
     }
     var parsed = parseSDF(sdf);
     var molecules = parsed.molecules;
-    var collection = new MolCollection(molecules.length, options);
+    var collection = new MolCollection(options);
     for (var i = 0; i < molecules.length; i++) {
-        collection.add(Molecule.fromMolfile(molecules[i].molfile.value), molecules[i]);
+        collection.push(Molecule.fromMolfile(molecules[i].molfile.value), molecules[i]);
     }
     collection.statistics = parsed.statistics;
     return collection;
@@ -73,14 +65,18 @@ MolCollection.parseCSV = function (csv, options) {
     if (!datatype) {
         throw new Error('this document does not contain any molecule field');
     }
-    var molecules = datatype(datafield, parsed.data, new Array(parsed.data.length));
-    return new MolCollection(molecules, parsed.data, stats);
+    var collection = new MolCollection(options);
+    for (var i = 0; i < parsed.data.length; i++) {
+        collection.push(datatype(parsed.data[i][datafield]), parsed.data[i])
+    }
+    collection.statistics = stats;
+    return collection;
 };
 
-MolCollection.prototype.add = function (molecule, data) {
+MolCollection.prototype.push = function (molecule, data) {
     if (data === undefined) data = {};
-    this.molecules[this.currentIndex] = molecule;
-    this.data[this.currentIndex++] = data;
+    this.molecules[this.length] = molecule;
+    this.data[this.length++] = data;
     if (this.computeProperties) {
         var molecularFormula = molecule.getMolecularFormula();
         data.molecularFormula = {

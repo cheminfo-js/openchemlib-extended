@@ -1,3 +1,3 @@
 'use strict';
 
-exports.MolCollection = require('./MolCollection');
+exports.MolCollection = require('./collection/MolCollection');

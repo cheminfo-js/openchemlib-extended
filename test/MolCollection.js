@@ -11,6 +11,7 @@ describe('MolCollection', function () {
     describe('parseSDF', function () {
         var collection = MolCollection.parseSDF(sdf);
         it('should parse all molecules', function () {
+            collection.length.should.equal(20);
             collection.data.length.should.equal(20);
             collection.molecules.length.should.equal(20);
         });
@@ -27,5 +28,6 @@ describe('MolCollection', function () {
 
     describe('parseCSV', function () {
         var collection = MolCollection.parseCSV(csv);
+        collection.length.should.equal(4);
     });
 });
