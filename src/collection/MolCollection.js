@@ -6,6 +6,7 @@ var Papa = require('papaparse');
 var extend = require('extend');
 
 var moleculeCreator = require('./moleculeCreator');
+var setImmediate = typeof setImmediate === 'undefined' ? setTimeout : setImmediate;
 
 var defaultCollectionOptions = {
     length: 0,
@@ -21,18 +22,31 @@ function MolCollection(options) {
     this.computeProperties = !!options.computeProperties;
 }
 
+var defaultSDFOptions = {
+    step: function (current, total) {}
+};
+
 MolCollection.parseSDF = function (sdf, options) {
     if (typeof sdf !== 'string') {
         throw new TypeError('sdf must be a string');
     }
-    var parsed = parseSDF(sdf);
-    var molecules = parsed.molecules;
-    var collection = new MolCollection(options);
-    for (var i = 0; i < molecules.length; i++) {
-        collection.push(Molecule.fromMolfile(molecules[i].molfile.value), molecules[i]);
-    }
-    collection.statistics = parsed.statistics;
-    return collection;
+    options = extend({}, defaultSDFOptions, options);
+    return new Promise(function (resolve, reject) {
+        var parsed = parseSDF(sdf);
+        var molecules = parsed.molecules;
+        var collection = new MolCollection(options);
+        collection.statistics = parsed.statistics;
+        var i = 0, l = molecules.length;
+        parseNext();
+        function parseNext() {
+            if (i === l) {
+                return resolve(collection);
+            }
+            collection.push(Molecule.fromMolfile(molecules[i].molfile.value), molecules[i]);
+            options.step(++i, l);
+            setTimeout(parseNext, 0);
+        }
+    });
 };
 
 var defaultCSVOptions = {
@@ -79,13 +93,11 @@ MolCollection.prototype.push = function (molecule, data) {
     this.data[this.length++] = data;
     if (this.computeProperties) {
         var molecularFormula = molecule.getMolecularFormula();
-        data.molecularFormula = {
-            absoluteWeight: molecularFormula.getAbsoluteWeight(),
-            relativeWeight: molecularFormula.getRelativeWeight(),
-            formula: molecularFormula.getFormula()
-        };
         var properties = molecule.getProperties();
         data.properties = {
+            absoluteWeight: molecularFormula.getAbsoluteWeight(),
+            relativeWeight: molecularFormula.getRelativeWeight(),
+            formula: molecularFormula.getFormula(),
             acceptorCount: properties.getAcceptorCount(),
             donorCount: properties.getDonorCount(),
             logP: properties.getLogP(),
@@ -95,6 +107,16 @@ MolCollection.prototype.push = function (molecule, data) {
             stereoCenterCount: properties.getStereoCenterCount()
         };
     }
+};
+
+var defaultSearch = {
+    format: 'oclid',
+    mode: 'substructure',
+    limit: 0
+};
+
+MolCollection.prototype.search = function (toSearch, options) {
+
 };
 
 module.exports = MolCollection;
