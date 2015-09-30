@@ -151,13 +151,13 @@ MolCollection.prototype.search = function (query, options) {
     var result;
     switch (options.mode.toLowerCase()) {
         case 'exact':
-            result = this.exactSearch(query);
+            result = this.exactSearch(query, options.limit);
             break;
         case 'substructure':
-            result = this.subStructureSearch(query);
+            result = this.subStructureSearch(query, options.limit);
             break;
         case 'similarity':
-            result = this.similaritySearch(query);
+            result = this.similaritySearch(query, options.limit);
             break;
         default:
             throw new Error('unknown search mode: ' + options.mode);
@@ -165,18 +165,20 @@ MolCollection.prototype.search = function (query, options) {
     return result;
 };
 
-MolCollection.prototype.exactSearch = function (query) {
+MolCollection.prototype.exactSearch = function (query, limit) {
     var queryIdcode = query.getIDCode();
     var result = new MolCollection();
+    limit = limit || Number.MAX_SAFE_INTEGER;
     for (var i = 0; i < this.length; i++) {
         if (this.molecules[i].idcode === queryIdcode) {
             result.push(this.molecules[i], this.data[i]);
+            if (result.length >= limit) break;
         }
     }
     return result;
 };
 
-MolCollection.prototype.subStructureSearch = function (query) {
+MolCollection.prototype.subStructureSearch = function (query, limit) {
     var needReset = false;
     if (!query.isFragment()) {
         needReset = true;
@@ -199,8 +201,9 @@ MolCollection.prototype.subStructureSearch = function (query) {
         return Math.abs(queryMW - a[0].mw) - Math.abs(queryMW - b[0].mw);
     });
 
-    var result = new MolCollection({length: searchResult.length});
-    for (var i = 0; i < searchResult.length; i++) {
+    var length = limit || searchResult.length;
+    var result = new MolCollection({length: length});
+    for (var i = 0; i < length; i++) {
         result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
     }
 
@@ -210,8 +213,32 @@ MolCollection.prototype.subStructureSearch = function (query) {
     return result;
 };
 
-MolCollection.prototype.similaritySearch = function (query) {
-    throw new Error('similarity search is not implemented yet');
+MolCollection.prototype.similaritySearch = function (query, limit) {
+    var queryIndex = query.getIndex();
+    var queryMW = query.getMolecularFormula().getRelativeWeight();
+    var queryIDCode = query.getIDCode();
+
+    var searchResult = new Array(this.length);
+    var similarity;
+    for (var i = 0; i < this.length; i++) {
+        if (this.molecules[i].idcode === queryIDCode) {
+            similarity = 1e10;
+        } else {
+            similarity = OCL.SSSearcherWithIndex.getSimilarityTanimoto(queryIndex, this.molecules[i].index)
+                * 100000 - Math.abs(queryMW - this.molecules[i].mw) / 1000;
+        }
+        searchResult[i] = [similarity, i];
+    }
+    searchResult.sort(function (a, b) {
+        return b[0] - a[0];
+    });
+
+    var length = limit || searchResult.length;
+    var result = new MolCollection({length: length});
+    for (var i = 0; i < length; i++) {
+        result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
+    }
+    return result;
 };
 
 MolCollection.prototype.getSearcher = function () {

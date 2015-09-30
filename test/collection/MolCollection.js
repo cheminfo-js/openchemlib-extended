@@ -77,18 +77,30 @@ describe('MolCollection', function () {
             result.length.should.equal(1);
             result = collection.search('CCC', {format: 'smiles', mode: 'exact'});
             result.length.should.equal(2);
+            result = collection.search('CCC', {format: 'smiles', mode: 'exact', limit: 1});
+            result.length.should.equal(1);
             result = collection.search('CCCO', {format: 'smiles', mode: 'exact'});
             result.length.should.equal(0);
         });
 
         it('subStructure with SMILES', function () {
-            var result = collection.search('CC', {format: 'smiles'});
+            var result = collection.search('CC', {format: 'smiles', mode: 'substructure'});
             result.length.should.equal(4);
             result.data[0].name.should.equal('Ethane');
             result = collection.search('CCC', {format: 'smiles'});
             result.length.should.equal(3);
+            result = collection.search('CCC', {format: 'smiles', limit: 1});
+            result.length.should.equal(1);
             result = collection.search('CCCO', {format: 'smiles'});
             result.length.should.equal(0);
+        });
+
+        it('similarity with SMILES', function () {
+            var result = collection.search('CC', {format: 'smiles', mode: 'similarity'});
+            result.length.should.equal(5);
+            result.data[0].name.should.equal('Ethane');
+            result = collection.search('CC', {format: 'smiles', mode: 'similarity', limit: 2});
+            result.length.should.equal(2);
         });
     });
 });
