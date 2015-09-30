@@ -23,7 +23,7 @@ describe('MolCollection', function () {
                 current.should.equal(++called);
                 total.should.equal(20);
             }
-            return MolCollection.parseSDF(sdf, {onStep}).then(function () {
+            return MolCollection.parseSDF(sdf, {onStep: onStep}).then(function () {
                 called.should.equal(20);
             });
         });
@@ -49,7 +49,7 @@ describe('MolCollection', function () {
                 current.should.equal(++called);
                 total.should.equal(5);
             }
-            return MolCollection.parseCSV(csv, {onStep}).then(function () {
+            return MolCollection.parseCSV(csv, {onStep: onStep}).then(function () {
                 called.should.equal(5);
             });
         });
