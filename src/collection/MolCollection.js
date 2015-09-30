@@ -1,12 +1,12 @@
 'use strict';
 
-var Molecule = require('openchemlib').Molecule;
+var OCL = require('openchemlib');
+var Molecule = OCL.Molecule;
 var parseSDF = require('sdf-parser');
 var Papa = require('papaparse');
 var extend = require('extend');
 
 var moleculeCreator = require('./moleculeCreator');
-var setImmediate = typeof setImmediate === 'undefined' ? setTimeout : setImmediate;
 
 var defaultCollectionOptions = {
     length: 0,
@@ -20,10 +20,11 @@ function MolCollection(options) {
     this.statistics = null;
     this.length = 0;
     this.computeProperties = !!options.computeProperties;
+    this.searcher = null;
 }
 
 var defaultSDFOptions = {
-    step: function (current, total) {}
+    onStep: function (current, total) {}
 };
 
 MolCollection.parseSDF = function (sdf, options) {
@@ -42,9 +43,13 @@ MolCollection.parseSDF = function (sdf, options) {
             if (i === l) {
                 return resolve(collection);
             }
-            collection.push(Molecule.fromMolfile(molecules[i].molfile.value), molecules[i]);
-            options.step(++i, l);
-            setTimeout(parseNext, 0);
+            try {
+                collection.push(Molecule.fromMolfile(molecules[i].molfile.value), molecules[i]);
+            } catch (e) {
+                return reject(e);
+            }
+            options.onStep(++i, l);
+            setImmediate(parseNext);
         }
     });
 };
@@ -52,7 +57,8 @@ MolCollection.parseSDF = function (sdf, options) {
 var defaultCSVOptions = {
     header: true,
     dynamicTyping: true,
-    skipEmptyLines: true
+    skipEmptyLines: true,
+    onStep: function (current, total) {}
 };
 
 MolCollection.parseCSV = function (csv, options) {
@@ -60,36 +66,53 @@ MolCollection.parseCSV = function (csv, options) {
         throw new TypeError('csv must be a string');
     }
     options = extend({}, defaultCSVOptions, options);
-    var parsed = Papa.parse(csv, options);
-    var fields = parsed.meta.fields;
-    var stats = new Array(fields.length);
-    var firstElement = parsed.data[0];
-    var datatype, datafield;
-    for (var i = 0; i < fields.length; i++) {
-        stats[i] = {
-            label: fields[i],
-            isNumeric: typeof firstElement[fields[i]] === 'number'
-        };
-        var lowerField = fields[i].toLowerCase();
-        if (moleculeCreator.fields.has(lowerField)) {
-            datatype = moleculeCreator.fields.get(lowerField);
-            datafield = fields[i];
+    return new Promise(function (resolve, reject) {
+        var parsed = Papa.parse(csv, options);
+        var fields = parsed.meta.fields;
+        var stats = new Array(fields.length);
+        var firstElement = parsed.data[0];
+        var datatype, datafield;
+        for (var i = 0; i < fields.length; i++) {
+            stats[i] = {
+                label: fields[i],
+                isNumeric: typeof firstElement[fields[i]] === 'number'
+            };
+            var lowerField = fields[i].toLowerCase();
+            if (moleculeCreator.has(lowerField)) {
+                datatype = moleculeCreator.get(lowerField);
+                datafield = fields[i];
+            }
         }
-    }
-    if (!datatype) {
-        throw new Error('this document does not contain any molecule field');
-    }
-    var collection = new MolCollection(options);
-    for (var i = 0; i < parsed.data.length; i++) {
-        collection.push(datatype(parsed.data[i][datafield]), parsed.data[i])
-    }
-    collection.statistics = stats;
-    return collection;
+        if (!datatype) {
+            throw new Error('this document does not contain any molecule field');
+        }
+        var collection = new MolCollection(options);
+        collection.statistics = stats;
+
+        var i = 0, l = parsed.data.length;
+        parseNext();
+        function parseNext() {
+            if (i === l) {
+                return resolve(collection);
+            }
+            try {
+                collection.push(datatype(parsed.data[i][datafield]), parsed.data[i]);
+            } catch (e) {
+                return reject(e);
+            }
+            options.onStep(++i, l);
+            setImmediate(parseNext);
+        }
+    });
 };
 
 MolCollection.prototype.push = function (molecule, data) {
     if (data === undefined) data = {};
     this.molecules[this.length] = molecule;
+    if (!molecule.index) {
+        molecule.index = molecule.getIndex();
+        molecule.idcode = molecule.getIDCode();
+    }
     this.data[this.length++] = data;
     if (this.computeProperties) {
         var molecularFormula = molecule.getMolecularFormula();
@@ -109,14 +132,65 @@ MolCollection.prototype.push = function (molecule, data) {
     }
 };
 
-var defaultSearch = {
+var defaultSearchOptions = {
     format: 'oclid',
     mode: 'substructure',
     limit: 0
 };
 
-MolCollection.prototype.search = function (toSearch, options) {
+MolCollection.prototype.search = function (query, options) {
+    options = extend({}, defaultSearchOptions, options);
 
+    if (typeof query === 'string') {
+        query = moleculeCreator.get(options.format.toLowerCase())(query);
+    } else if (!(query instanceof Molecule)) {
+        throw new TypeError('toSearch must be a Molecule or string');
+    }
+
+    var result;
+    switch (options.mode.toLowerCase()) {
+        case 'substructure':
+            result = this.subStructureSearch(query);
+            break;
+        case 'similarity':
+            result = this.similaritySearch(query);
+        default:
+            throw new Error('unknown search mode: ' + options.mode);
+    }
+    return result;
+};
+
+MolCollection.prototype.subStructureSearch = function (query) {
+    var needReset = false;
+    if (!query.isFragment()) {
+        needReset = true;
+        query.setFragment(true);
+    }
+
+    var queryIndex = query.getIndex();
+    var searcher = this.getSearcher();
+
+    searcher.setFragment(query, queryIndex);
+    var result = new MolCollection();
+    for (var i = 0; i < this.length; i++) {
+        searcher.setMolecule(this.molecules[i], this.molecules[i].index);
+        if (searcher.isFragmentInMolecule()) {
+            result.push(this.molecules[i], this.data[i]);
+        }
+    }
+
+    if (needReset) {
+        query.setFragment(false);
+    }
+    return result;
+};
+
+MolCollection.prototype.similaritySearch = function (query) {
+    throw new Error('similarity search is not implemented yet');
+};
+
+MolCollection.prototype.getSearcher = function () {
+    return this.searcher || (this.searcher = new OCL.SSSearcherWithIndex());
 };
 
 module.exports = MolCollection;
