@@ -39,7 +39,7 @@ describe('MolCollection', function () {
     describe('parseCSV', function () {
         it('should parse all molecules', function () {
             return MolCollection.parseCSV(csv).then(function (collection) {
-                collection.length.should.equal(4);
+                collection.length.should.equal(5);
             });
         });
 
@@ -47,10 +47,10 @@ describe('MolCollection', function () {
             var called = 0;
             function onStep(current, total) {
                 current.should.equal(++called);
-                total.should.equal(4);
+                total.should.equal(5);
             }
             return MolCollection.parseCSV(csv, {onStep}).then(function () {
-                called.should.equal(4);
+                called.should.equal(5);
             });
         });
     });
@@ -63,11 +63,29 @@ describe('MolCollection', function () {
             });
         });
 
+        it('invalid arguments', function () {
+            (function () {
+                collection.search(null);
+            }).should.throw(/toSearch must be a Molecule or string/);
+            (function () {
+                collection.search('CCC', {mode: 'abc'});
+            }).should.throw(/unknown search mode: abc/);
+        });
+
+        it('exact with SMILES', function () {
+            var result = collection.search('CC', {format: 'smiles', mode: 'exact'});
+            result.length.should.equal(1);
+            result = collection.search('CCC', {format: 'smiles', mode: 'exact'});
+            result.length.should.equal(2);
+            result = collection.search('CCCO', {format: 'smiles', mode: 'exact'});
+            result.length.should.equal(0);
+        });
+
         it('subStructure with SMILES', function () {
             var result = collection.search('CC', {format: 'smiles'});
-            result.length.should.equal(3);
+            result.length.should.equal(4);
             result = collection.search('CCC', {format: 'smiles'});
-            result.length.should.equal(2);
+            result.length.should.equal(3);
             result = collection.search('CCCO', {format: 'smiles'});
             result.length.should.equal(0);
         });

@@ -109,17 +109,18 @@ MolCollection.parseCSV = function (csv, options) {
 MolCollection.prototype.push = function (molecule, data) {
     if (data === undefined) data = {};
     this.molecules[this.length] = molecule;
+    var molecularFormula = molecule.getMolecularFormula();
     if (!molecule.index) {
         molecule.index = molecule.getIndex();
         molecule.idcode = molecule.getIDCode();
+        molecule.mw = molecularFormula.getRelativeWeight();
     }
     this.data[this.length++] = data;
     if (this.computeProperties) {
-        var molecularFormula = molecule.getMolecularFormula();
         var properties = molecule.getProperties();
         data.properties = {
             absoluteWeight: molecularFormula.getAbsoluteWeight(),
-            relativeWeight: molecularFormula.getRelativeWeight(),
+            relativeWeight: molecule.mw,
             formula: molecularFormula.getFormula(),
             acceptorCount: properties.getAcceptorCount(),
             donorCount: properties.getDonorCount(),
@@ -149,13 +150,28 @@ MolCollection.prototype.search = function (query, options) {
 
     var result;
     switch (options.mode.toLowerCase()) {
+        case 'exact':
+            result = this.exactSearch(query);
+            break;
         case 'substructure':
             result = this.subStructureSearch(query);
             break;
         case 'similarity':
             result = this.similaritySearch(query);
+            break;
         default:
             throw new Error('unknown search mode: ' + options.mode);
+    }
+    return result;
+};
+
+MolCollection.prototype.exactSearch = function (query) {
+    var queryIdcode = query.getIDCode();
+    var result = new MolCollection();
+    for (var i = 0; i < this.length; i++) {
+        if (this.molecules[i].idcode === queryIdcode) {
+            result.push(this.molecules[i], this.data[i]);
+        }
     }
     return result;
 };
