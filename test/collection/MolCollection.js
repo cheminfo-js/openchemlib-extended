@@ -84,6 +84,7 @@ describe('MolCollection', function () {
         it('subStructure with SMILES', function () {
             var result = collection.search('CC', {format: 'smiles'});
             result.length.should.equal(4);
+            result.data[0].name.should.equal('Ethane');
             result = collection.search('CCC', {format: 'smiles'});
             result.length.should.equal(3);
             result = collection.search('CCCO', {format: 'smiles'});

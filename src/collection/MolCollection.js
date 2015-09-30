@@ -184,15 +184,24 @@ MolCollection.prototype.subStructureSearch = function (query) {
     }
 
     var queryIndex = query.getIndex();
+    var queryMW = query.getMolecularFormula().getRelativeWeight();
     var searcher = this.getSearcher();
 
     searcher.setFragment(query, queryIndex);
-    var result = new MolCollection();
+    var searchResult = [];
     for (var i = 0; i < this.length; i++) {
         searcher.setMolecule(this.molecules[i], this.molecules[i].index);
         if (searcher.isFragmentInMolecule()) {
-            result.push(this.molecules[i], this.data[i]);
+            searchResult.push([this.molecules[i], i]);
         }
+    }
+    searchResult.sort(function (a, b) {
+        return Math.abs(queryMW - a[0].mw) - Math.abs(queryMW - b[0].mw);
+    });
+
+    var result = new MolCollection({length: searchResult.length});
+    for (var i = 0; i < searchResult.length; i++) {
+        result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
     }
 
     if (needReset) {
