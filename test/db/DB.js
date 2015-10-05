@@ -1,19 +1,19 @@
 'use strict';
 
-var MolCollection = require('../..').MolCollection;
+var DB = require('../..').DB;
 var fs = require('fs');
 var Molecule = require('openchemlib').Molecule;
 
 var sdf = fs.readFileSync(__dirname + '/../data/data.sdf', 'ascii');
 var csv = fs.readFileSync(__dirname + '/../data/data.csv', 'ascii');
 
-describe('MolCollection', function () {
+describe('DB', function () {
     describe('parseSDF', function () {
         it('should parse all molecules', function () {
-            return MolCollection.parseSDF(sdf).then(function (collection) {
-                collection.length.should.equal(20);
-                collection.data.length.should.equal(20);
-                collection.molecules.length.should.equal(20);
+            return DB.parseSDF(sdf).then(function (db) {
+                db.length.should.equal(20);
+                db.data.length.should.equal(20);
+                db.molecules.length.should.equal(20);
             });
         });
 
@@ -23,23 +23,23 @@ describe('MolCollection', function () {
                 current.should.equal(++called);
                 total.should.equal(20);
             }
-            return MolCollection.parseSDF(sdf, {onStep: onStep}).then(function () {
+            return DB.parseSDF(sdf, {onStep: onStep}).then(function () {
                 called.should.equal(20);
             });
         });
 
         it('should compute properties', function () {
-            return MolCollection.parseSDF(sdf, {computeProperties: true}).then(function (collection) {
-                collection.data[0].should.have.property('properties');
-                collection.data[0].properties.should.have.properties(['formula', 'logP', 'polarSurfaceArea']);
+            return DB.parseSDF(sdf, {computeProperties: true}).then(function (db) {
+                db.data[0].should.have.property('properties');
+                db.data[0].properties.should.have.properties(['formula', 'logP', 'polarSurfaceArea']);
             });
         });
     });
 
     describe('parseCSV', function () {
         it('should parse all molecules', function () {
-            return MolCollection.parseCSV(csv).then(function (collection) {
-                collection.length.should.equal(5);
+            return DB.parseCSV(csv).then(function (db) {
+                db.length.should.equal(5);
             });
         });
 
@@ -49,57 +49,57 @@ describe('MolCollection', function () {
                 current.should.equal(++called);
                 total.should.equal(5);
             }
-            return MolCollection.parseCSV(csv, {onStep: onStep}).then(function () {
+            return DB.parseCSV(csv, {onStep: onStep}).then(function () {
                 called.should.equal(5);
             });
         });
     });
 
     describe('search', function () {
-        var collection;
+        var db;
         before(function () {
-            return MolCollection.parseCSV(csv).then(function (col) {
-                collection = col;
+            return DB.parseCSV(csv).then(function (database) {
+                db = database;
             });
         });
 
         it('invalid arguments', function () {
             (function () {
-                collection.search(null);
+                db.search(null);
             }).should.throw(/toSearch must be a Molecule or string/);
             (function () {
-                collection.search('CCC', {mode: 'abc'});
+                db.search('CCC', {mode: 'abc'});
             }).should.throw(/unknown search mode: abc/);
         });
 
         it('exact with SMILES', function () {
-            var result = collection.search('CC', {format: 'smiles', mode: 'exact'});
+            var result = db.search('CC', {format: 'smiles', mode: 'exact'});
             result.length.should.equal(1);
-            result = collection.search('CCC', {format: 'smiles', mode: 'exact'});
+            result = db.search('CCC', {format: 'smiles', mode: 'exact'});
             result.length.should.equal(2);
-            result = collection.search('CCC', {format: 'smiles', mode: 'exact', limit: 1});
+            result = db.search('CCC', {format: 'smiles', mode: 'exact', limit: 1});
             result.length.should.equal(1);
-            result = collection.search('CCCO', {format: 'smiles', mode: 'exact'});
+            result = db.search('CCCO', {format: 'smiles', mode: 'exact'});
             result.length.should.equal(0);
         });
 
         it('subStructure with SMILES', function () {
-            var result = collection.search('CC', {format: 'smiles', mode: 'substructure'});
+            var result = db.search('CC', {format: 'smiles', mode: 'substructure'});
             result.length.should.equal(4);
             result.data[0].name.should.equal('Ethane');
-            result = collection.search('CCC', {format: 'smiles'});
+            result = db.search('CCC', {format: 'smiles'});
             result.length.should.equal(3);
-            result = collection.search('CCC', {format: 'smiles', limit: 1});
+            result = db.search('CCC', {format: 'smiles', limit: 1});
             result.length.should.equal(1);
-            result = collection.search('CCCO', {format: 'smiles'});
+            result = db.search('CCCO', {format: 'smiles'});
             result.length.should.equal(0);
         });
 
         it('similarity with SMILES', function () {
-            var result = collection.search('CC', {format: 'smiles', mode: 'similarity'});
+            var result = db.search('CC', {format: 'smiles', mode: 'similarity'});
             result.length.should.equal(5);
             result.data[0].name.should.equal('Ethane');
-            result = collection.search('CC', {format: 'smiles', mode: 'similarity', limit: 2});
+            result = db.search('CC', {format: 'smiles', mode: 'similarity', limit: 2});
             result.length.should.equal(2);
         });
     });

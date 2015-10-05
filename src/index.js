@@ -2,4 +2,5 @@
 
 require('setimmediate');
 
-exports.MolCollection = require('./collection/MolCollection');
+module.exports = exports = require('openchemlib');
+exports.DB = require('./db/DB');

@@ -8,13 +8,13 @@ var extend = require('extend');
 
 var moleculeCreator = require('./moleculeCreator');
 
-var defaultCollectionOptions = {
+var defaultDBOptions = {
     length: 0,
     computeProperties: false
 };
 
-function MolCollection(options) {
-    options = extend({}, defaultCollectionOptions, options);
+function DB(options) {
+    options = extend({}, defaultDBOptions, options);
     this.data = new Array(options.length);
     this.molecules = new Array(options.length);
     this.statistics = null;
@@ -27,7 +27,7 @@ var defaultSDFOptions = {
     onStep: function (current, total) {}
 };
 
-MolCollection.parseSDF = function (sdf, options) {
+DB.parseSDF = function (sdf, options) {
     if (typeof sdf !== 'string') {
         throw new TypeError('sdf must be a string');
     }
@@ -35,16 +35,16 @@ MolCollection.parseSDF = function (sdf, options) {
     return new Promise(function (resolve, reject) {
         var parsed = parseSDF(sdf);
         var molecules = parsed.molecules;
-        var collection = new MolCollection(options);
-        collection.statistics = parsed.statistics;
+        var db = new DB(options);
+        db.statistics = parsed.statistics;
         var i = 0, l = molecules.length;
         parseNext();
         function parseNext() {
             if (i === l) {
-                return resolve(collection);
+                return resolve(db);
             }
             try {
-                collection.push(Molecule.fromMolfile(molecules[i].molfile.value), molecules[i]);
+                db.push(Molecule.fromMolfile(molecules[i].molfile.value), molecules[i]);
             } catch (e) {
                 return reject(e);
             }
@@ -61,7 +61,7 @@ var defaultCSVOptions = {
     onStep: function (current, total) {}
 };
 
-MolCollection.parseCSV = function (csv, options) {
+DB.parseCSV = function (csv, options) {
     if (typeof csv !== 'string') {
         throw new TypeError('csv must be a string');
     }
@@ -86,17 +86,17 @@ MolCollection.parseCSV = function (csv, options) {
         if (!datatype) {
             throw new Error('this document does not contain any molecule field');
         }
-        var collection = new MolCollection(options);
-        collection.statistics = stats;
+        var db = new DB(options);
+        db.statistics = stats;
 
         var i = 0, l = parsed.data.length;
         parseNext();
         function parseNext() {
             if (i === l) {
-                return resolve(collection);
+                return resolve(db);
             }
             try {
-                collection.push(datatype(parsed.data[i][datafield]), parsed.data[i]);
+                db.push(datatype(parsed.data[i][datafield]), parsed.data[i]);
             } catch (e) {
                 return reject(e);
             }
@@ -106,7 +106,7 @@ MolCollection.parseCSV = function (csv, options) {
     });
 };
 
-MolCollection.prototype.push = function (molecule, data) {
+DB.prototype.push = function (molecule, data) {
     if (data === undefined) data = {};
     this.molecules[this.length] = molecule;
     var molecularFormula = molecule.getMolecularFormula();
@@ -139,7 +139,7 @@ var defaultSearchOptions = {
     limit: 0
 };
 
-MolCollection.prototype.search = function (query, options) {
+DB.prototype.search = function (query, options) {
     options = extend({}, defaultSearchOptions, options);
 
     if (typeof query === 'string') {
@@ -165,9 +165,9 @@ MolCollection.prototype.search = function (query, options) {
     return result;
 };
 
-MolCollection.prototype.exactSearch = function (query, limit) {
+DB.prototype.exactSearch = function (query, limit) {
     var queryIdcode = query.getIDCode();
-    var result = new MolCollection();
+    var result = new DB();
     limit = limit || Number.MAX_SAFE_INTEGER;
     for (var i = 0; i < this.length; i++) {
         if (this.molecules[i].idcode === queryIdcode) {
@@ -178,7 +178,7 @@ MolCollection.prototype.exactSearch = function (query, limit) {
     return result;
 };
 
-MolCollection.prototype.subStructureSearch = function (query, limit) {
+DB.prototype.subStructureSearch = function (query, limit) {
     var needReset = false;
     if (!query.isFragment()) {
         needReset = true;
@@ -202,7 +202,7 @@ MolCollection.prototype.subStructureSearch = function (query, limit) {
     });
 
     var length = limit || searchResult.length;
-    var result = new MolCollection({length: length});
+    var result = new DB({length: length});
     for (var i = 0; i < length; i++) {
         result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
     }
@@ -213,7 +213,7 @@ MolCollection.prototype.subStructureSearch = function (query, limit) {
     return result;
 };
 
-MolCollection.prototype.similaritySearch = function (query, limit) {
+DB.prototype.similaritySearch = function (query, limit) {
     var queryIndex = query.getIndex();
     var queryMW = query.getMolecularFormula().getRelativeWeight();
     var queryIDCode = query.getIDCode();
@@ -234,15 +234,15 @@ MolCollection.prototype.similaritySearch = function (query, limit) {
     });
 
     var length = limit || searchResult.length;
-    var result = new MolCollection({length: length});
+    var result = new DB({length: length});
     for (var i = 0; i < length; i++) {
         result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
     }
     return result;
 };
 
-MolCollection.prototype.getSearcher = function () {
+DB.prototype.getSearcher = function () {
     return this.searcher || (this.searcher = new OCL.SSSearcherWithIndex());
 };
 
-module.exports = MolCollection;
+module.exports = DB;
