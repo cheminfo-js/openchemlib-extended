@@ -12,7 +12,7 @@
     "url": "https://github.com/cheminfo-js/openchemlib-extended/issues"
   },
   "homepage": "https://github.com/cheminfo-js/openchemlib-extended",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "main": "./src/index.js",
   "directories": {
     "lib": "src",
