@@ -2,7 +2,6 @@
 
 var OCL = require('openchemlib');
 var parseRXN = require('rxn-parser');
-var sprintf = require('sprintf-js');
 
 function RXN(rxn, options) {
     var parsed=parseRXN(rxn);

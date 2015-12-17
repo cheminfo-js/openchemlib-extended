@@ -63,7 +63,7 @@ describe('DB', function () {
             });
         });
 
-        it('invalid arguments', function () {
+        it.only('invalid arguments', function () {
             (function () {
                 db.search(null);
             }).should.throw(/toSearch must be a Molecule or string/);
