@@ -7,6 +7,30 @@
 
 Openchemlib extended
 
+## DB
+
+
+
+## RXN
+
+Create an instance of the RXN object based on a text file in RXN format. This will also calculate for each reagent and product:
+* SMILES
+* Molecular formula
+* Molecular weight
+* idCode
+
+``
+var rxn = new RXN(rxnFile)`
+```
+
+methods on rxn:
+* addReagent(molfile)
+* addProduct(molfile)
+* toRXN() : create a new RXN file
+
+
+
+
 ## License
 
   [BSD-3-Clause](./LICENSE)
