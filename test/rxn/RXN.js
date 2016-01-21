@@ -18,4 +18,10 @@ describe('RXN', function () {
         rxn.addProduct("C1CCC1\nJME 2015-05-03 Thu Dec 17 14:46:42 GMT+100 2015\n \n  4  4  0  0  0  0  0  0  0  0999 V2000\n    1.4000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.4000    1.4000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0000    1.4000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  1  0  0  0  0\n  2  3  1  0  0  0  0\n  3  4  1  0  0  0  0\n  4  1  1  0  0  0  0\nM  END\n");
         rxn.products.length.should.equal(4);
     });
+
+    it('should deal with empty reaction', function() {
+        var rxn=new RXN('');
+        rxn.products.length.should.equal(0);
+        rxn.reagents.length.should.equal(0);
+    })
 });
