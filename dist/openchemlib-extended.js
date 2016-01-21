@@ -3524,9 +3524,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var parseRXN = __webpack_require__(11);
 
 	function RXN(rxn, options) {
-	    var parsed=parseRXN(rxn);
-	    this.reagents=generateInfo(parsed.reagents);
-	    this.products=generateInfo(parsed.products);
+	    if (! rxn) {
+	        this.reagents=[];
+	        this.products=[];
+	    } else {
+	        var parsed=parseRXN(rxn);
+	        this.reagents=generateInfo(parsed.reagents);
+	        this.products=generateInfo(parsed.products);
+	    }
 	}
 
 	RXN.prototype.addReagent=function (molfile) {
