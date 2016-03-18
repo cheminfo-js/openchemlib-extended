@@ -2,7 +2,7 @@
 
 var DB = require('../..').DB;
 var fs = require('fs');
-var Molecule = require('openchemlib').Molecule;
+var Molecule = require('../..').Molecule;
 
 var sdf = fs.readFileSync(__dirname + '/../data/data.sdf', 'ascii');
 var csv = fs.readFileSync(__dirname + '/../data/data.csv', 'ascii');
