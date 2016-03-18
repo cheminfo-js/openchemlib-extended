@@ -1,4 +1,6 @@
-exports.getGroupedDiastereotopicIDs=function(options) {
+'use strict';
+
+module.exports = function getGroupedDiastereotopicIDs(options) {
     var diaIDs=molecule.getDiastereotopicAtomIDs(options);
     var diaIDsObject={};
 
