@@ -113,22 +113,22 @@ DB.prototype.push = function (molecule, data) {
     if (!molecule.index) {
         molecule.index = molecule.getIndex();
         molecule.idcode = molecule.getIDCode();
-        molecule.mw = molecularFormula.getRelativeWeight();
+        molecule.mw = molecularFormula.relativeWeight;
     }
     this.data[this.length++] = data;
     if (this.computeProperties) {
         var properties = molecule.getProperties();
         data.properties = {
-            absoluteWeight: molecularFormula.getAbsoluteWeight(),
+            absoluteWeight: molecularFormula.absoluteWeight,
             relativeWeight: molecule.mw,
-            formula: molecularFormula.getFormula(),
-            acceptorCount: properties.getAcceptorCount(),
-            donorCount: properties.getDonorCount(),
-            logP: properties.getLogP(),
-            logS: properties.getLogS(),
-            polarSurfaceArea: properties.getPolarSurfaceArea(),
-            rotatableBondCount: properties.getRotatableBondCount(),
-            stereoCenterCount: properties.getStereoCenterCount()
+            formula: molecularFormula.formula,
+            acceptorCount: properties.acceptorCount,
+            donorCount: properties.donorCount,
+            logP: properties.logP,
+            logS: properties.logS,
+            polarSurfaceArea: properties.polarSurfaceArea,
+            rotatableBondCount: properties.rotatableBondCount,
+            stereoCenterCount: properties.stereoCenterCount
         };
     }
 };
@@ -186,7 +186,7 @@ DB.prototype.subStructureSearch = function (query, limit) {
     }
 
     var queryIndex = query.getIndex();
-    var queryMW = query.getMolecularFormula().getRelativeWeight();
+    var queryMW = query.getMolecularFormula().relativeWeight;
     var searcher = this.getSearcher();
 
     searcher.setFragment(query, queryIndex);
@@ -215,7 +215,7 @@ DB.prototype.subStructureSearch = function (query, limit) {
 
 DB.prototype.similaritySearch = function (query, limit) {
     var queryIndex = query.getIndex();
-    var queryMW = query.getMolecularFormula().getRelativeWeight();
+    var queryMW = query.getMolecularFormula().relativeWeight;
     var queryIDCode = query.getIDCode();
 
     var searchResult = new Array(this.length);

@@ -60,11 +60,16 @@ function generateInfo(molecules) {
 
 function getMolfileInfo(molfile) {
     var ocl=OCL.Molecule.fromMolfile(molfile);
+
+    console.log(ocl.getMolecularFormula())
+    console.log(ocl.getMolecularFormula().formula)
+
+
     return {
         molfile: molfile,
         smiles: ocl.toSmiles(),
-        mf: ocl.getMolecularFormula().getFormula(),
-        mw: ocl.getMolecularFormula().getRelativeWeight(),
+        mf: ocl.getMolecularFormula().formula,
+        mw: ocl.getMolecularFormula().relativeWeight,
         idCode: ocl.getIDCode
     }
 }
