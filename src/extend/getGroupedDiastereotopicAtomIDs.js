@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = function getGroupedDiastereotopicIDs(options) {
-    var diaIDs=molecule.getDiastereotopicAtomIDs(options);
+module.exports = function getGroupedDiastereotopicAtomIDs() {
+    var diaIDs=this.getDiastereotopicAtomIDs();
     var diaIDsObject={};
 
     for (var i=0; i<diaIDs.length; i++) {
@@ -10,7 +10,7 @@ module.exports = function getGroupedDiastereotopicIDs(options) {
             diaIDsObject[diaID]={
                 counter:1,
                 atom: [i],
-                oclID: oclID
+                oclID: diaID
             }
         } else {
             diaIDsObject[diaID].counter++;
@@ -19,7 +19,7 @@ module.exports = function getGroupedDiastereotopicIDs(options) {
     }
 
     var diaIDsTable=[];
-    for (var key in Object.keys(diaIDsObject)) {
+    for (var key of Object.keys(diaIDsObject)) {
         diaIDsTable.push(diaIDsObject[key]);
     }
     return diaIDsTable;

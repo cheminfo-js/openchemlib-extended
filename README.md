@@ -29,6 +29,12 @@ methods on rxn:
 * toRXN() : create a new RXN file
 
 
+## Molecule extension
+
+### getGroupedDiastereotopicAtomIDs()
+
+Return an array containing the all the different diastereotopic atoms in the molecule with the occurence of each of them.
+It may be usefull to first create the implicite hydrogens before using the method ``Molecule.addImplicitHydrogens()```.
 
 
 ## License
