@@ -60,13 +60,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	var OCL = __webpack_require__(4)
 
 	var getGroupedDiastereotopicAtomIDs=__webpack_require__(5);
+	var toVisualizerMolfile=__webpack_require__(6);
+	var getGroupedHOSECodes=__webpack_require__(7);
 
 	module.exports = exports = OCL;
-	exports.DB = __webpack_require__(6);
-	exports.RXN = __webpack_require__(11);
+	exports.DB = __webpack_require__(8);
+	exports.RXN = __webpack_require__(13);
 
 
 	OCL.Molecule.prototype.getGroupedDiastereotopicAtomIDs = getGroupedDiastereotopicAtomIDs;
+	OCL.Molecule.prototype.toVisualizerMolfile = toVisualizerMolfile;
+	OCL.Molecule.prototype.getGroupedHOSECodes = getGroupedHOSECodes;
+
 
 
 /***/ },
@@ -1693,7 +1698,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            diaIDsObject[diaID]={
 	                counter:1,
 	                atom: [i],
-	                oclID: diaID
+	                oclID: diaID,
+	                _highlight: [diaID]
 	            }
 	        } else {
 	            diaIDsObject[diaID].counter++;
@@ -1711,17 +1717,72 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = function toVisualizerMolfile() {
+	    var diaIDs=this.getGroupedDiastereotopicAtomIDs();
+
+	    var highlight=[];
+	    var atoms={};
+	    diaIDs.forEach(function(diaID) {
+	        atoms[diaID.oclID]=diaID.atom;
+	        highlight.push(diaID.oclID);
+	    })
+
+	    var molfile={
+	        type:'mol2d',
+	        value:this.toMolfile(),
+	        _highlight:highlight,
+	        _atoms:atoms
+	    }
+
+	    return molfile;
+	}
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Util = __webpack_require__(4).Util;
+
+	module.exports = function getGroupedHOSECodes() {
+	    var diaIDs=this.getGroupedDiastereotopicAtomIDs();
+	    diaIDs.forEach(function(diaID) {
+	        var hoses=Util.getHoseCodesFromDiastereotopicID(diaID.oclID);
+
+	        diaID.hoses=[];
+	        var level=1;
+	        for (var hose of hoses) {
+	            diaID.hoses.push(
+	                {
+	                    level: level++,
+	                    oclID: hose
+	                })
+	        }
+	    });
+
+	    return diaIDs;
+	};
+
+
+/***/ },
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(setImmediate) {'use strict';
 
 	var OCL = __webpack_require__(4);
 	var Molecule = OCL.Molecule;
-	var parseSDF = __webpack_require__(7);
-	var Papa = __webpack_require__(8);
-	var extend = __webpack_require__(9);
+	var parseSDF = __webpack_require__(9);
+	var Papa = __webpack_require__(10);
+	var extend = __webpack_require__(11);
 
-	var moleculeCreator = __webpack_require__(10);
+	var moleculeCreator = __webpack_require__(12);
 
 	var defaultDBOptions = {
 	    length: 0,
@@ -1965,7 +2026,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2).setImmediate))
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2073,7 +2134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -3482,7 +3543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3574,7 +3635,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3591,13 +3652,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var OCL = __webpack_require__(4);
-	var parseRXN = __webpack_require__(12);
+	var parseRXN = __webpack_require__(14);
 
 	function RXN(rxn, options) {
 	    if (! rxn) {
@@ -3669,7 +3730,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports) {
 
 	'use strict';
