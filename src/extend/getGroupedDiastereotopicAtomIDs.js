@@ -10,7 +10,8 @@ module.exports = function getGroupedDiastereotopicAtomIDs() {
             diaIDsObject[diaID]={
                 counter:1,
                 atom: [i],
-                oclID: diaID
+                oclID: diaID,
+                _highlight: [diaID]
             }
         } else {
             diaIDsObject[diaID].counter++;
