@@ -19,8 +19,8 @@ Create an instance of the RXN object based on a text file in RXN format. This wi
 * Molecular weight
 * idCode
 
-``
-var rxn = new RXN(rxnFile)`
+```
+var rxn = new RXN(rxnFile)
 ```
 
 methods on rxn:
