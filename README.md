@@ -36,6 +36,14 @@ methods on rxn:
 Return an array containing the all the different diastereotopic atoms in the molecule with the occurence of each of them.
 It may be usefull to first create the implicite hydrogens before using the method ``Molecule.addImplicitHydrogens()```.
 
+### toDiastereotopicSVG(options)
+
+Return a SVG containing a circle at the level of each atom having a data-atomid a diastereoisotopic unique identifier.
+
+options:
+* height (default: 300)
+* width (default: 200)
+* prefix : prefix for the id of each SVG element (default: ocl)
 
 ## License
 

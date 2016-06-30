@@ -12,4 +12,4 @@ OCL.Molecule.prototype.getGroupedDiastereotopicAtomIDs = require('./extend/getGr
 OCL.Molecule.prototype.toVisualizerMolfile = require('./extend/toVisualizerMolfile');
 OCL.Molecule.prototype.getGroupedHOSECodes = require('./extend/getGroupedHOSECodes');
 OCL.Molecule.prototype.getNumberOfAtoms = require('./extend/getNumberOfAtoms');
-
+OCL.Molecule.prototype.toDiastereotopicSVG = require('./extend/toDiastereotopicSVG');
