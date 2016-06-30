@@ -4,7 +4,7 @@
 var OCLE = require('../..');
 
 
-describe.only('toDiastereotopicSVG on propane', function () {
+describe('toDiastereotopicSVG on propane', function () {
     var molecule=OCLE.Molecule.fromSmiles('CCC');
     var svg=molecule.toDiastereotopicSVG();
     
