@@ -33,7 +33,7 @@ methods on rxn:
 
 ### getGroupedDiastereotopicAtomIDs()
 
-Return an array containing the all the different diastereotopic atoms in the molecule with the occurence of each of them.
+Return an array containing all the different diastereotopic atoms in the molecule with the occurence of each of them.
 It may be usefull to first create the implicite hydrogens before using the method ``Molecule.addImplicitHydrogens()```.
 
 ### toDiastereotopicSVG(options)
