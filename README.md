@@ -45,6 +45,17 @@ options:
 * width (default: 200)
 * prefix : prefix for the id of each SVG element (default: ocl)
 
+### getGroupedHOSECodes
+
+### toVisualizerMolfile
+
+### getNumberOfAtoms
+
+### getExtendedDiastereotopicAtomIDs
+
+Return an array of explicit hydrogens added molecule of diastereotopicAtomIDs.
+Extra information like the diastereotopicIDs of the molecule are added
+
 ## License
 
   [BSD-3-Clause](./LICENSE)

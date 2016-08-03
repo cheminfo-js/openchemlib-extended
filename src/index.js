@@ -9,6 +9,7 @@ exports.RXN = require('./rxn/RXN');
 
 
 OCL.Molecule.prototype.getGroupedDiastereotopicAtomIDs = require('./extend/getGroupedDiastereotopicAtomIDs');
+OCL.Molecule.prototype.getExtendedDiastereotopicAtomIDs = require('./extend/getExtendedDiastereotopicAtomIDs');
 OCL.Molecule.prototype.toVisualizerMolfile = require('./extend/toVisualizerMolfile');
 OCL.Molecule.prototype.getGroupedHOSECodes = require('./extend/getGroupedHOSECodes');
 OCL.Molecule.prototype.getNumberOfAtoms = require('./extend/getNumberOfAtoms');
