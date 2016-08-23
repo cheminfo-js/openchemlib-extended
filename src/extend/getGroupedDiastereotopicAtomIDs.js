@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = function getGroupedDiastereotopicAtomIDs() {
-    var diaIDs=this.getDiastereotopicAtomIDs();
+module.exports = function getGroupedDiastereotopicAtomIDs(elementLabel) {
+    var diaIDs=this.getDiastereotopicAtomIDs(elementLabel);
     var diaIDsObject={};
 
     for (var i=0; i<diaIDs.length; i++) {
