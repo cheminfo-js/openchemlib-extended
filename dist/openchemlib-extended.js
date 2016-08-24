@@ -369,17 +369,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	} ())
 	function runTimeout(fun) {
 	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
 	        return setTimeout(fun, 0);
-	    } else {
-	        return cachedSetTimeout.call(null, fun, 0);
 	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+
+
 	}
 	function runClearTimeout(marker) {
 	    if (cachedClearTimeout === clearTimeout) {
-	        clearTimeout(marker);
-	    } else {
-	        cachedClearTimeout.call(null, marker);
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
 	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+
+
+
 	}
 	var queue = [];
 	var draining = false;
@@ -3787,22 +3815,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	module.exports = function getGroupedDiastereotopicAtomIDs() {
-	    var diaIDs=this.getDiastereotopicAtomIDs();
+	module.exports = function getGroupedDiastereotopicAtomIDs(options) {
+	    var options=options || {};
+	    var label=options.atomLabel;
+
+	    var diaIDs=this.getDiastereotopicAtomIDs(options);
 	    var diaIDsObject={};
 
 	    for (var i=0; i<diaIDs.length; i++) {
-	        var diaID=diaIDs[i];
-	        if (! diaIDsObject[diaID]) {
-	            diaIDsObject[diaID]={
-	                counter:1,
-	                atom: [i],
-	                oclID: diaID,
-	                _highlight: [diaID]
+	        if (! label || this.getAtomLabel(i)===label) {
+	            var diaID=diaIDs[i];
+	            if (! diaIDsObject[diaID]) {
+	                diaIDsObject[diaID]={
+	                    counter:1,
+	                    atoms: [i],
+	                    oclID: diaID,
+	                    atomLabel: this.getAtomLabel(i),
+	                    _highlight: [diaID]
+	                }
+	            } else {
+	                diaIDsObject[diaID].counter++;
+	                diaIDsObject[diaID].atoms.push(i);
 	            }
-	        } else {
-	            diaIDsObject[diaID].counter++;
-	            diaIDsObject[diaID].atom.push(i);
 	        }
 	    }
 
@@ -3863,7 +3897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var highlight=[];
 	    var atoms={};
 	    diaIDs.forEach(function(diaID) {
-	        atoms[diaID.oclID]=diaID.atom;
+	        atoms[diaID.oclID]=diaID.atoms;
 	        highlight.push(diaID.oclID);
 	    })
 
@@ -3887,7 +3921,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Util = __webpack_require__(4).Util;
 
 	module.exports = function getGroupedHOSECodes(options) {
-	    var diaIDs=this.getGroupedDiastereotopicAtomIDs();
+	    var options=options || {};
+	    var diaIDs=this.getGroupedDiastereotopicAtomIDs(options);
 	    diaIDs.forEach(function(diaID) {
 	        var hoses=Util.getHoseCodesFromDiastereotopicID(diaID.oclID, options);
 
@@ -3912,7 +3947,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	module.exports = function getNumberOfAtoms(label) {
+	module.exports = function getNumberOfAtoms(options) {
+	    var options=options || {};
+	    var label=options.atomLabel;
 	    var mf = this.getMolecularFormula().formula;
 	    var parts = mf.split(/(?=[A-Z])/);
 	    for (var part of parts) {
@@ -3933,7 +3970,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	module.exports = function toDiastereotopicSVG(options) {
-	    options=options || {};
+	    var options=options || {};
 	    var width=options.width||300;
 	    var height=options.width||200;
 	    var prefix=options.width||"ocl";
