@@ -6,7 +6,7 @@ module.exports = function toVisualizerMolfile() {
     var highlight=[];
     var atoms={};
     diaIDs.forEach(function(diaID) {
-        atoms[diaID.oclID]=diaID.atom;
+        atoms[diaID.oclID]=diaID.atoms;
         highlight.push(diaID.oclID);
     })
 

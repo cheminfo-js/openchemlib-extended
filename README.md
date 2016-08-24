@@ -31,10 +31,14 @@ methods on rxn:
 
 ## Molecule extension
 
-### getGroupedDiastereotopicAtomIDs()
+### getGroupedDiastereotopicAtomIDs(options)
 
-Return an array containing all the different diastereotopic atoms in the molecule with the occurence of each of them.
+Returns an array containing all the different diastereotopic atoms in the molecule with the occurence of each of them.
 It may be usefull to first create the implicite hydrogens before using the method ``Molecule.addImplicitHydrogens()```.
+
+options:
+* atomLabel: filter to show only a specific atom (default: '')
+
 
 ### toDiastereotopicSVG(options)
 
@@ -45,7 +49,13 @@ options:
 * width (default: 200)
 * prefix : prefix for the id of each SVG element (default: ocl)
 
-### getGroupedHOSECodes
+### getGroupedHOSECodes(options)
+
+Returns an extended groupedDiastereotopicID with hoses
+
+options:
+* atomLabel: filter to show only a specific atom (default: '')
+
 
 ### toVisualizerMolfile
 

@@ -1,6 +1,8 @@
 'use strict';
 
-module.exports = function getNumberOfAtoms(label) {
+module.exports = function getNumberOfAtoms(options) {
+    var options=options || {};
+    var label=options.atomLabel;
     var mf = this.getMolecularFormula().formula;
     var parts = mf.split(/(?=[A-Z])/);
     for (var part of parts) {

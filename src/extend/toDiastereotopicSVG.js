@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function toDiastereotopicSVG(options) {
-    options=options || {};
+    var options=options || {};
     var width=options.width||300;
     var height=options.width||200;
     var prefix=options.width||"ocl";

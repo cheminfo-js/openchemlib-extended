@@ -3,7 +3,8 @@
 var Util = require('openchemlib').Util;
 
 module.exports = function getGroupedHOSECodes(options) {
-    var diaIDs=this.getGroupedDiastereotopicAtomIDs();
+    var options=options || {};
+    var diaIDs=this.getGroupedDiastereotopicAtomIDs(options);
     diaIDs.forEach(function(diaID) {
         var hoses=Util.getHoseCodesFromDiastereotopicID(diaID.oclID, options);
 
