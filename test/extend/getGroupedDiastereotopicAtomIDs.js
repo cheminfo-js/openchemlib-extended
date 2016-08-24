@@ -4,7 +4,7 @@
 var OCLE = require('../..');
 
 
-describe.only('getGroupedDiastereotopicIDs test propane', function () {
+describe('getGroupedDiastereotopicIDs test propane', function () {
     it('should yield the right table for all atoms', function () {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         molecule.addImplicitHydrogens();
