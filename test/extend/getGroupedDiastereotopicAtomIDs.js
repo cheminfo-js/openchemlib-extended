@@ -36,6 +36,6 @@ describe('getGroupedDiastereotopicIDs test propane', function () {
         diaIDs.length.should.equal(2);
         diaIDs[0].counter.should.equal(6);
         diaIDs[0].atoms.length.should.equal(6);
-        diaIDs[0].oclID.should.equal('gC`HALiKT@'+String.fromCharCode(127)+'RHDRj@');
+        diaIDs[0].oclID.should.equal('gC`HALiKT@\u007FRHDRj@');
     });
 });
