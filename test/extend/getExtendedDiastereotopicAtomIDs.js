@@ -14,6 +14,4 @@ describe('getExtendedDiastereotopicIDs test propane', function () {
         diaIDs[0].hydrogenOCLIDs.length.should.equal(1);
         diaIDs[0].hydrogenOCLIDs[0].should.equal('gC`HALiKT@RHDRj@');
     });
-
-
 });
