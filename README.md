@@ -34,11 +34,15 @@ methods on rxn:
 ### getGroupedDiastereotopicAtomIDs(options)
 
 Returns an array containing all the different diastereotopic atoms in the molecule with the occurence of each of them.
-It may be usefull to first create the implicite hydrogens before using the method ``Molecule.addImplicitHydrogens()```.
+It may be useful to first create the implicit hydrogens before using the method ``Molecule.addImplicitHydrogens()```.
 
 options:
 * atomLabel: filter to show only a specific atom (default: '')
 
+### getAtomsInfo(options)
+
+Returns an array containing many informations about the atoms.
+It may be useful to first create the implicit hydrogens before using the method ``Molecule.addImplicitHydrogens()```.
 
 ### toDiastereotopicSVG(options)
 
