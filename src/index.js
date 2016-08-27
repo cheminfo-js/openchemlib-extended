@@ -15,3 +15,4 @@ OCL.Molecule.prototype.getGroupedHOSECodes = require('./extend/getGroupedHOSECod
 OCL.Molecule.prototype.getNumberOfAtoms = require('./extend/getNumberOfAtoms');
 OCL.Molecule.prototype.toDiastereotopicSVG = require('./extend/toDiastereotopicSVG');
 OCL.Molecule.prototype.getAtomsInfo = require('./extend/getAtomsInfo');
+OCL.Molecule.prototype.getAllPaths = require('./extend/getAllPaths');
