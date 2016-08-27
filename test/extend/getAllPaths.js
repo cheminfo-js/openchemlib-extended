@@ -4,7 +4,7 @@
 var OCLE = require('../..');
 
 
-describe.only('getAllPaths test propane', function () {
+describe('getAllPaths test propane', function () {
     it('should yield the right result', function () {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         molecule.addImplicitHydrogens();
@@ -18,5 +18,4 @@ describe.only('getAllPaths test propane', function () {
         
         console.log(paths);
     });
-
 });
