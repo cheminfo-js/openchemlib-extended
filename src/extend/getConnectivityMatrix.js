@@ -3,6 +3,7 @@
 module.exports = function getConnectivityMatrix(options) {
     
     // TODO remove this line when the bug is fixed ... (in OCL addImplicitHydrogens)
+    // this.ensureHelperArrays(this.cHelperNeighbours)
     this.toMolfile();
 
     var nbAtoms=this.getAllAtoms();
