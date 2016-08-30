@@ -1,5 +1,8 @@
 'use strict';
 
+var floydWarshall=require('ml-floyd-warshall');
+var Matrix=require('ml-matrix');
+
 module.exports = function getAllPaths(options) {
     var options=options || [];
     var fromLabel = options.fromLabel || '';
@@ -14,7 +17,7 @@ module.exports = function getAllPaths(options) {
   
     var connectivityMatrix=this.getConnectivityMatrix();
     // TODO have a package that allows to convert the connectivityMatrix to a distanceMatrix
-    var pathLengthMatrix=connectivityMatrix;
+    var pathLengthMatrix=floydWarshall(new Matrix(connectivityMatrix));
     
     for (var from=0; from<this.getAllAtoms(); from++) {
         for (var to=0; to<this.getAllAtoms(); to++) {
@@ -34,8 +37,8 @@ module.exports = function getAllPaths(options) {
                                 pathLength: pathLength
                             }
                         }
-                        results[key].fromAtoms.push(from);
-                        results[key].toAtoms.push(to);
+                        if (results[key].fromAtoms.indexOf(from)===-1) results[key].fromAtoms.push(from);
+                        if (results[key].toAtoms.indexOf(to)===-1) results[key].toAtoms.push(to);
                     }
                 }
             }
