@@ -1,11 +1,10 @@
 'use strict';
 
-module.exports = function getConnectivityMatrix(options) {
-    
-    // TODO remove this line when the bug is fixed ... (in OCL addImplicitHydrogens)
-    // this.ensureHelperArrays(this.cHelperNeighbours)
-    this.toMolfile();
+var OCLE=require('../index.js');
 
+module.exports = function getConnectivityMatrix(options) {
+
+    this.ensureHelperArrays(OCLE.Molecule.cHelperNeighbours);
     var nbAtoms=this.getAllAtoms();
     var result=new Array(nbAtoms);
     for (var i=0; i<nbAtoms; i++) {
