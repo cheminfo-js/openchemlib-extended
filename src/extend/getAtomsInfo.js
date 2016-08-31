@@ -1,6 +1,11 @@
 'use strict';
 
+var OCLE=require('../index.js');
+
 module.exports = function getAtomsInfo() {
+
+    this.ensureHelperArrays(OCLE.Molecule.cHelperRings);
+
     var diaIDs=this.getDiastereotopicAtomIDs();
 
     var results=[];
