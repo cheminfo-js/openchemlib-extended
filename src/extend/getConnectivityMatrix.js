@@ -1,10 +1,10 @@
 'use strict';
 
-var OCLE=require('../index.js');
+var OCL = require('openchemlib');
 
 module.exports = function getConnectivityMatrix(options) {
 
-    this.ensureHelperArrays(OCLE.Molecule.cHelperNeighbours);
+    this.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
     var nbAtoms=this.getAllAtoms();
     var result=new Array(nbAtoms);
     for (var i=0; i<nbAtoms; i++) {

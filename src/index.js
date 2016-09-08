@@ -1,7 +1,7 @@
 'use strict';
 
 require('setimmediate');
-var OCL = require('openchemlib')
+var OCL = require('openchemlib');
 
 module.exports = exports = OCL;
 exports.DB = require('./db/DB');

@@ -1,10 +1,10 @@
 'use strict';
 
-var OCLE=require('../index.js');
+var OCL = require('openchemlib');
 
 module.exports = function getAtomsInfo() {
 
-    this.ensureHelperArrays(OCLE.Molecule.cHelperRings);
+    this.ensureHelperArrays(OCL.Molecule.cHelperRings);
 
     var diaIDs=this.getDiastereotopicAtomIDs();
 
