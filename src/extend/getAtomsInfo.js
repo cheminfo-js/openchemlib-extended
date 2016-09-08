@@ -50,6 +50,8 @@ module.exports = function getAtomsInfo() {
         result.connAtoms = this.getConnAtoms(i);
         result.allConnAtoms = this.getAllConnAtoms(i);
 
+        result.implicitHydrogens=result.allHydrogens+result.connAtoms-result.allConnAtoms;
+
         result.isAromatic = this.isAromaticAtom(i);
         result.isAllylic = this.isAllylicAtom(i);
         result.isStereoCenter = this.isAtomStereoCenter(i);
@@ -57,13 +59,15 @@ module.exports = function getAtomsInfo() {
         result.isSmallRing = this.isSmallRingAtom(i);
         result.isStabilized = this.isStabilizedAtom(i);
 
-        result.extra.singleBonds = result.allHydrogens;
+        // todo HACK to circumvent bug in OCL that consider than an hydrogen is connected to itself
+        result.extra.singleBonds = (result.atomicNo===1) ? 0 : result.implicitHydrogens;
         for (var j = 0; j < this.getAllConnAtoms(i); j++) {
             var bond = this.getConnBond(i, j);
             var bondOrder = this.getBondOrder(bond);
             if (this.isAromaticBond(bond)) {
                 extra.aromaticBonds++;
             } else if (bondOrder === 1) {
+                // not an hydrogen
                 extra.singleBonds++;
             } else if (bondOrder === 2) {
                 extra.doubleBonds++;
@@ -80,6 +84,8 @@ module.exports = function getAtomsInfo() {
             result.extra.cnoHybridation = result.extra.totalBonds;
         } else if (result.atomicNo === 8) {
             result.extra.cnoHybridation = result.extra.totalBonds + 1;
+        } else if (result.atomicNo === 1) {
+            result.extra.hydrogenOnAtomicNo = (this.getAllConnAtoms(i)===0) ? 0 : this.getAtomicNo(this.getConnAtom(i,0));
         }
     }
     return results;
