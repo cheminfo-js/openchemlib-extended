@@ -52,7 +52,9 @@ describe('getAtomsInfo test propane', function () {
                 aromaticBonds: 0,
                 cnoHybridation: 0,
                 totalBonds: 1,
-                hydrogenOnAtomicNo: 8 },
+                hydrogenOnAtomicNo: 8,
+                labileHydrogen: true
+            },
             abnormalValence: -1,
             charge: 0,
             cipParity: 0,
