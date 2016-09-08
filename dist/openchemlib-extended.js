@@ -4098,7 +4098,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else if (result.atomicNo === 8) {
 	            result.extra.cnoHybridation = result.extra.totalBonds + 1;
 	        } else if (result.atomicNo === 1) {
-	            result.extra.hydrogenOnAtomicNo = (this.getAllConnAtoms(i)===0) ? 0 : this.getAtomicNo(this.getConnAtom(i,0));
+	            var connectedAtom=(this.getAllConnAtoms(i)===0) ? 0 : this.getAtomicNo(this.getConnAtom(i,0));
+	            result.extra.hydrogenOnAtomicNo = connectedAtom;
+	            if (connectedAtom === 7 || connectedAtom === 8) {
+	                result.extra.labileHydrogen = true;
+	            }
 	        }
 	    }
 	    return results;
