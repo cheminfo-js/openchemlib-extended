@@ -57,29 +57,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	__webpack_require__(1);
-	var OCL = __webpack_require__(4);
+	var OCL = __webpack_require__(3);
 
 	module.exports = exports = OCL;
-	exports.DB = __webpack_require__(5);
-	exports.RXN = __webpack_require__(10);
+	exports.DB = __webpack_require__(4);
+	exports.RXN = __webpack_require__(9);
 
 
-	OCL.Molecule.prototype.getGroupedDiastereotopicAtomIDs = __webpack_require__(12);
-	OCL.Molecule.prototype.getExtendedDiastereotopicAtomIDs = __webpack_require__(13);
-	OCL.Molecule.prototype.toVisualizerMolfile = __webpack_require__(14);
-	OCL.Molecule.prototype.getGroupedHOSECodes = __webpack_require__(15);
-	OCL.Molecule.prototype.getNumberOfAtoms = __webpack_require__(16);
-	OCL.Molecule.prototype.toDiastereotopicSVG = __webpack_require__(17);
-	OCL.Molecule.prototype.getAtomsInfo = __webpack_require__(18);
-	OCL.Molecule.prototype.getAllPaths = __webpack_require__(19);
-	OCL.Molecule.prototype.getConnectivityMatrix = __webpack_require__(49);
+	OCL.Molecule.prototype.getGroupedDiastereotopicAtomIDs = __webpack_require__(11);
+	OCL.Molecule.prototype.getExtendedDiastereotopicAtomIDs = __webpack_require__(12);
+	OCL.Molecule.prototype.toVisualizerMolfile = __webpack_require__(13);
+	OCL.Molecule.prototype.getGroupedHOSECodes = __webpack_require__(14);
+	OCL.Molecule.prototype.getNumberOfAtoms = __webpack_require__(15);
+	OCL.Molecule.prototype.toDiastereotopicSVG = __webpack_require__(16);
+	OCL.Molecule.prototype.getAtomsInfo = __webpack_require__(17);
+	OCL.Molecule.prototype.getAllPaths = __webpack_require__(18);
+	OCL.Molecule.prototype.getConnectivityMatrix = __webpack_require__(48);
 
 
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global, clearImmediate, process) {(function (global, undefined) {
+	/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
 	    "use strict";
 
 	    if (global.setImmediate) {
@@ -90,24 +90,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var tasksByHandle = {};
 	    var currentlyRunningATask = false;
 	    var doc = global.document;
-	    var setImmediate;
+	    var registerImmediate;
 
-	    function addFromSetImmediateArguments(args) {
-	        tasksByHandle[nextHandle] = partiallyApplied.apply(undefined, args);
-	        return nextHandle++;
+	    function setImmediate(callback) {
+	      // Callback can either be a function or a string
+	      if (typeof callback !== "function") {
+	        callback = new Function("" + callback);
+	      }
+	      // Copy function arguments
+	      var args = new Array(arguments.length - 1);
+	      for (var i = 0; i < args.length; i++) {
+	          args[i] = arguments[i + 1];
+	      }
+	      // Store and register the task
+	      var task = { callback: callback, args: args };
+	      tasksByHandle[nextHandle] = task;
+	      registerImmediate(nextHandle);
+	      return nextHandle++;
 	    }
 
-	    // This function accepts the same arguments as setImmediate, but
-	    // returns a function that requires no arguments.
-	    function partiallyApplied(handler) {
-	        var args = [].slice.call(arguments, 1);
-	        return function() {
-	            if (typeof handler === "function") {
-	                handler.apply(undefined, args);
-	            } else {
-	                (new Function("" + handler))();
-	            }
-	        };
+	    function clearImmediate(handle) {
+	        delete tasksByHandle[handle];
+	    }
+
+	    function run(task) {
+	        var callback = task.callback;
+	        var args = task.args;
+	        switch (args.length) {
+	        case 0:
+	            callback();
+	            break;
+	        case 1:
+	            callback(args[0]);
+	            break;
+	        case 2:
+	            callback(args[0], args[1]);
+	            break;
+	        case 3:
+	            callback(args[0], args[1], args[2]);
+	            break;
+	        default:
+	            callback.apply(undefined, args);
+	            break;
+	        }
 	    }
 
 	    function runIfPresent(handle) {
@@ -116,13 +141,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (currentlyRunningATask) {
 	            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
 	            // "too much recursion" error.
-	            setTimeout(partiallyApplied(runIfPresent, handle), 0);
+	            setTimeout(runIfPresent, 0, handle);
 	        } else {
 	            var task = tasksByHandle[handle];
 	            if (task) {
 	                currentlyRunningATask = true;
 	                try {
-	                    task();
+	                    run(task);
 	                } finally {
 	                    clearImmediate(handle);
 	                    currentlyRunningATask = false;
@@ -131,15 +156,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 
-	    function clearImmediate(handle) {
-	        delete tasksByHandle[handle];
-	    }
-
 	    function installNextTickImplementation() {
-	        setImmediate = function() {
-	            var handle = addFromSetImmediateArguments(arguments);
-	            process.nextTick(partiallyApplied(runIfPresent, handle));
-	            return handle;
+	        registerImmediate = function(handle) {
+	            process.nextTick(function () { runIfPresent(handle); });
 	        };
 	    }
 
@@ -178,10 +197,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            global.attachEvent("onmessage", onGlobalMessage);
 	        }
 
-	        setImmediate = function() {
-	            var handle = addFromSetImmediateArguments(arguments);
+	        registerImmediate = function(handle) {
 	            global.postMessage(messagePrefix + handle, "*");
-	            return handle;
 	        };
 	    }
 
@@ -192,17 +209,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            runIfPresent(handle);
 	        };
 
-	        setImmediate = function() {
-	            var handle = addFromSetImmediateArguments(arguments);
+	        registerImmediate = function(handle) {
 	            channel.port2.postMessage(handle);
-	            return handle;
 	        };
 	    }
 
 	    function installReadyStateChangeImplementation() {
 	        var html = doc.documentElement;
-	        setImmediate = function() {
-	            var handle = addFromSetImmediateArguments(arguments);
+	        registerImmediate = function(handle) {
 	            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
 	            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
 	            var script = doc.createElement("script");
@@ -213,15 +227,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                script = null;
 	            };
 	            html.appendChild(script);
-	            return handle;
 	        };
 	    }
 
 	    function installSetTimeoutImplementation() {
-	        setImmediate = function() {
-	            var handle = addFromSetImmediateArguments(arguments);
-	            setTimeout(partiallyApplied(runIfPresent, handle), 0);
-	            return handle;
+	        registerImmediate = function(handle) {
+	            setTimeout(runIfPresent, 0, handle);
 	        };
 	    }
 
@@ -255,92 +266,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    attachTo.clearImmediate = clearImmediate;
 	}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(2).clearImmediate, __webpack_require__(3)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(2)))
 
 /***/ },
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(3).nextTick;
-	var apply = Function.prototype.apply;
-	var slice = Array.prototype.slice;
-	var immediateIds = {};
-	var nextImmediateId = 0;
-
-	// DOM APIs, for completeness
-
-	exports.setTimeout = function() {
-	  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
-	};
-	exports.setInterval = function() {
-	  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
-	};
-	exports.clearTimeout =
-	exports.clearInterval = function(timeout) { timeout.close(); };
-
-	function Timeout(id, clearFn) {
-	  this._id = id;
-	  this._clearFn = clearFn;
-	}
-	Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-	Timeout.prototype.close = function() {
-	  this._clearFn.call(window, this._id);
-	};
-
-	// Does not start the time, just sets up the members needed.
-	exports.enroll = function(item, msecs) {
-	  clearTimeout(item._idleTimeoutId);
-	  item._idleTimeout = msecs;
-	};
-
-	exports.unenroll = function(item) {
-	  clearTimeout(item._idleTimeoutId);
-	  item._idleTimeout = -1;
-	};
-
-	exports._unrefActive = exports.active = function(item) {
-	  clearTimeout(item._idleTimeoutId);
-
-	  var msecs = item._idleTimeout;
-	  if (msecs >= 0) {
-	    item._idleTimeoutId = setTimeout(function onTimeout() {
-	      if (item._onTimeout)
-	        item._onTimeout();
-	    }, msecs);
-	  }
-	};
-
-	// That's not how node.js implements it but the exposed api is the same.
-	exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
-	  var id = nextImmediateId++;
-	  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
-
-	  immediateIds[id] = true;
-
-	  nextTick(function onNextTick() {
-	    if (immediateIds[id]) {
-	      // fn.call() is faster so we optimize for the common use-case
-	      // @see http://jsperf.com/call-apply-segu
-	      if (args) {
-	        fn.apply(null, args);
-	      } else {
-	        fn.call(null);
-	      }
-	      // Prevent ids from leaking
-	      exports.clearImmediate(id);
-	    }
-	  });
-
-	  return id;
-	};
-
-	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
-	  delete immediateIds[id];
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2).setImmediate, __webpack_require__(2).clearImmediate))
-
-/***/ },
-/* 3 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -506,7 +435,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -1811,259 +1740,350 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(setImmediate) {'use strict';
 
-	var OCL = __webpack_require__(4);
-	var Molecule = OCL.Molecule;
-	var parseSDF = __webpack_require__(6);
-	var Papa = __webpack_require__(7);
-	var extend = __webpack_require__(8);
+	const OCL = __webpack_require__(3);
+	const Molecule = OCL.Molecule;
+	const parseSDF = __webpack_require__(6);
+	const Papa = __webpack_require__(7);
 
-	var moleculeCreator = __webpack_require__(9);
+	const moleculeCreator = __webpack_require__(8);
 
-	var defaultDBOptions = {
+	const defaultDBOptions = {
 	    length: 0,
 	    computeProperties: false
 	};
 
-	function DB(options) {
-	    options = extend({}, defaultDBOptions, options);
-	    this.data = new Array(options.length);
-	    this.molecules = new Array(options.length);
-	    this.statistics = null;
-	    this.length = 0;
-	    this.computeProperties = !!options.computeProperties;
-	    this.searcher = null;
-	}
-
-	var defaultSDFOptions = {
-	    onStep: function (current, total) {}
+	const defaultSDFOptions = {
+	    onStep(current, total){}
 	};
 
-	DB.parseSDF = function (sdf, options) {
-	    if (typeof sdf !== 'string') {
-	        throw new TypeError('sdf must be a string');
-	    }
-	    options = extend({}, defaultSDFOptions, options);
-	    return new Promise(function (resolve, reject) {
-	        var parsed = parseSDF(sdf);
-	        var molecules = parsed.molecules;
-	        var db = new DB(options);
-	        db.statistics = parsed.statistics;
-	        var i = 0, l = molecules.length;
-	        parseNext();
-	        function parseNext() {
-	            if (i === l) {
-	                return resolve(db);
-	            }
-	            try {
-	                db.push(Molecule.fromMolfile(molecules[i].molfile.value), molecules[i]);
-	            } catch (e) {
-	                return reject(e);
-	            }
-	            options.onStep(++i, l);
-	            setImmediate(parseNext);
-	        }
-	    });
-	};
-
-	var defaultCSVOptions = {
+	const defaultCSVOptions = {
 	    header: true,
 	    dynamicTyping: true,
 	    skipEmptyLines: true,
-	    onStep: function (current, total) {}
+	    onStep(current, total) {}
 	};
 
-	DB.parseCSV = function (csv, options) {
-	    if (typeof csv !== 'string') {
-	        throw new TypeError('csv must be a string');
-	    }
-	    options = extend({}, defaultCSVOptions, options);
-	    return new Promise(function (resolve, reject) {
-	        var parsed = Papa.parse(csv, options);
-	        var fields = parsed.meta.fields;
-	        var stats = new Array(fields.length);
-	        var firstElement = parsed.data[0];
-	        var datatype, datafield;
-	        for (var i = 0; i < fields.length; i++) {
-	            stats[i] = {
-	                label: fields[i],
-	                isNumeric: typeof firstElement[fields[i]] === 'number'
-	            };
-	            var lowerField = fields[i].toLowerCase();
-	            if (moleculeCreator.has(lowerField)) {
-	                datatype = moleculeCreator.get(lowerField);
-	                datafield = fields[i];
-	            }
-	        }
-	        if (!datatype) {
-	            throw new Error('this document does not contain any molecule field');
-	        }
-	        var db = new DB(options);
-	        db.statistics = stats;
-
-	        var i = 0, l = parsed.data.length;
-	        parseNext();
-	        function parseNext() {
-	            if (i === l) {
-	                return resolve(db);
-	            }
-	            try {
-	                db.push(datatype(parsed.data[i][datafield]), parsed.data[i]);
-	            } catch (e) {
-	                return reject(e);
-	            }
-	            options.onStep(++i, l);
-	            setImmediate(parseNext);
-	        }
-	    });
-	};
-
-	DB.prototype.push = function (molecule, data) {
-	    if (data === undefined) data = {};
-	    this.molecules[this.length] = molecule;
-	    var molecularFormula = molecule.getMolecularFormula();
-	    if (!molecule.index) {
-	        molecule.index = molecule.getIndex();
-	        molecule.idcode = molecule.getIDCode();
-	        molecule.mw = molecularFormula.relativeWeight;
-	    }
-	    this.data[this.length++] = data;
-	    if (this.computeProperties) {
-	        var properties = molecule.getProperties();
-	        data.properties = {
-	            absoluteWeight: molecularFormula.absoluteWeight,
-	            relativeWeight: molecule.mw,
-	            formula: molecularFormula.formula,
-	            acceptorCount: properties.acceptorCount,
-	            donorCount: properties.donorCount,
-	            logP: properties.logP,
-	            logS: properties.logS,
-	            polarSurfaceArea: properties.polarSurfaceArea,
-	            rotatableBondCount: properties.rotatableBondCount,
-	            stereoCenterCount: properties.stereoCenterCount
-	        };
-	    }
-	};
-
-	var defaultSearchOptions = {
+	const defaultSearchOptions = {
 	    format: 'oclid',
 	    mode: 'substructure',
 	    limit: 0
 	};
 
-	DB.prototype.search = function (query, options) {
-	    options = extend({}, defaultSearchOptions, options);
-
-	    if (typeof query === 'string') {
-	        query = moleculeCreator.get(options.format.toLowerCase())(query);
-	    } else if (!(query instanceof Molecule)) {
-	        throw new TypeError('toSearch must be a Molecule or string');
+	class MoleculeDB {
+	    constructor(options) {
+	        options = Object.assign({}, defaultDBOptions, options);
+	        this.data = new Array(options.length);
+	        this.molecules = new Array(options.length);
+	        this.statistics = null;
+	        this.length = 0;
+	        this.computeProperties = !!options.computeProperties;
+	        this.searcher = null;
 	    }
 
-	    var result;
-	    switch (options.mode.toLowerCase()) {
-	        case 'exact':
-	            result = this.exactSearch(query, options.limit);
-	            break;
-	        case 'substructure':
-	            result = this.subStructureSearch(query, options.limit);
-	            break;
-	        case 'similarity':
-	            result = this.similaritySearch(query, options.limit);
-	            break;
-	        default:
-	            throw new Error('unknown search mode: ' + options.mode);
+	    static parseSDF(sdf, options) {
+	        if (typeof sdf !== 'string') {
+	            throw new TypeError('sdf must be a string');
+	        }
+	        options = Object.assign({}, defaultSDFOptions, options);
+	        return new Promise(function (resolve, reject) {
+	            var parsed = parseSDF(sdf);
+	            var molecules = parsed.molecules;
+	            var db = new MoleculeDB(options);
+	            db.statistics = parsed.statistics;
+	            var i = 0, l = molecules.length;
+	            parseNext();
+	            function parseNext() {
+	                if (i === l) {
+	                    return resolve(db);
+	                }
+	                try {
+	                    db.push(Molecule.fromMolfile(molecules[i].molfile), molecules[i]);
+	                } catch (e) {
+	                    return reject(e);
+	                }
+	                options.onStep(++i, l);
+	                setImmediate(parseNext);
+	            }
+	        });
 	    }
-	    return result;
-	};
 
-	DB.prototype.exactSearch = function (query, limit) {
-	    var queryIdcode = query.getIDCode();
-	    var result = new DB();
-	    limit = limit || Number.MAX_SAFE_INTEGER;
-	    for (var i = 0; i < this.length; i++) {
-	        if (this.molecules[i].idcode === queryIdcode) {
-	            result.push(this.molecules[i], this.data[i]);
-	            if (result.length >= limit) break;
+	    static parseCSV(csv, options) {
+	        if (typeof csv !== 'string') {
+	            throw new TypeError('csv must be a string');
+	        }
+	        options = Object.assign({}, defaultCSVOptions, options);
+	        return new Promise(function (resolve, reject) {
+	            var parsed = Papa.parse(csv, options);
+	            var fields = parsed.meta.fields;
+	            var stats = new Array(fields.length);
+	            var firstElement = parsed.data[0];
+	            var datatype, datafield;
+	            for (var i = 0; i < fields.length; i++) {
+	                stats[i] = {
+	                    label: fields[i],
+	                    isNumeric: typeof firstElement[fields[i]] === 'number'
+	                };
+	                var lowerField = fields[i].toLowerCase();
+	                if (moleculeCreator.has(lowerField)) {
+	                    datatype = moleculeCreator.get(lowerField);
+	                    datafield = fields[i];
+	                }
+	            }
+	            if (!datatype) {
+	                throw new Error('this document does not contain any molecule field');
+	            }
+	            var db = new MoleculeDB(options);
+	            db.statistics = stats;
+
+	            var i = 0, l = parsed.data.length;
+	            parseNext();
+	            function parseNext() {
+	                if (i === l) {
+	                    return resolve(db);
+	                }
+	                try {
+	                    db.push(datatype(parsed.data[i][datafield]), parsed.data[i]);
+	                } catch (e) {
+	                    return reject(e);
+	                }
+	                options.onStep(++i, l);
+	                setImmediate(parseNext);
+	            }
+	        });
+	    }
+
+	    push(molecule, data) {
+	        if (data === undefined) data = {};
+	        this.molecules[this.length] = molecule;
+	        var molecularFormula;
+	        if (!molecule.index) {
+	            molecule.index = molecule.getIndex();
+	        }
+	        if (!molecule.idcode) {
+	            molecule.idcode = molecule.getIDCode();
+	        }
+	        if (!molecule.mw) {
+	            molecularFormula = molecule.getMolecularFormula();
+	            molecule.mw = molecularFormula.relativeWeight;
+	        }
+	        this.data[this.length++] = data;
+	        if (this.computeProperties) {
+	            if (!molecularFormula) {
+	                molecularFormula = molecule.getMolecularFormula();
+	            }
+	            var properties = molecule.getProperties();
+	            data.properties = {
+	                absoluteWeight: molecularFormula.absoluteWeight,
+	                relativeWeight: molecule.mw,
+	                formula: molecularFormula.formula,
+	                acceptorCount: properties.acceptorCount,
+	                donorCount: properties.donorCount,
+	                logP: properties.logP,
+	                logS: properties.logS,
+	                polarSurfaceArea: properties.polarSurfaceArea,
+	                rotatableBondCount: properties.rotatableBondCount,
+	                stereoCenterCount: properties.stereoCenterCount
+	            };
 	        }
 	    }
-	    return result;
-	};
 
-	DB.prototype.subStructureSearch = function (query, limit) {
-	    var needReset = false;
-	    if (!query.isFragment()) {
-	        needReset = true;
-	        query.setFragment(true);
-	    }
+	    search(query, options) {
+	        options = Object.assign({}, defaultSearchOptions, options);
 
-	    var queryIndex = query.getIndex();
-	    var queryMW = query.getMolecularFormula().relativeWeight;
-	    var searcher = this.getSearcher();
-
-	    searcher.setFragment(query, queryIndex);
-	    var searchResult = [];
-	    for (var i = 0; i < this.length; i++) {
-	        searcher.setMolecule(this.molecules[i], this.molecules[i].index);
-	        if (searcher.isFragmentInMolecule()) {
-	            searchResult.push([this.molecules[i], i]);
+	        if (typeof query === 'string') {
+	            query = moleculeCreator.get(options.format.toLowerCase())(query);
+	        } else if (!(query instanceof Molecule)) {
+	            throw new TypeError('toSearch must be a Molecule or string');
 	        }
-	    }
-	    searchResult.sort(function (a, b) {
-	        return Math.abs(queryMW - a[0].mw) - Math.abs(queryMW - b[0].mw);
-	    });
 
-	    var length = limit || searchResult.length;
-	    var result = new DB({length: length});
-	    for (var i = 0; i < length; i++) {
-	        result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
-	    }
-
-	    if (needReset) {
-	        query.setFragment(false);
-	    }
-	    return result;
-	};
-
-	DB.prototype.similaritySearch = function (query, limit) {
-	    var queryIndex = query.getIndex();
-	    var queryMW = query.getMolecularFormula().relativeWeight;
-	    var queryIDCode = query.getIDCode();
-
-	    var searchResult = new Array(this.length);
-	    var similarity;
-	    for (var i = 0; i < this.length; i++) {
-	        if (this.molecules[i].idcode === queryIDCode) {
-	            similarity = 1e10;
-	        } else {
-	            similarity = OCL.SSSearcherWithIndex.getSimilarityTanimoto(queryIndex, this.molecules[i].index)
-	                * 100000 - Math.abs(queryMW - this.molecules[i].mw) / 1000;
+	        var result;
+	        switch (options.mode.toLowerCase()) {
+	            case 'exact':
+	                result = this.exactSearch(query, options.limit);
+	                break;
+	            case 'substructure':
+	                result = this.subStructureSearch(query, options.limit);
+	                break;
+	            case 'similarity':
+	                result = this.similaritySearch(query, options.limit);
+	                break;
+	            default:
+	                throw new Error('unknown search mode: ' + options.mode);
 	        }
-	        searchResult[i] = [similarity, i];
+	        return result;
 	    }
-	    searchResult.sort(function (a, b) {
-	        return b[0] - a[0];
-	    });
 
-	    var length = limit || searchResult.length;
-	    var result = new DB({length: length});
-	    for (var i = 0; i < length; i++) {
-	        result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
+	    exactSearch(query, limit) {
+	        var queryIdcode = query.getIDCode();
+	        var result = new MoleculeDB();
+	        limit = limit || Number.MAX_SAFE_INTEGER;
+	        for (var i = 0; i < this.length; i++) {
+	            if (this.molecules[i].idcode === queryIdcode) {
+	                result.push(this.molecules[i], this.data[i]);
+	                if (result.length >= limit) break;
+	            }
+	        }
+	        return result;
 	    }
-	    return result;
+
+	    subStructureSearch(query, limit) {
+	        var needReset = false;
+	        if (!query.isFragment()) {
+	            needReset = true;
+	            query.setFragment(true);
+	        }
+
+	        var queryIndex = query.getIndex();
+	        var queryMW = query.getMolecularFormula().relativeWeight;
+	        var searcher = this.getSearcher();
+
+	        searcher.setFragment(query, queryIndex);
+	        var searchResult = [];
+	        for (var i = 0; i < this.length; i++) {
+	            searcher.setMolecule(this.molecules[i], this.molecules[i].index);
+	            if (searcher.isFragmentInMolecule()) {
+	                searchResult.push([this.molecules[i], i]);
+	            }
+	        }
+	        searchResult.sort(function (a, b) {
+	            return Math.abs(queryMW - a[0].mw) - Math.abs(queryMW - b[0].mw);
+	        });
+
+	        var length = limit || searchResult.length;
+	        var result = new MoleculeDB({length: length});
+	        for (var i = 0; i < length; i++) {
+	            result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
+	        }
+
+	        if (needReset) {
+	            query.setFragment(false);
+	        }
+	        return result;
+	    }
+
+	    similaritySearch(query, limit) {
+	        var queryIndex = query.getIndex();
+	        var queryMW = query.getMolecularFormula().relativeWeight;
+	        var queryIDCode = query.getIDCode();
+
+	        var searchResult = new Array(this.length);
+	        var similarity;
+	        for (var i = 0; i < this.length; i++) {
+	            if (this.molecules[i].idcode === queryIDCode) {
+	                similarity = 1e10;
+	            } else {
+	                similarity = OCL.SSSearcherWithIndex.getSimilarityTanimoto(queryIndex, this.molecules[i].index)
+	                    * 100000 - Math.abs(queryMW - this.molecules[i].mw) / 1000;
+	            }
+	            searchResult[i] = [similarity, i];
+	        }
+	        searchResult.sort(function (a, b) {
+	            return b[0] - a[0];
+	        });
+
+	        var length = limit || searchResult.length;
+	        var result = new MoleculeDB({length: length});
+	        for (var i = 0; i < length; i++) {
+	            result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
+	        }
+	        return result;
+	    }
+
+	    getSearcher() {
+	        return this.searcher || (this.searcher = new OCL.SSSearcherWithIndex());
+	    }
+	}
+
+	module.exports = MoleculeDB;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5).setImmediate))
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(2).nextTick;
+	var apply = Function.prototype.apply;
+	var slice = Array.prototype.slice;
+	var immediateIds = {};
+	var nextImmediateId = 0;
+
+	// DOM APIs, for completeness
+
+	exports.setTimeout = function() {
+	  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+	};
+	exports.setInterval = function() {
+	  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+	};
+	exports.clearTimeout =
+	exports.clearInterval = function(timeout) { timeout.close(); };
+
+	function Timeout(id, clearFn) {
+	  this._id = id;
+	  this._clearFn = clearFn;
+	}
+	Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+	Timeout.prototype.close = function() {
+	  this._clearFn.call(window, this._id);
 	};
 
-	DB.prototype.getSearcher = function () {
-	    return this.searcher || (this.searcher = new OCL.SSSearcherWithIndex());
+	// Does not start the time, just sets up the members needed.
+	exports.enroll = function(item, msecs) {
+	  clearTimeout(item._idleTimeoutId);
+	  item._idleTimeout = msecs;
 	};
 
-	module.exports = DB;
+	exports.unenroll = function(item) {
+	  clearTimeout(item._idleTimeoutId);
+	  item._idleTimeout = -1;
+	};
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2).setImmediate))
+	exports._unrefActive = exports.active = function(item) {
+	  clearTimeout(item._idleTimeoutId);
+
+	  var msecs = item._idleTimeout;
+	  if (msecs >= 0) {
+	    item._idleTimeoutId = setTimeout(function onTimeout() {
+	      if (item._onTimeout)
+	        item._onTimeout();
+	    }, msecs);
+	  }
+	};
+
+	// That's not how node.js implements it but the exposed api is the same.
+	exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
+	  var id = nextImmediateId++;
+	  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+
+	  immediateIds[id] = true;
+
+	  nextTick(function onNextTick() {
+	    if (immediateIds[id]) {
+	      // fn.call() is faster so we optimize for the common use-case
+	      // @see http://jsperf.com/call-apply-segu
+	      if (args) {
+	        fn.apply(null, args);
+	      } else {
+	        fn.call(null);
+	      }
+	      // Prevent ids from leaking
+	      exports.clearImmediate(id);
+	    }
+	  });
+
+	  return id;
+	};
+
+	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
+	  delete immediateIds[id];
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5).setImmediate, __webpack_require__(5).clearImmediate))
 
 /***/ },
 /* 6 */
@@ -3584,103 +3604,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 8 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var hasOwn = Object.prototype.hasOwnProperty;
-	var toStr = Object.prototype.toString;
-
-	var isArray = function isArray(arr) {
-		if (typeof Array.isArray === 'function') {
-			return Array.isArray(arr);
-		}
-
-		return toStr.call(arr) === '[object Array]';
-	};
-
-	var isPlainObject = function isPlainObject(obj) {
-		if (!obj || toStr.call(obj) !== '[object Object]') {
-			return false;
-		}
-
-		var hasOwnConstructor = hasOwn.call(obj, 'constructor');
-		var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
-		// Not own constructor property must be Object
-		if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
-			return false;
-		}
-
-		// Own properties are enumerated firstly, so to speed up,
-		// if last one is own, then all properties are own.
-		var key;
-		for (key in obj) {/**/}
-
-		return typeof key === 'undefined' || hasOwn.call(obj, key);
-	};
-
-	module.exports = function extend() {
-		var options, name, src, copy, copyIsArray, clone,
-			target = arguments[0],
-			i = 1,
-			length = arguments.length,
-			deep = false;
-
-		// Handle a deep copy situation
-		if (typeof target === 'boolean') {
-			deep = target;
-			target = arguments[1] || {};
-			// skip the boolean and the target
-			i = 2;
-		} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
-			target = {};
-		}
-
-		for (; i < length; ++i) {
-			options = arguments[i];
-			// Only deal with non-null/undefined values
-			if (options != null) {
-				// Extend the base object
-				for (name in options) {
-					src = target[name];
-					copy = options[name];
-
-					// Prevent never-ending loop
-					if (target !== copy) {
-						// Recurse if we're merging plain objects or arrays
-						if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
-							if (copyIsArray) {
-								copyIsArray = false;
-								clone = src && isArray(src) ? src : [];
-							} else {
-								clone = src && isPlainObject(src) ? src : {};
-							}
-
-							// Never move original objects, clone them
-							target[name] = extend(deep, clone, copy);
-
-						// Don't bring in undefined values
-						} else if (typeof copy !== 'undefined') {
-							target[name] = copy;
-						}
-					}
-				}
-			}
-		}
-
-		// Return the modified object
-		return target;
-	};
-
-
-
-/***/ },
-/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Molecule = __webpack_require__(4).Molecule;
+	var Molecule = __webpack_require__(3).Molecule;
 
 	var fields = new Map();
 	module.exports = fields;
@@ -3692,13 +3620,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var OCL = __webpack_require__(4);
-	var parseRXN = __webpack_require__(11);
+	var OCL = __webpack_require__(3);
+	var parseRXN = __webpack_require__(10);
 
 	function RXN(rxn, options) {
 	    if (! rxn) {
@@ -3770,7 +3698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3830,7 +3758,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3869,7 +3797,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3906,7 +3834,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3933,12 +3861,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Util = __webpack_require__(4).Util;
+	var Util = __webpack_require__(3).Util;
 
 	module.exports = function getGroupedHOSECodes(options) {
 	    var options=options || {};
@@ -3962,7 +3890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3984,7 +3912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4008,12 +3936,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var OCL = __webpack_require__(4);
+	var OCL = __webpack_require__(3);
 
 	module.exports = function getAtomsInfo() {
 
@@ -4110,13 +4038,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var floydWarshall=__webpack_require__(20);
-	var Matrix=__webpack_require__(21);
+	var floydWarshall=__webpack_require__(19);
+	var Matrix=__webpack_require__(20);
 
 	module.exports = function getAllPaths(options) {
 	    var options=options || [];
@@ -4169,12 +4097,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const Matrix = __webpack_require__(21);
+	const Matrix = __webpack_require__(20);
 
 	/**
 	 * Algorithm that finds the shortest distance from one node to the other
@@ -4221,24 +4149,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = __webpack_require__(21);
+	module.exports.Decompositions = module.exports.DC = __webpack_require__(41);
+
+
+/***/ },
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	module.exports = __webpack_require__(22);
-	module.exports.Decompositions = module.exports.DC = __webpack_require__(42);
-
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	__webpack_require__(23);
-	var abstractMatrix = __webpack_require__(24);
-	var util = __webpack_require__(33);
+	__webpack_require__(22);
+	var abstractMatrix = __webpack_require__(23);
+	var util = __webpack_require__(32);
 
 	class Matrix extends abstractMatrix(Array) {
 	    constructor(nRows, nColumns) {
@@ -4374,7 +4302,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4385,22 +4313,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = abstractMatrix;
 
-	var arrayUtils = __webpack_require__(25);
-	var util = __webpack_require__(33);
-	var MatrixTransposeView = __webpack_require__(34);
-	var MatrixRowView = __webpack_require__(36);
-	var MatrixSubView = __webpack_require__(37);
-	var MatrixSelectionView = __webpack_require__(38);
-	var MatrixColumnView = __webpack_require__(39);
-	var MatrixFlipRowView = __webpack_require__(40);
-	var MatrixFlipColumnView = __webpack_require__(41);
+	var arrayUtils = __webpack_require__(24);
+	var util = __webpack_require__(32);
+	var MatrixTransposeView = __webpack_require__(33);
+	var MatrixRowView = __webpack_require__(35);
+	var MatrixSubView = __webpack_require__(36);
+	var MatrixSelectionView = __webpack_require__(37);
+	var MatrixColumnView = __webpack_require__(38);
+	var MatrixFlipRowView = __webpack_require__(39);
+	var MatrixFlipColumnView = __webpack_require__(40);
 
 	function abstractMatrix(superCtor) {
 	    if (superCtor === undefined) superCtor = Object;
@@ -5863,22 +5791,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = exports = __webpack_require__(26);
-	exports.getEquallySpacedData = __webpack_require__(30).getEquallySpacedData;
-	exports.SNV = __webpack_require__(31).SNV;
-	exports.binarySearch = __webpack_require__(32);
+	module.exports = exports = __webpack_require__(25);
+	exports.getEquallySpacedData = __webpack_require__(29).getEquallySpacedData;
+	exports.SNV = __webpack_require__(30).SNV;
+	exports.binarySearch = __webpack_require__(31);
 
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const Stat = __webpack_require__(27).array;
+	const Stat = __webpack_require__(26).array;
 	/**
 	 * Function that returns an array of points given 1D array as follows:
 	 *
@@ -6104,17 +6032,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 27 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	exports.array = __webpack_require__(28);
-	exports.matrix = __webpack_require__(29);
+	exports.array = __webpack_require__(27);
+	exports.matrix = __webpack_require__(28);
 
 
 /***/ },
-/* 28 */
+/* 27 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6596,12 +6524,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 29 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var arrayStat = __webpack_require__(28);
+	var arrayStat = __webpack_require__(27);
 
 	function compareNumbers(a, b) {
 	    return a - b;
@@ -7210,7 +7138,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 30 */
+/* 29 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7469,13 +7397,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.integral = integral;
 
 /***/ },
-/* 31 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.SNV = SNV;
-	var Stat = __webpack_require__(27).array;
+	var Stat = __webpack_require__(26).array;
 
 	/**
 	 * Function that applies the standard normal variate (SNV) to an array of values.
@@ -7495,7 +7423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 32 */
+/* 31 */
 /***/ function(module, exports) {
 
 	/**
@@ -7527,7 +7455,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 33 */
+/* 32 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7643,12 +7571,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 34 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(35);
+	var BaseView = __webpack_require__(34);
 
 	class MatrixTransposeView extends BaseView {
 	    constructor(matrix) {
@@ -7669,12 +7597,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 35 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var abstractMatrix = __webpack_require__(24);
+	var abstractMatrix = __webpack_require__(23);
 	var Matrix;
 
 	class BaseView extends abstractMatrix() {
@@ -7687,7 +7615,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    static get [Symbol.species]() {
 	        if (!Matrix) {
-	            Matrix = __webpack_require__(22);
+	            Matrix = __webpack_require__(21);
 	        }
 	        return Matrix;
 	    }
@@ -7697,12 +7625,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 36 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(35);
+	var BaseView = __webpack_require__(34);
 
 	class MatrixRowView extends BaseView {
 	    constructor(matrix, row) {
@@ -7724,13 +7652,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 37 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(35);
-	var util = __webpack_require__(33);
+	var BaseView = __webpack_require__(34);
+	var util = __webpack_require__(32);
 
 	class MatrixSubView extends BaseView {
 	    constructor(matrix, startRow, endRow, startColumn, endColumn) {
@@ -7754,13 +7682,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 38 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(35);
-	var util = __webpack_require__(33);
+	var BaseView = __webpack_require__(34);
+	var util = __webpack_require__(32);
 
 	class MatrixSelectionView extends BaseView {
 	    constructor(matrix, rowIndices, columnIndices) {
@@ -7784,12 +7712,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 39 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(35);
+	var BaseView = __webpack_require__(34);
 
 	class MatrixColumnView extends BaseView {
 	    constructor(matrix, column) {
@@ -7811,12 +7739,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 40 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(35);
+	var BaseView = __webpack_require__(34);
 
 	class MatrixFlipRowView extends BaseView {
 	    constructor(matrix) {
@@ -7837,12 +7765,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 41 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(35);
+	var BaseView = __webpack_require__(34);
 
 	class MatrixFlipColumnView extends BaseView {
 	    constructor(matrix) {
@@ -7863,18 +7791,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 42 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Matrix = __webpack_require__(22);
+	var Matrix = __webpack_require__(21);
 
-	var SingularValueDecomposition = __webpack_require__(43);
-	var EigenvalueDecomposition = __webpack_require__(45);
-	var LuDecomposition = __webpack_require__(46);
-	var QrDecomposition = __webpack_require__(47);
-	var CholeskyDecomposition = __webpack_require__(48);
+	var SingularValueDecomposition = __webpack_require__(42);
+	var EigenvalueDecomposition = __webpack_require__(44);
+	var LuDecomposition = __webpack_require__(45);
+	var QrDecomposition = __webpack_require__(46);
+	var CholeskyDecomposition = __webpack_require__(47);
 
 	function inverse(matrix) {
 	    matrix = Matrix.checkMatrix(matrix);
@@ -7914,13 +7842,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 43 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Matrix = __webpack_require__(22);
-	var util = __webpack_require__(44);
+	var Matrix = __webpack_require__(21);
+	var util = __webpack_require__(43);
 	var hypotenuse = util.hypotenuse;
 	var getFilled2DArray = util.getFilled2DArray;
 
@@ -8433,7 +8361,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 44 */
+/* 43 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -8475,13 +8403,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 45 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const Matrix = __webpack_require__(22);
-	const util = __webpack_require__(44);
+	const Matrix = __webpack_require__(21);
+	const util = __webpack_require__(43);
 	const hypotenuse = util.hypotenuse;
 	const getFilled2DArray = util.getFilled2DArray;
 
@@ -9264,12 +9192,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 46 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Matrix = __webpack_require__(22);
+	var Matrix = __webpack_require__(21);
 
 	// https://github.com/lutzroeder/Mapack/blob/master/Source/LuDecomposition.cs
 	function LuDecomposition(matrix) {
@@ -9439,13 +9367,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 47 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Matrix = __webpack_require__(22);
-	var hypotenuse = __webpack_require__(44).hypotenuse;
+	var Matrix = __webpack_require__(21);
+	var hypotenuse = __webpack_require__(43).hypotenuse;
 
 	//https://github.com/lutzroeder/Mapack/blob/master/Source/QrDecomposition.cs
 	function QrDecomposition(value) {
@@ -9595,12 +9523,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 48 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Matrix = __webpack_require__(22);
+	var Matrix = __webpack_require__(21);
 
 	// https://github.com/lutzroeder/Mapack/blob/master/Source/CholeskyDecomposition.cs
 	function CholeskyDecomposition(value) {
@@ -9690,12 +9618,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 49 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var OCL = __webpack_require__(4);
+	var OCL = __webpack_require__(3);
 
 	module.exports = function getConnectivityMatrix(options) {
 
