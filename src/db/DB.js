@@ -209,7 +209,7 @@ class MoleculeDB {
             return Math.abs(queryMW - a[0].mw) - Math.abs(queryMW - b[0].mw);
         });
 
-        var length = limit || searchResult.length;
+        var length = Math.min(limit || 0, searchResult.length);
         var result = new MoleculeDB({length: length});
         for (var i = 0; i < length; i++) {
             result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
@@ -241,7 +241,7 @@ class MoleculeDB {
             return b[0] - a[0];
         });
 
-        var length = limit || searchResult.length;
+        var length = Math.min(limit || 0, searchResult.length);
         var result = new MoleculeDB({length: length});
         for (var i = 0; i < length; i++) {
             result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
