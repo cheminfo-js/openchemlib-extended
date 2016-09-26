@@ -283,25 +283,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	var cachedSetTimeout;
 	var cachedClearTimeout;
 
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
 	(function () {
 	    try {
-	        cachedSetTimeout = setTimeout;
-	    } catch (e) {
-	        cachedSetTimeout = function () {
-	            throw new Error('setTimeout is not defined');
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
 	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
 	    }
 	    try {
-	        cachedClearTimeout = clearTimeout;
-	    } catch (e) {
-	        cachedClearTimeout = function () {
-	            throw new Error('clearTimeout is not defined');
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
 	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
 	    }
 	} ())
 	function runTimeout(fun) {
 	    if (cachedSetTimeout === setTimeout) {
 	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
 	        return setTimeout(fun, 0);
 	    }
 	    try {
@@ -322,6 +337,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	function runClearTimeout(marker) {
 	    if (cachedClearTimeout === clearTimeout) {
 	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
 	        return clearTimeout(marker);
 	    }
 	    try {
@@ -440,8 +460,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * openchemlib - Manipulate molecules
-	 * @version v4.4.0
-	 * @date 2016-09-01T11:25:09.510Z
+	 * @version v4.4.2
+	 * @date 2016-09-23T09:33:49.987Z
 	 * @link https://github.com/cheminfo/openchemlib-js
 	 * @license BSD-3-Clause
 	*/
@@ -1660,7 +1680,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var toReturn = $wnd["OCL"];
 
-	        toReturn.version = '4.4.0';
+	        toReturn.version = '4.4.2';
 
 	        return toReturn;
 	    }
@@ -1954,7 +1974,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return Math.abs(queryMW - a[0].mw) - Math.abs(queryMW - b[0].mw);
 	        });
 
-	        var length = limit || searchResult.length;
+	        var length = Math.min(limit || searchResult.length, searchResult.length);
 	        var result = new MoleculeDB({length: length});
 	        for (var i = 0; i < length; i++) {
 	            result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
@@ -1986,7 +2006,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return b[0] - a[0];
 	        });
 
-	        var length = limit || searchResult.length;
+	        var length = Math.min(limit || searchResult.length, searchResult.length);
 	        var result = new MoleculeDB({length: length});
 	        for (var i = 0; i < length; i++) {
 	            result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
@@ -3798,15 +3818,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 12 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+
+	var OCL=__webpack_require__(3)
 
 	module.exports = function getExtendedDiastereotopicAtomIDs() {
 	    var molecule=this.getCompactCopy();
 	    molecule.addImplicitHydrogens();
-	    var diaIDs=molecule.getDiastereotopicAtomIDs();
+	    // Temporary code ???
+	    molecule.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
 	    
+	    var diaIDs=molecule.getDiastereotopicAtomIDs();
 	    var newDiaIDs=[];
 
 	    for (var i=0; i<diaIDs.length; i++) {
@@ -3839,16 +3863,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	module.exports = function toVisualizerMolfile() {
+	module.exports = function toVisualizerMolfile(options) {
+	    var options = options || {};
+	    var heavyAtomHydrogen = options.heavyAtomHydrogen;
+	    
+	    var hydrogenInfo={};
+	    this.getExtendedDiastereotopicAtomIDs().forEach(function(line) {
+	        hydrogenInfo[line.oclID]=line;
+	    });
+	    
 	    var diaIDs=this.getGroupedDiastereotopicAtomIDs();
-
+	    
 	    var highlight=[];
 	    var atoms={};
 	    diaIDs.forEach(function(diaID) {
 	        atoms[diaID.oclID]=diaID.atoms;
 	        highlight.push(diaID.oclID);
-	    })
-
+	        if (heavyAtomHydrogen) {
+	            if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens>0) {
+	                hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach(function(id) {
+	                    highlight.push(id);
+	                    atoms[id]=diaID.atoms;
+	                })
+	                
+	            }
+	        }
+	    });
+	    
 	    var molfile={
 	        type:'mol2d',
 	        value:this.toMolfile(),
