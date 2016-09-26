@@ -1,10 +1,14 @@
 'use strict';
 
+var OCL=require('openchemlib')
+
 module.exports = function getExtendedDiastereotopicAtomIDs() {
     var molecule=this.getCompactCopy();
     molecule.addImplicitHydrogens();
-    var diaIDs=molecule.getDiastereotopicAtomIDs();
+    // Temporary code ???
+    molecule.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
     
+    var diaIDs=molecule.getDiastereotopicAtomIDs();
     var newDiaIDs=[];
 
     for (var i=0; i<diaIDs.length; i++) {
