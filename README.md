@@ -53,13 +53,22 @@ options:
 * width (default: 200)
 * prefix : prefix for the id of each SVG element (default: ocl)
 
+
+
+### getDiastereotopicHoseCodes(options)
+
+Returns an array containing diastereotopic hoses codes
+
+options:
+* maxSphereSize: maxSphere for hose code calculation
+
 ### getGroupedHOSECodes(options)
 
 Returns an extended groupedDiastereotopicID with hoses
 
 options:
 * atomLabel: filter to show only a specific atom (default: '')
-
+* maxSphereSize: maxSphere for hose code calculation
 
 ### toVisualizerMolfile()
 
