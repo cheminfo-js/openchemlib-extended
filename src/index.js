@@ -19,4 +19,7 @@ OCL.Molecule.prototype.getAllPaths = require('./extend/getAllPaths');
 OCL.Molecule.prototype.getConnectivityMatrix = require('./extend/getConnectivityMatrix');
 OCL.Molecule.prototype.getDiastereotopicHoseCodes = require('./extend/getDiastereotopicHoseCodes');
 
+OCL.Molecule.prototype.getFunctionCodes = require('./extend/getFunctionCodes');
+OCL.Molecule.prototype.getFunctions = require('./extend/getFunctions');
+
 
