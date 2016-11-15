@@ -75,6 +75,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	OCL.Molecule.prototype.getConnectivityMatrix = __webpack_require__(47);
 	OCL.Molecule.prototype.getDiastereotopicHoseCodes = __webpack_require__(48);
 
+	OCL.Molecule.prototype.getFunctionCodes = __webpack_require__(49);
+	OCL.Molecule.prototype.getFunctions = __webpack_require__(50);
+
 
 
 
@@ -3898,30 +3901,38 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = function toVisualizerMolfile(options) {
 	    var options = options || {};
-	    var heavyAtomHydrogen = options.heavyAtomHydrogen;
+	    var diastereotopic = options.diastereotopic;
 	    
-	    var hydrogenInfo={};
-	    this.getExtendedDiastereotopicAtomIDs().forEach(function(line) {
-	        hydrogenInfo[line.oclID]=line;
-	    });
-	    
-	    var diaIDs=this.getGroupedDiastereotopicAtomIDs();
-	    
-	    var highlight=[];
-	    var atoms={};
-	    diaIDs.forEach(function(diaID) {
-	        atoms[diaID.oclID]=diaID.atoms;
-	        highlight.push(diaID.oclID);
-	        if (heavyAtomHydrogen) {
-	            if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens>0) {
-	                hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach(function(id) {
-	                    highlight.push(id);
-	                    atoms[id]=diaID.atoms;
-	                })
-	                
+	    if (diastereotopic) {
+	        var heavyAtomHydrogen = options.heavyAtomHydrogen;
+	        var hydrogenInfo={};
+	        this.getExtendedDiastereotopicAtomIDs().forEach(function(line) {
+	            hydrogenInfo[line.oclID]=line;
+	        });
+
+	        var diaIDs=this.getGroupedDiastereotopicAtomIDs();
+
+	        var highlight=[];
+	        var atoms={};
+	        diaIDs.forEach(function(diaID) {
+	            atoms[diaID.oclID]=diaID.atoms;
+	            highlight.push(diaID.oclID);
+	            if (heavyAtomHydrogen) {
+	                if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens>0) {
+	                    hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach(function(id) {
+	                        highlight.push(id);
+	                        atoms[id]=diaID.atoms;
+	                    })
+
+	                }
 	            }
-	        }
-	    });
+	        });
+	    } else {
+	        var size=this.getAllAtoms();
+	        var highlight=(new Array(size)).fill(0).map( (a,index) => index);
+	        var atoms=highlight.map( (a) => [a]);
+	    }
+
 	    
 	    var molfile={
 	        type:'mol2d',
@@ -3931,7 +3942,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    return molfile;
-	}
+	};
 
 
 /***/ },
@@ -10008,6 +10019,238 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return diaIDs;
 	};
 
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var OCL = __webpack_require__(3);
+
+	module.exports = function getFunctionCodes() {
+	    var molecule=this.getCompactCopy();
+	    var atoms=molecule.getAtomsInfo();;
+	    for (var i=0; i<molecule.getAllAtoms(); i++) {
+	        var atom=atoms[i];
+	        atom.i=i;
+	        atom.mapNo=molecule.getAtomMapNo(i);
+	        atom.links=[]; // we will store connected atoms of broken bonds
+	    }
+
+	    var bonds=[];
+	    for (var i=0; i<molecule.getAllBonds(); i++) {
+	        var bond={};
+	        bonds.push(bond);
+	        bond.i=i;
+	        bond.order=molecule.getBondOrder(i);
+	        bond.atom1=molecule.getBondAtom(0,i);
+	        bond.atom2=molecule.getBondAtom(1,i);
+	        bond.type=molecule.getBondType(i);
+	        bond.isAromatic=molecule.isAromaticBond(i);
+
+	        if (! bond.isAromatic
+	            && molecule.getBondTypeSimple(i)===1
+	            && molecule.getAtomicNo(bond.atom1) === 6
+	            && molecule.getAtomicNo(bond.atom2) === 6
+	            && (
+	                atoms[bond.atom1].extra.cnoHybridation===3
+	                || atoms[bond.atom2].extra.cnoHybridation===3
+	            )
+	        ) {
+
+	            bond.selected=true;
+	            atoms[bond.atom1].links.push(bond.atom2);
+	            atoms[bond.atom2].links.push(bond.atom1);
+	        }
+	    }
+
+	    var brokenMolecule=molecule.getCompactCopy();
+	    for (var bond of bonds) {
+	        if (bond.selected) {
+	            brokenMolecule.markBondForDeletion(bond.i);
+	        }
+	    }
+
+	    brokenMolecule.deleteMarkedAtomsAndBonds();
+	    var fragmentMap=[];
+	    var nbFragments=brokenMolecule.getFragmentNumbers(fragmentMap);
+
+	    var results={};
+
+	    for (var i=0; i<nbFragments; i++) {
+	        var result={};
+	        result.atomMap=[];
+	        var includeAtom=fragmentMap.map(function(id) {return id===i});
+	        var fragment=new OCL.Molecule();
+	        var atomMap=[];
+	        brokenMolecule.copyMoleculeByAtoms(fragment, includeAtom, false, atomMap);
+	        var parent=fragment.getCompactCopy();
+	        parent.setFragment(true);
+	        // we will remove the hydrogens of the broken carbon
+	        for (var j=0; j<atomMap.length; j++) {
+	            if (atomMap[j]>-1) {
+	                var numberDeletedHydrogens=0;
+	                if (atoms[j].links.length>0) {
+	                    for (var k=0; k<atoms[j].links.length; k++) {
+	                        if (parent.getAtomicNo(atoms[j].links[k])===1) {
+	                            numberDeletedHydrogens++;
+	                            fragment.deleteAtom(atoms[j].links[k]);
+	                        }
+	                    }
+	                }
+	                fragment.ensureHelperArrays(OCL.Molecule.cHelperBitNeighbours);
+	                // we will allow any substitution on sp3 hydrogens
+	                // that is at an extremety (only one connection)
+
+	                if (atoms[j].atomicNo===6 && fragment.getConnAtoms(atomMap[j])>1) {
+	                    if (atoms[j].allHydrogens!==0) parent.setAtomQueryFeature(atomMap[j],OCL.Molecule.cAtomQFNot0Hydrogen, true);
+	                    if (atoms[j].allHydrogens!==1) parent.setAtomQueryFeature(atomMap[j],OCL.Molecule.cAtomQFNot1Hydrogen, true);
+	                    if (atoms[j].allHydrogens!==2) parent.setAtomQueryFeature(atomMap[j],OCL.Molecule.cAtomQFNot2Hydrogen, true);
+	                    if (atoms[j].allHydrogens!==3) parent.setAtomQueryFeature(atomMap[j],OCL.Molecule.cAtomQFNot3Hydrogen, true);
+	                }
+	                if (atoms[j].atomicNo!==6) {
+	                    parent.setAtomQueryFeature(atomMap[j],OCL.Molecule.cAtomQFNoMoreNeighbours, true);
+	                }
+	            }
+	        }
+
+	        result.parent=parent.getIDCode();
+	        fragment.setFragment(false); // required for small molecules like methanol
+
+	        // we will add some R groups at the level of the broken bonds
+	        for (var j=0; j<atomMap.length; j++) {
+	            if (atomMap[j]>-1) {
+	                result.atomMap.push(j);
+	                if (atoms[j].links.length>0) {
+	                    for (var k=0; k<atoms[j].links.length; k++) {
+	                        var rGroup=fragment.addAtom(154);
+	                        var x=molecule.getAtomX(atoms[j].links[k]);
+	                        var y=molecule.getAtomY(atoms[j].links[k]);
+	                        fragment.setAtomX(rGroup, x);
+	                        fragment.setAtomY(rGroup, y);
+	                        fragment.addBond(atomMap[j], rGroup,1);
+	                    }
+	                }
+	            }
+	        }
+	        result.idCode=fragment.getIDCode();
+
+	        if (results[result.idCode]) {
+	            results[result.idCode].atomMap=results[result.idCode].atomMap.concat(result.atomMap);
+	        } else {
+	            results[result.idCode]={
+	                atomMap: result.atomMap,
+	                idCode: result.idCode
+	            }
+	        }
+
+	        if (results[result.parent]) {
+	            results[result.parent].atomMap=results[result.parent].atomMap.concat(result.atomMap);
+	        } else {
+	            results[result.parent]={
+	                atomMap: result.atomMap,
+	                idCode: result.parent
+	            }
+	        }
+	    }
+
+	    // fragments should be unique
+	    var fragments=[];
+	    Object.keys(results).forEach( function(key) {
+	        fragments.push(results[key]);
+	    });
+	    return fragments;
+	};
+
+
+/***/ },
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var getFunctionCodes=__webpack_require__(49);
+	var functionIndex=__webpack_require__(51);
+
+	module.exports = function getFunctions() {
+	    var currentFunctionCodes=this.getFunctionCodes();
+	    var currentFunctions=[];
+	    for (var fragment of currentFunctionCodes) {
+	        if (functionIndex[fragment.idCode]) {
+	            var currentFunction=JSON.parse(JSON.stringify(functionIndex[fragment.idCode]));
+	            currentFunction.atomMap=fragment.atomMap;
+	            currentFunctions.push(currentFunction)
+	        }
+	    }
+	    return currentFunctions;
+	};
+
+/***/ },
+/* 51 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = {
+	    "gJQLBEeKNVTfjh@": {
+	        "name": "tertiary alcohol"
+	    },
+	    "eF@HxP": {
+	        "name": "alkyne"
+	    },
+	    "eF@HhP": {
+	        "name": "alkene"
+	    },
+	    "eM`BN`p`": {
+	        "name": "secondary amine"
+	    },
+	    "gC``@deZ@~d\\": {
+	        "name": "ester"
+	    },
+	    "eMHBN``": {
+	        "name": "ether"
+	    },
+	    "gC``Adij@pf}IX": {
+	        "name": "hemiacetal"
+	    },
+	    "gJP`AdizhCzRp": {
+	        "name": "acetal"
+	    },
+	    "gCh@AGj@`": {
+	        "name": "tertiary amine"
+	    },
+	    "gJP`AdizhCzQp": {
+	        "name": "cetal"
+	    },
+	    "gJP`AdizhCzSP": {
+	        "name": "acetal"
+	    },
+	    "gJY@DDefhCzQp": {
+	        "name": "tertiary amide"
+	    },
+	    "eMJDVTfP@": {
+	        "name": "aldehyde"
+	    },
+	    "gCaDLEeKJST`@": {
+	        "name": "ketone"
+	    },
+	    "eF`BLFD@": {
+	        "name": "primary amine"
+	    },
+	    "eFHBLFD@": {
+	        "name": ""
+	    },
+	    "eMJDVTf`@": {
+	        "name": "primary alcohol"
+	    },
+	    "gCaDLEeKJSU@@": {
+	        "name": "secondary alcohol"
+	    },
+	    "eMDARVCB_Tx": {
+	        "name": "carboxylic acid"
+	    }
+	};
 
 /***/ }
 /******/ ])
