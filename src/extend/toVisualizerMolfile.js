@@ -2,30 +2,38 @@
 
 module.exports = function toVisualizerMolfile(options) {
     var options = options || {};
-    var heavyAtomHydrogen = options.heavyAtomHydrogen;
+    var diastereotopic = options.diastereotopic;
     
-    var hydrogenInfo={};
-    this.getExtendedDiastereotopicAtomIDs().forEach(function(line) {
-        hydrogenInfo[line.oclID]=line;
-    });
-    
-    var diaIDs=this.getGroupedDiastereotopicAtomIDs();
-    
-    var highlight=[];
-    var atoms={};
-    diaIDs.forEach(function(diaID) {
-        atoms[diaID.oclID]=diaID.atoms;
-        highlight.push(diaID.oclID);
-        if (heavyAtomHydrogen) {
-            if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens>0) {
-                hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach(function(id) {
-                    highlight.push(id);
-                    atoms[id]=diaID.atoms;
-                })
-                
+    if (diastereotopic) {
+        var heavyAtomHydrogen = options.heavyAtomHydrogen;
+        var hydrogenInfo={};
+        this.getExtendedDiastereotopicAtomIDs().forEach(function(line) {
+            hydrogenInfo[line.oclID]=line;
+        });
+
+        var diaIDs=this.getGroupedDiastereotopicAtomIDs();
+
+        var highlight=[];
+        var atoms={};
+        diaIDs.forEach(function(diaID) {
+            atoms[diaID.oclID]=diaID.atoms;
+            highlight.push(diaID.oclID);
+            if (heavyAtomHydrogen) {
+                if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens>0) {
+                    hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach(function(id) {
+                        highlight.push(id);
+                        atoms[id]=diaID.atoms;
+                    })
+
+                }
             }
-        }
-    });
+        });
+    } else {
+        var size=this.getAllAtoms();
+        var highlight=(new Array(size)).fill(0).map( (a,index) => index);
+        var atoms=highlight.map( (a) => [a]);
+    }
+
     
     var molfile={
         type:'mol2d',
@@ -35,4 +43,4 @@ module.exports = function toVisualizerMolfile(options) {
     }
 
     return molfile;
-}
+};
