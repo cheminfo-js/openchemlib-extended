@@ -84,6 +84,12 @@ Extra information like the diastereotopicIDs of the molecule are added
 Returns an array of array (matrix) containing a '1' for all the connected atoms.
 An atom is considered connected to itself (dialog is equal to 1)
 
+### getMF()
+
+Return an object containing the molecular formula and the molecular formula of each distinct
+part of the molecule.
+The molecular formula takes into account multihydrates, charges and isotopes.
+
 ## License
 
   [BSD-3-Clause](./LICENSE)

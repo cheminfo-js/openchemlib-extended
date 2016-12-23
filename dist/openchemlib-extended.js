@@ -74,9 +74,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	OCL.Molecule.prototype.getAllPaths = __webpack_require__(18);
 	OCL.Molecule.prototype.getConnectivityMatrix = __webpack_require__(47);
 	OCL.Molecule.prototype.getDiastereotopicHoseCodes = __webpack_require__(48);
+	OCL.Molecule.prototype.getMF = __webpack_require__(49);
 
-	OCL.Molecule.prototype.getFunctionCodes = __webpack_require__(49);
-	OCL.Molecule.prototype.getFunctions = __webpack_require__(50);
+	OCL.Molecule.prototype.getFunctionCodes = __webpack_require__(50);
+	OCL.Molecule.prototype.getFunctions = __webpack_require__(51);
 
 
 
@@ -2063,11 +2064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(2).nextTick;
 	var apply = Function.prototype.apply;
-	var slice = Array.prototype.slice;
-	var immediateIds = {};
-	var nextImmediateId = 0;
 
 	// DOM APIs, for completeness
 
@@ -2078,7 +2075,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
 	};
 	exports.clearTimeout =
-	exports.clearInterval = function(timeout) { timeout.close(); };
+	exports.clearInterval = function(timeout) {
+	  if (timeout) {
+	    timeout.close();
+	  }
+	};
 
 	function Timeout(id, clearFn) {
 	  this._id = id;
@@ -2112,34 +2113,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	// That's not how node.js implements it but the exposed api is the same.
-	exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
-	  var id = nextImmediateId++;
-	  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+	// setimmediate attaches itself to the global object
+	__webpack_require__(1);
+	exports.setImmediate = setImmediate;
+	exports.clearImmediate = clearImmediate;
 
-	  immediateIds[id] = true;
-
-	  nextTick(function onNextTick() {
-	    if (immediateIds[id]) {
-	      // fn.call() is faster so we optimize for the common use-case
-	      // @see http://jsperf.com/call-apply-segu
-	      if (args) {
-	        fn.apply(null, args);
-	      } else {
-	        fn.call(null);
-	      }
-	      // Prevent ids from leaking
-	      exports.clearImmediate(id);
-	    }
-	  });
-
-	  return id;
-	};
-
-	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
-	  delete immediateIds[id];
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5).setImmediate, __webpack_require__(5).clearImmediate))
 
 /***/ },
 /* 6 */
@@ -4239,8 +4217,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	module.exports = __webpack_require__(21);
-	module.exports.Decompositions = module.exports.DC = __webpack_require__(40);
+	module.exports = __webpack_require__(21).Matrix;
+	module.exports.Decompositions = module.exports.DC = __webpack_require__(41);
 
 
 /***/ },
@@ -4251,10 +4229,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	__webpack_require__(22);
 	var abstractMatrix = __webpack_require__(23);
-	var util = __webpack_require__(31);
+	var util = __webpack_require__(32);
 
 	class Matrix extends abstractMatrix(Array) {
 	    constructor(nRows, nColumns) {
+	        var i;
 	        if (arguments.length === 1 && typeof nRows === 'number') {
 	            return new Array(nRows);
 	        }
@@ -4263,21 +4242,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else if (Number.isInteger(nRows) && nRows > 0) { // Create an empty matrix
 	            super(nRows);
 	            if (Number.isInteger(nColumns) && nColumns > 0) {
-	                for (var i = 0; i < nRows; i++) {
+	                for (i = 0; i < nRows; i++) {
 	                    this[i] = new Array(nColumns);
 	                }
 	            } else {
 	                throw new TypeError('nColumns must be a positive integer');
 	            }
 	        } else if (Array.isArray(nRows)) { // Copy the values from the 2D array
-	            var matrix = nRows;
+	            const matrix = nRows;
 	            nRows = matrix.length;
 	            nColumns = matrix[0].length;
 	            if (typeof nColumns !== 'number' || nColumns === 0) {
 	                throw new TypeError('Data must be a 2D array with at least one element');
 	            }
 	            super(nRows);
-	            for (var i = 0; i < nRows; i++) {
+	            for (i = 0; i < nRows; i++) {
 	                if (matrix[i].length !== nColumns) {
 	                    throw new RangeError('Inconsistent array dimensions');
 	                }
@@ -4288,6 +4267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        this.rows = nRows;
 	        this.columns = nColumns;
+	        return this;
 	    }
 
 	    set(rowIndex, columnIndex, value) {
@@ -4301,7 +4281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Creates an exact and independent copy of the matrix
-	     * @returns {Matrix}
+	     * @return {Matrix}
 	     */
 	    clone() {
 	        var newMatrix = new this.constructor[Symbol.species](this.rows, this.columns);
@@ -4316,12 +4296,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Removes a row from the given index
 	     * @param {number} index - Row index
-	     * @returns {Matrix} this
+	     * @return {Matrix} this
 	     */
 	    removeRow(index) {
 	        util.checkRowIndex(this, index);
-	        if (this.rows === 1)
+	        if (this.rows === 1) {
 	            throw new RangeError('A matrix cannot have less than one row');
+	        }
 	        this.splice(index, 1);
 	        this.rows -= 1;
 	        return this;
@@ -4331,7 +4312,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Adds a row at the given index
 	     * @param {number} [index = this.rows] - Row index
 	     * @param {Array|Matrix} array - Array or vector
-	     * @returns {Matrix} this
+	     * @return {Matrix} this
 	     */
 	    addRow(index, array) {
 	        if (array === undefined) {
@@ -4348,12 +4329,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Removes a column from the given index
 	     * @param {number} index - Column index
-	     * @returns {Matrix} this
+	     * @return {Matrix} this
 	     */
 	    removeColumn(index) {
 	        util.checkColumnIndex(this, index);
-	        if (this.columns === 1)
+	        if (this.columns === 1) {
 	            throw new RangeError('A matrix cannot have less than one column');
+	        }
 	        for (var i = 0; i < this.rows; i++) {
 	            this[i].splice(index, 1);
 	        }
@@ -4365,7 +4347,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Adds a column at the given index
 	     * @param {number} [index = this.columns] - Column index
 	     * @param {Array|Matrix} array - Array or vector
-	     * @returns {Matrix} this
+	     * @return {Matrix} this
 	     */
 	    addColumn(index, array) {
 	        if (typeof array === 'undefined') {
@@ -4382,7 +4364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 
-	module.exports = Matrix;
+	exports.Matrix = Matrix;
 	Matrix.abstractMatrix = abstractMatrix;
 
 
@@ -4405,15 +4387,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = abstractMatrix;
 
-	var arrayUtils = __webpack_require__(24);
-	var util = __webpack_require__(31);
-	var MatrixTransposeView = __webpack_require__(32);
-	var MatrixRowView = __webpack_require__(34);
-	var MatrixSubView = __webpack_require__(35);
-	var MatrixSelectionView = __webpack_require__(36);
-	var MatrixColumnView = __webpack_require__(37);
-	var MatrixFlipRowView = __webpack_require__(38);
-	var MatrixFlipColumnView = __webpack_require__(39);
+	var LuDecomposition = __webpack_require__(24);
+	var arrayUtils = __webpack_require__(25);
+	var util = __webpack_require__(32);
+	var MatrixTransposeView = __webpack_require__(33);
+	var MatrixRowView = __webpack_require__(35);
+	var MatrixSubView = __webpack_require__(36);
+	var MatrixSelectionView = __webpack_require__(37);
+	var MatrixColumnView = __webpack_require__(38);
+	var MatrixFlipRowView = __webpack_require__(39);
+	var MatrixFlipColumnView = __webpack_require__(40);
 
 	function abstractMatrix(superCtor) {
 	    if (superCtor === undefined) superCtor = Object;
@@ -4435,7 +4418,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {number} newRows - Number of rows
 	         * @param {number} newColumns - Number of columns
 	         * @param {Array} newData - A 1D array containing data for the matrix
-	         * @returns {Matrix} - The new matrix
+	         * @return {Matrix} - The new matrix
 	         */
 	        static from1DArray(newRows, newColumns, newData) {
 	            var length = newRows * newColumns;
@@ -4454,7 +4437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Creates a row vector, a matrix with only one row.
 	         * @param {Array} newData - A 1D array containing data for the vector
-	         * @returns {Matrix} - The new matrix
+	         * @return {Matrix} - The new matrix
 	         */
 	        static rowVector(newData) {
 	            var vector = new this(1, newData.length);
@@ -4467,7 +4450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Creates a column vector, a matrix with only one column.
 	         * @param {Array} newData - A 1D array containing data for the vector
-	         * @returns {Matrix} - The new matrix
+	         * @return {Matrix} - The new matrix
 	         */
 	        static columnVector(newData) {
 	            var vector = new this(newData.length, 1);
@@ -4481,7 +4464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Creates an empty matrix with the given dimensions. Values will be undefined. Same as using new Matrix(rows, columns).
 	         * @param {number} rows - Number of rows
 	         * @param {number} columns - Number of columns
-	         * @returns {Matrix} - The new matrix
+	         * @return {Matrix} - The new matrix
 	         */
 	        static empty(rows, columns) {
 	            return new this(rows, columns);
@@ -4491,7 +4474,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Creates a matrix with the given dimensions. Values will be set to zero.
 	         * @param {number} rows - Number of rows
 	         * @param {number} columns - Number of columns
-	         * @returns {Matrix} - The new matrix
+	         * @return {Matrix} - The new matrix
 	         */
 	        static zeros(rows, columns) {
 	            return this.empty(rows, columns).fill(0);
@@ -4501,7 +4484,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Creates a matrix with the given dimensions. Values will be set to one.
 	         * @param {number} rows - Number of rows
 	         * @param {number} columns - Number of columns
-	         * @returns {Matrix} - The new matrix
+	         * @return {Matrix} - The new matrix
 	         */
 	        static ones(rows, columns) {
 	            return this.empty(rows, columns).fill(1);
@@ -4512,7 +4495,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {number} rows - Number of rows
 	         * @param {number} columns - Number of columns
 	         * @param {function} [rng=Math.random] - Random number generator
-	         * @returns {Matrix} The new matrix
+	         * @return {Matrix} The new matrix
 	         */
 	        static rand(rows, columns, rng) {
 	            if (rng === undefined) rng = Math.random;
@@ -4531,7 +4514,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {number} columns - Number of columns
 	         * @param {number} [maxValue=1000] - Maximum value
 	         * @param {function} [rng=Math.random] - Random number generator
-	         * @returns {Matrix} The new matrix
+	         * @return {Matrix} The new matrix
 	         */
 	        static randInt(rows, columns, maxValue, rng) {
 	            if (maxValue === undefined) maxValue = 1000;
@@ -4549,12 +4532,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Creates an identity matrix with the given dimension. Values of the diagonal will be 1 and others will be 0.
 	         * @param {number} rows - Number of rows
-	         * @param {number} [columns] - Number of columns (Default: rows)
-	         * @returns {Matrix} - The new identity matrix
+	         * @param {number} [columns=rows] - Number of columns
+	         * @param {number} [value=1] - Value to fill the diagonal with
+	         * @return {Matrix} - The new identity matrix
 	         */
 	        static eye(rows, columns, value) {
-	            if (value === undefined) value = 1
 	            if (columns === undefined) columns = rows;
+	            if (value === undefined) value = 1;
 	            var min = Math.min(rows, columns);
 	            var matrix = this.zeros(rows, columns);
 	            for (var i = 0; i < min; i++) {
@@ -4568,7 +4552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {Array} data - Array containing the data for the diagonal
 	         * @param {number} [rows] - Number of rows (Default: data.length)
 	         * @param {number} [columns] - Number of columns (Default: rows)
-	         * @returns {Matrix} - The new diagonal matrix
+	         * @return {Matrix} - The new diagonal matrix
 	         */
 	        static diag(data, rows, columns) {
 	            var l = data.length;
@@ -4584,9 +4568,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns a matrix whose elements are the minimum between matrix1 and matrix2
-	         * @param matrix1
-	         * @param matrix2
-	         * @returns {Matrix}
+	         * @param {Matrix} matrix1
+	         * @param {Matrix} matrix2
+	         * @return {Matrix}
 	         */
 	        static min(matrix1, matrix2) {
 	            matrix1 = this.checkMatrix(matrix1);
@@ -4604,9 +4588,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns a matrix whose elements are the maximum between matrix1 and matrix2
-	         * @param matrix1
-	         * @param matrix2
-	         * @returns {Matrix}
+	         * @param {Matrix} matrix1
+	         * @param {Matrix} matrix2
+	         * @return {Matrix}
 	         */
 	        static max(matrix1, matrix2) {
 	            matrix1 = this.checkMatrix(matrix1);
@@ -4624,8 +4608,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Check that the provided value is a Matrix and tries to instantiate one if not
-	         * @param value - The value to check
-	         * @returns {Matrix}
+	         * @param {*} value - The value to check
+	         * @return {Matrix}
 	         */
 	        static checkMatrix(value) {
 	            return Matrix.isMatrix(value) ? value : new this(value);
@@ -4633,7 +4617,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns true if the argument is a Matrix, false otherwise
-	         * @param value - The value to check
+	         * @param {*} value - The value to check
 	         * @return {boolean}
 	         */
 	        static isMatrix(value) {
@@ -4641,7 +4625,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
-	         * @property {number} - The number of elements in the matrix.
+	         * @prop {number} size - The number of elements in the matrix.
 	         */
 	        get size() {
 	            return this.rows * this.columns;
@@ -4650,7 +4634,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Applies a callback for each element of the matrix. The function is called in the matrix (this) context.
 	         * @param {function} callback - Function that will be called with two parameters : i (row) and j (column)
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        apply(callback) {
 	            if (typeof callback !== 'function') {
@@ -4668,7 +4652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns a new 1D array filled row by row with the matrix values
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        to1DArray() {
 	            var array = new Array(this.size);
@@ -4682,7 +4666,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns a 2D array containing a copy of the data
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        to2DArray() {
 	            var copy = new Array(this.rows);
@@ -4696,35 +4680,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
-	         * @returns {boolean} true if the matrix has one row
+	         * @return {boolean} true if the matrix has one row
 	         */
 	        isRowVector() {
 	            return this.rows === 1;
 	        }
 
 	        /**
-	         * @returns {boolean} true if the matrix has one column
+	         * @return {boolean} true if the matrix has one column
 	         */
 	        isColumnVector() {
 	            return this.columns === 1;
 	        }
 
 	        /**
-	         * @returns {boolean} true if the matrix has one row or one column
+	         * @return {boolean} true if the matrix has one row or one column
 	         */
 	        isVector() {
 	            return (this.rows === 1) || (this.columns === 1);
 	        }
 
 	        /**
-	         * @returns {boolean} true if the matrix has the same number of rows and columns
+	         * @return {boolean} true if the matrix has the same number of rows and columns
 	         */
 	        isSquare() {
 	            return this.rows === this.columns;
 	        }
 
 	        /**
-	         * @returns {boolean} true if the matrix is square and has the same values on both sides of the diagonal
+	         * @return {boolean} true if the matrix is square and has the same values on both sides of the diagonal
 	         */
 	        isSymmetric() {
 	            if (this.isSquare()) {
@@ -4742,22 +4726,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Sets a given element of the matrix. mat.set(3,4,1) is equivalent to mat[3][4]=1
+	         * @abstract
 	         * @param {number} rowIndex - Index of the row
 	         * @param {number} columnIndex - Index of the column
 	         * @param {number} value - The new value for the element
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
-	        set(rowIndex, columnIndex, value) {
+	        set(rowIndex, columnIndex, value) { // eslint-disable-line no-unused-vars
 	            throw new Error('set method is unimplemented');
 	        }
 
 	        /**
 	         * Returns the given element of the matrix. mat.get(3,4) is equivalent to matrix[3][4]
+	         * @abstract
 	         * @param {number} rowIndex - Index of the row
 	         * @param {number} columnIndex - Index of the column
-	         * @returns {number}
+	         * @return {number}
 	         */
-	        get(rowIndex, columnIndex) {
+	        get(rowIndex, columnIndex) { // eslint-disable-line no-unused-vars
 	            throw new Error('get method is unimplemented');
 	        }
 
@@ -4766,6 +4752,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * rows of the matrix, and colRep times the number of columns of the matrix
 	         * @param {number} rowRep - Number of times the rows should be repeated
 	         * @param {number} colRep - Number of times the columns should be re
+	         * @return {Matrix}
 	         * @example
 	         * var matrix = new Matrix([[1,2]]);
 	         * matrix.repeat(2); // [[1,2],[1,2]]
@@ -4785,7 +4772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Fills the matrix with a given value. All elements will be set to this value.
 	         * @param {number} value - New value
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        fill(value) {
 	            for (var i = 0; i < this.rows; i++) {
@@ -4798,7 +4785,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Negates the matrix. All elements will be multiplied by (-1)
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        neg() {
 	            return this.mulS(-1);
@@ -4807,7 +4794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns a new array from the given row index
 	         * @param {number} index - Row index
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        getRow(index) {
 	            util.checkRowIndex(this, index);
@@ -4821,7 +4808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns a new row vector from the given row index
 	         * @param {number} index - Row index
-	         * @returns {Matrix}
+	         * @return {Matrix}
 	         */
 	        getRowVector(index) {
 	            return this.constructor.rowVector(this.getRow(index));
@@ -4831,7 +4818,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Sets a row at the given index
 	         * @param {number} index - Row index
 	         * @param {Array|Matrix} array - Array or vector
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        setRow(index, array) {
 	            util.checkRowIndex(this, index);
@@ -4846,7 +4833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Swaps two rows
 	         * @param {number} row1 - First row index
 	         * @param {number} row2 - Second row index
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        swapRows(row1, row2) {
 	            util.checkRowIndex(this, row1);
@@ -4862,7 +4849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns a new array from the given column index
 	         * @param {number} index - Column index
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        getColumn(index) {
 	            util.checkColumnIndex(this, index);
@@ -4876,7 +4863,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns a new column vector from the given column index
 	         * @param {number} index - Column index
-	         * @returns {Matrix}
+	         * @return {Matrix}
 	         */
 	        getColumnVector(index) {
 	            return this.constructor.columnVector(this.getColumn(index));
@@ -4886,7 +4873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Sets a column at the given index
 	         * @param {number} index - Column index
 	         * @param {Array|Matrix} array - Array or vector
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        setColumn(index, array) {
 	            util.checkColumnIndex(this, index);
@@ -4901,7 +4888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Swaps two columns
 	         * @param {number} column1 - First column index
 	         * @param {number} column2 - Second column index
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        swapColumns(column1, column2) {
 	            util.checkColumnIndex(this, column1);
@@ -4917,7 +4904,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Adds the values of a vector to each row
 	         * @param {Array|Matrix} vector - Array or vector
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        addRowVector(vector) {
 	            vector = util.checkRowVector(this, vector);
@@ -4932,7 +4919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Subtracts the values of a vector from each row
 	         * @param {Array|Matrix} vector - Array or vector
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        subRowVector(vector) {
 	            vector = util.checkRowVector(this, vector);
@@ -4947,7 +4934,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Multiplies the values of a vector with each row
 	         * @param {Array|Matrix} vector - Array or vector
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        mulRowVector(vector) {
 	            vector = util.checkRowVector(this, vector);
@@ -4962,7 +4949,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Divides the values of each row by those of a vector
 	         * @param {Array|Matrix} vector - Array or vector
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        divRowVector(vector) {
 	            vector = util.checkRowVector(this, vector);
@@ -4977,7 +4964,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Adds the values of a vector to each column
 	         * @param {Array|Matrix} vector - Array or vector
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        addColumnVector(vector) {
 	            vector = util.checkColumnVector(this, vector);
@@ -4992,7 +4979,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Subtracts the values of a vector from each column
 	         * @param {Array|Matrix} vector - Array or vector
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        subColumnVector(vector) {
 	            vector = util.checkColumnVector(this, vector);
@@ -5007,7 +4994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Multiplies the values of a vector with each column
 	         * @param {Array|Matrix} vector - Array or vector
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        mulColumnVector(vector) {
 	            vector = util.checkColumnVector(this, vector);
@@ -5022,7 +5009,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Divides the values of each column by those of a vector
 	         * @param {Array|Matrix} vector - Array or vector
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        divColumnVector(vector) {
 	            vector = util.checkColumnVector(this, vector);
@@ -5038,7 +5025,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Multiplies the values of a row with a scalar
 	         * @param {number} index - Row index
 	         * @param {number} value
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        mulRow(index, value) {
 	            util.checkRowIndex(this, index);
@@ -5052,18 +5039,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Multiplies the values of a column with a scalar
 	         * @param {number} index - Column index
 	         * @param {number} value
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        mulColumn(index, value) {
 	            util.checkColumnIndex(this, index);
 	            for (var i = 0; i < this.rows; i++) {
 	                this.set(i, index, this.get(i, index) * value);
 	            }
+	            return this;
 	        }
 
 	        /**
 	         * Returns the maximum value of the matrix
-	         * @returns {number}
+	         * @return {number}
 	         */
 	        max() {
 	            var v = this.get(0, 0);
@@ -5079,7 +5067,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns the index of the maximum value
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        maxIndex() {
 	            var v = this.get(0, 0);
@@ -5098,7 +5086,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns the minimum value of the matrix
-	         * @returns {number}
+	         * @return {number}
 	         */
 	        min() {
 	            var v = this.get(0, 0);
@@ -5114,7 +5102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns the index of the minimum value
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        minIndex() {
 	            var v = this.get(0, 0);
@@ -5134,7 +5122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns the maximum value of one row
 	         * @param {number} row - Row index
-	         * @returns {number}
+	         * @return {number}
 	         */
 	        maxRow(row) {
 	            util.checkRowIndex(this, row);
@@ -5150,7 +5138,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns the index of the maximum value of one row
 	         * @param {number} row - Row index
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        maxRowIndex(row) {
 	            util.checkRowIndex(this, row);
@@ -5168,7 +5156,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns the minimum value of one row
 	         * @param {number} row - Row index
-	         * @returns {number}
+	         * @return {number}
 	         */
 	        minRow(row) {
 	            util.checkRowIndex(this, row);
@@ -5184,7 +5172,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns the index of the maximum value of one row
 	         * @param {number} row - Row index
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        minRowIndex(row) {
 	            util.checkRowIndex(this, row);
@@ -5202,7 +5190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns the maximum value of one column
 	         * @param {number} column - Column index
-	         * @returns {number}
+	         * @return {number}
 	         */
 	        maxColumn(column) {
 	            util.checkColumnIndex(this, column);
@@ -5218,7 +5206,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns the index of the maximum value of one column
 	         * @param {number} column - Column index
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        maxColumnIndex(column) {
 	            util.checkColumnIndex(this, column);
@@ -5236,7 +5224,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns the minimum value of one column
 	         * @param {number} column - Column index
-	         * @returns {number}
+	         * @return {number}
 	         */
 	        minColumn(column) {
 	            util.checkColumnIndex(this, column);
@@ -5252,7 +5240,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns the index of the minimum value of one column
 	         * @param {number} column - Column index
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        minColumnIndex(column) {
 	            util.checkColumnIndex(this, column);
@@ -5269,7 +5257,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns an array containing the diagonal values of the matrix
-	         * @returns {Array}
+	         * @return {Array}
 	         */
 	        diag() {
 	            var min = Math.min(this.rows, this.columns);
@@ -5281,22 +5269,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
-	         * Returns the sum of all elements of the matrix
-	         * @returns {number}
+	         * Returns the sum by the argument given, if no argument given,
+	         * it returns the sum of all elements of the matrix.
+	         * @param {string} by - sum by 'row' or 'column'.
+	         * @return {Matrix|number}
 	         */
-	        sum() {
-	            var v = 0;
-	            for (var i = 0; i < this.rows; i++) {
-	                for (var j = 0; j < this.columns; j++) {
-	                    v += this.get(i, j);
-	                }
+	        sum(by) {
+	            switch (by) {
+	                case 'row':
+	                    return util.sumByRow(this);
+	                case 'column':
+	                    return util.sumByColumn(this);
+	                default:
+	                    return util.sumAll(this);
 	            }
-	            return v;
 	        }
 
 	        /**
 	         * Returns the mean of all elements of the matrix
-	         * @returns {number}
+	         * @return {number}
 	         */
 	        mean() {
 	            return this.sum() / this.size;
@@ -5304,7 +5295,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns the product of all elements of the matrix
-	         * @returns {number}
+	         * @return {number}
 	         */
 	        prod() {
 	            var prod = 1;
@@ -5318,7 +5309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Computes the cumulative sum of the matrix elements (in place, row by row)
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        cumulativeSum() {
 	            var sum = 0;
@@ -5334,7 +5325,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Computes the dot (scalar) product between the matrix and another
 	         * @param {Matrix} vector2 vector
-	         * @returns {number}
+	         * @return {number}
 	         */
 	        dot(vector2) {
 	            if (Matrix.isMatrix(vector2)) vector2 = vector2.to1DArray();
@@ -5352,12 +5343,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns the matrix product between this and other
 	         * @param {Matrix} other
-	         * @returns {Matrix}
+	         * @return {Matrix}
 	         */
 	        mmul(other) {
 	            other = this.constructor.checkMatrix(other);
-	            if (this.columns !== other.rows)
+	            if (this.columns !== other.rows) {
+	                // eslint-disable-next-line no-console
 	                console.warn('Number of columns of left matrix are not equal to number of rows of right matrix.');
+	            }
 
 	            var m = this.rows;
 	            var n = this.columns;
@@ -5383,134 +5376,132 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return result;
 	        }
 
-	        strassen_2x2(other){
+	        strassen2x2(other) {
 	            var result = new this.constructor[Symbol.species](2, 2);
-	            const a11 = this.get(0,0);
-	            const b11 = other.get(0,0);
-	            const a12 = this.get(0,1);
-	            const b12 = other.get(0,1);
-	            const a21 = this.get(1,0);
-	            const b21 = other.get(1,0);
-	            const a22 = this.get(1,1);
-	            const b22 = other.get(1,1);
+	            const a11 = this.get(0, 0);
+	            const b11 = other.get(0, 0);
+	            const a12 = this.get(0, 1);
+	            const b12 = other.get(0, 1);
+	            const a21 = this.get(1, 0);
+	            const b21 = other.get(1, 0);
+	            const a22 = this.get(1, 1);
+	            const b22 = other.get(1, 1);
 
 	            // Compute intermediate values.
-	            const m1 = (a11+a22)*(b11+b22);
-	            const m2 = (a21+a22)*b11;
-	            const m3 = a11*(b12-b22);
-	            const m4 = a22*(b21-b11);
-	            const m5 = (a11+a12)*b22;
-	            const m6 = (a21-a11)*(b11+b12);
-	            const m7 = (a12-a22)*(b21+b22);
+	            const m1 = (a11 + a22) * (b11 + b22);
+	            const m2 = (a21 + a22) * b11;
+	            const m3 = a11 * (b12 - b22);
+	            const m4 = a22 * (b21 - b11);
+	            const m5 = (a11 + a12) * b22;
+	            const m6 = (a21 - a11) * (b11 + b12);
+	            const m7 = (a12 - a22) * (b21 + b22);
 
 	            // Combine intermediate values into the output.
-	            const c00 =m1+m4-m5+m7;
-	            const c01 = m3+m5;
-	            const c10 = m2+m4;
-	            const c11 = m1-m2+m3+m6;
+	            const c00 = m1 + m4 - m5 + m7;
+	            const c01 = m3 + m5;
+	            const c10 = m2 + m4;
+	            const c11 = m1 - m2 + m3 + m6;
 
-	            result.set(0,0,c00);
-	            result.set(0,1,c01);
-	            result.set(1,0,c10);
-	            result.set(1,1,c11);
+	            result.set(0, 0, c00);
+	            result.set(0, 1, c01);
+	            result.set(1, 0, c10);
+	            result.set(1, 1, c11);
 	            return result;
 	        }
 
-	        strassen_3x3(other){
+	        strassen3x3(other) {
 	            var result = new this.constructor[Symbol.species](3, 3);
 
-	            const a00 = this.get(0,0);
-	            const a01 = this.get(0,1);
-	            const a02 = this.get(0,2);
-	            const a10 = this.get(1,0);
-	            const a11 = this.get(1,1);
-	            const a12 = this.get(1,2);
-	            const a20 = this.get(2,0);
-	            const a21 = this.get(2,1);
-	            const a22 = this.get(2,2);
+	            const a00 = this.get(0, 0);
+	            const a01 = this.get(0, 1);
+	            const a02 = this.get(0, 2);
+	            const a10 = this.get(1, 0);
+	            const a11 = this.get(1, 1);
+	            const a12 = this.get(1, 2);
+	            const a20 = this.get(2, 0);
+	            const a21 = this.get(2, 1);
+	            const a22 = this.get(2, 2);
 
-	            const b00 = other.get(0,0);
-	            const b01 = other.get(0,1);
-	            const b02 = other.get(0,2);
-	            const b10 = other.get(1,0);
-	            const b11 = other.get(1,1);
-	            const b12 = other.get(1,2);
-	            const b20 = other.get(2,0);
-	            const b21 = other.get(2,1);
-	            const b22 = other.get(2,2);
+	            const b00 = other.get(0, 0);
+	            const b01 = other.get(0, 1);
+	            const b02 = other.get(0, 2);
+	            const b10 = other.get(1, 0);
+	            const b11 = other.get(1, 1);
+	            const b12 = other.get(1, 2);
+	            const b20 = other.get(2, 0);
+	            const b21 = other.get(2, 1);
+	            const b22 = other.get(2, 2);
 
-	            const m1 = (a00+a01+a02-a10-a11-a21-a22)*b11;
-	            const m2 = (a00-a10)*(-b01+b11);
-	            const m3 = a11*(-b00+b01+b10-b11-b12-b20+b22);
-	            const m4 = (-a00+a10+a11)*(b00-b01+b11);
-	            const m5 = (a10+a11)*(-b00+b01);
-	            const m6 = a00*b00;
-	            const m7 = (-a00+a20+a21)*(b00-b02+b12);
-	            const m8 = (-a00+a20)*(b02-b12);
-	            const m9 = (a20+a21)*(-b00+b02);
-	            const m10 = (a00+a01+a02-a11-a12-a20-a21)*b12;
-	            const m11 = a21*(-b00+b02+b10-b11-b12-b20+b21);
-	            const m12 = (-a02+a21+a22)*(b11+b20-b21);
-	            const m13 = (a02-a22)*(b11-b21);
-	            const m14 = a02*b20;
-	            const m15 = (a21+a22)*(-b20+b21);
-	            const m16 = (-a02+a11+a12)*(b12+b20-b22);
-	            const m17 = (a02-a12)*(b12-b22);
-	            const m18 = (a11+a12)*(-b20+b22);
-	            const m19= a01*b10;
-	            const m20 = a12*b21;
-	            const m21 = a10*b02;
-	            const m22 = a20*b01;
-	            const m23 = a22*b22;
+	            const m1 = (a00 + a01 + a02 - a10 - a11 - a21 - a22) * b11;
+	            const m2 = (a00 - a10) * (-b01 + b11);
+	            const m3 = a11 * (-b00 + b01 + b10 - b11 - b12 - b20 + b22);
+	            const m4 = (-a00 + a10 + a11) * (b00 - b01 + b11);
+	            const m5 = (a10 + a11) * (-b00 + b01);
+	            const m6 = a00 * b00;
+	            const m7 = (-a00 + a20 + a21) * (b00 - b02 + b12);
+	            const m8 = (-a00 + a20) * (b02 - b12);
+	            const m9 = (a20 + a21) * (-b00 + b02);
+	            const m10 = (a00 + a01 + a02 - a11 - a12 - a20 - a21) * b12;
+	            const m11 = a21 * (-b00 + b02 + b10 - b11 - b12 - b20 + b21);
+	            const m12 = (-a02 + a21 + a22) * (b11 + b20 - b21);
+	            const m13 = (a02 - a22) * (b11 - b21);
+	            const m14 = a02 * b20;
+	            const m15 = (a21 + a22) * (-b20 + b21);
+	            const m16 = (-a02 + a11 + a12) * (b12 + b20 - b22);
+	            const m17 = (a02 - a12) * (b12 - b22);
+	            const m18 = (a11 + a12) * (-b20 + b22);
+	            const m19 = a01 * b10;
+	            const m20 = a12 * b21;
+	            const m21 = a10 * b02;
+	            const m22 = a20 * b01;
+	            const m23 = a22 * b22;
 
-	            const c00 = m6+m14+m19;
-	            const c01 = m1+m4+m5+m6+m12+m14+m15;
-	            const c02 = m6+m7+m9+m10+m14+m16+m18;
-	            const c10 = m2+m3+m4+m6+m14+m16+m17;
-	            const c11 = m2+m4+m5+m6+m20;
-	            const c12 = m14+m16+m17+m18+m21;
-	            const c20 = m6+m7+m8+m11+m12+m13+m14;
-	            const c21 = m12+m13+m14+m15+m22;
-	            const c22 = m6+m7+m8+m9+m23;
+	            const c00 = m6 + m14 + m19;
+	            const c01 = m1 + m4 + m5 + m6 + m12 + m14 + m15;
+	            const c02 = m6 + m7 + m9 + m10 + m14 + m16 + m18;
+	            const c10 = m2 + m3 + m4 + m6 + m14 + m16 + m17;
+	            const c11 = m2 + m4 + m5 + m6 + m20;
+	            const c12 = m14 + m16 + m17 + m18 + m21;
+	            const c20 = m6 + m7 + m8 + m11 + m12 + m13 + m14;
+	            const c21 = m12 + m13 + m14 + m15 + m22;
+	            const c22 = m6 + m7 + m8 + m9 + m23;
 
-	            result.set(0,0,c00);
-	            result.set(0,1,c01);
-	            result.set(0,2,c02);
-	            result.set(1,0,c10);
-	            result.set(1,1,c11);
-	            result.set(1,2,c12);
-	            result.set(2,0,c20);
-	            result.set(2,1,c21);
-	            result.set(2,2,c22);
+	            result.set(0, 0, c00);
+	            result.set(0, 1, c01);
+	            result.set(0, 2, c02);
+	            result.set(1, 0, c10);
+	            result.set(1, 1, c11);
+	            result.set(1, 2, c12);
+	            result.set(2, 0, c20);
+	            result.set(2, 1, c21);
+	            result.set(2, 2, c22);
 	            return result;
 	        }
-
 
 	        /**
 	         * Returns the matrix product between x and y. More efficient than mmul(other) only when we multiply squared matrix and when the size of the matrix is > 1000.
-	         * @param {Matrix} x
 	         * @param {Matrix} y
-	         * @returns {Matrix}
+	         * @return {Matrix}
 	         */
-	        mmul_strassen(y){
+	        mmulStrassen(y) {
 	            var x = this.clone();
 	            var r1 = x.rows;
 	            var c1 = x.columns;
 	            var r2 = y.rows;
 	            var c2 = y.columns;
-	            if(c1 != r2){
-	                console.log(`Multiplying ${r1} x ${c1} and ${r2} x ${c2} matrix: dimensions do not match.`)
+	            if (c1 !== r2) {
+	                // eslint-disable-next-line no-console
+	                console.warn(`Multiplying ${r1} x ${c1} and ${r2} x ${c2} matrix: dimensions do not match.`);
 	            }
 
 	            // Put a matrix into the top left of a matrix of zeros.
 	            // `rows` and `cols` are the dimensions of the output matrix.
-	            function embed(mat, rows, cols){
+	            function embed(mat, rows, cols) {
 	                var r = mat.rows;
 	                var c = mat.columns;
-	                if((r==rows) && (c==cols)){
+	                if ((r === rows) && (c === cols)) {
 	                    return mat;
-	                }
-	                else{
+	                } else {
 	                    var resultat = Matrix.zeros(rows, cols);
 	                    resultat = resultat.setSubMatrix(mat, 0, 0);
 	                    return resultat;
@@ -5524,81 +5515,78 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var r = Math.max(r1, r2);
 	            var c = Math.max(c1, c2);
-	            var x = embed(x, r, c);
-	            var y = embed(y, r, c);
+	            x = embed(x, r, c);
+	            y = embed(y, r, c);
 
 	            // Our recursive multiplication function.
-	            function block_mult(a, b, rows, cols){
+	            function blockMult(a, b, rows, cols) {
 	                // For small matrices, resort to naive multiplication.
-	                if (rows <= 512 || cols <= 512){
+	                if (rows <= 512 || cols <= 512) {
 	                    return a.mmul(b); // a is equivalent to this
 	                }
 
 	                // Apply dynamic padding.
-	                if ((rows % 2 == 1) && (cols % 2 == 1)) {
+	                if ((rows % 2 === 1) && (cols % 2 === 1)) {
 	                    a = embed(a, rows + 1, cols + 1);
 	                    b = embed(b, rows + 1, cols + 1);
-	                }
-	                else if (rows % 2 == 1){
+	                } else if (rows % 2 === 1) {
 	                    a = embed(a, rows + 1, cols);
 	                    b = embed(b, rows + 1, cols);
-	                }
-	                else if (cols % 2 == 1){
+	                } else if (cols % 2 === 1) {
 	                    a = embed(a, rows, cols + 1);
 	                    b = embed(b, rows, cols + 1);
 	                }
 
-	                var half_rows = parseInt(a.rows / 2);
-	                var half_cols = parseInt(a.columns / 2);
+	                var halfRows = parseInt(a.rows / 2);
+	                var halfCols = parseInt(a.columns / 2);
 	                // Subdivide input matrices.
-	                var a11 = a.subMatrix(0, half_rows -1, 0, half_cols - 1);
-	                var b11 = b.subMatrix(0, half_rows -1, 0, half_cols - 1);
+	                var a11 = a.subMatrix(0, halfRows - 1, 0, halfCols - 1);
+	                var b11 = b.subMatrix(0, halfRows - 1, 0, halfCols - 1);
 
-	                var a12 = a.subMatrix(0, half_rows -1, half_cols, a.columns - 1);
-	                var b12 = b.subMatrix(0, half_rows -1,  half_cols, b.columns - 1);
+	                var a12 = a.subMatrix(0, halfRows - 1, halfCols, a.columns - 1);
+	                var b12 = b.subMatrix(0, halfRows - 1, halfCols, b.columns - 1);
 
-	                var a21 = a.subMatrix(half_rows, a.rows - 1,  0, half_cols - 1);
-	                var b21 = b.subMatrix(half_rows, b.rows - 1,  0, half_cols - 1);
+	                var a21 = a.subMatrix(halfRows, a.rows - 1, 0, halfCols - 1);
+	                var b21 = b.subMatrix(halfRows, b.rows - 1, 0, halfCols - 1);
 
-	                var a22 = a.subMatrix(half_rows, a.rows - 1, half_cols, a.columns - 1);
-	                var b22 = b.subMatrix(half_rows, b.rows - 1, half_cols, b.columns - 1);
+	                var a22 = a.subMatrix(halfRows, a.rows - 1, halfCols, a.columns - 1);
+	                var b22 = b.subMatrix(halfRows, b.rows - 1, halfCols, b.columns - 1);
 
 	                // Compute intermediate values.
-	                var m1 = block_mult(Matrix.add(a11,a22), Matrix.add(b11,b22), half_rows, half_cols);
-	                var m2 = block_mult(Matrix.add(a21,a22), b11, half_rows, half_cols);
-	                var m3 = block_mult(a11, Matrix.sub(b12, b22), half_rows, half_cols);
-	                var m4 = block_mult(a22, Matrix.sub(b21,b11), half_rows, half_cols);
-	                var m5 = block_mult(Matrix.add(a11,a12), b22, half_rows, half_cols);
-	                var m6 = block_mult(Matrix.sub(a21, a11), Matrix.add(b11, b12), half_rows, half_cols);
-	                var m7 = block_mult(Matrix.sub(a12,a22), Matrix.add(b21,b22), half_rows, half_cols);
+	                var m1 = blockMult(Matrix.add(a11, a22), Matrix.add(b11, b22), halfRows, halfCols);
+	                var m2 = blockMult(Matrix.add(a21, a22), b11, halfRows, halfCols);
+	                var m3 = blockMult(a11, Matrix.sub(b12, b22), halfRows, halfCols);
+	                var m4 = blockMult(a22, Matrix.sub(b21, b11), halfRows, halfCols);
+	                var m5 = blockMult(Matrix.add(a11, a12), b22, halfRows, halfCols);
+	                var m6 = blockMult(Matrix.sub(a21, a11), Matrix.add(b11, b12), halfRows, halfCols);
+	                var m7 = blockMult(Matrix.sub(a12, a22), Matrix.add(b21, b22), halfRows, halfCols);
 
 	                // Combine intermediate values into the output.
 	                var c11 = Matrix.add(m1, m4);
 	                c11.sub(m5);
 	                c11.add(m7);
-	                var c12 = Matrix.add(m3,m5);
-	                var c21 = Matrix.add(m2,m4);
-	                var c22 = Matrix.sub(m1,m2);
+	                var c12 = Matrix.add(m3, m5);
+	                var c21 = Matrix.add(m2, m4);
+	                var c22 = Matrix.sub(m1, m2);
 	                c22.add(m3);
 	                c22.add(m6);
 
 	                //Crop output to the desired size (undo dynamic padding).
-	                var resultat = Matrix.zeros(2*c11.rows, 2*c11.columns);
+	                var resultat = Matrix.zeros(2 * c11.rows, 2 * c11.columns);
 	                resultat = resultat.setSubMatrix(c11, 0, 0);
-	                resultat = resultat.setSubMatrix(c12, c11.rows, 0)
+	                resultat = resultat.setSubMatrix(c12, c11.rows, 0);
 	                resultat = resultat.setSubMatrix(c21, 0, c11.columns);
 	                resultat = resultat.setSubMatrix(c22, c11.rows, c11.columns);
 	                return resultat.subMatrix(0, rows - 1, 0, cols - 1);
 	            }
-	            var resultat_final =  block_mult(x, y, r, c);
-	            return resultat_final;
-	        };
+	            return blockMult(x, y, r, c);
+	        }
 
 	        /**
 	         * Returns a row-by-row scaled matrix
-	         * @param {Number} [min=0] - Minimum scaled value
-	         * @param {Number} [max=1] - Maximum scaled value
-	         * @returns {Matrix} - The scaled matrix
+	         * @param {number} [min=0] - Minimum scaled value
+	         * @param {number} [max=1] - Maximum scaled value
+	         * @return {Matrix} - The scaled matrix
 	         */
 	        scaleRows(min, max) {
 	            min = min === undefined ? 0 : min;
@@ -5616,9 +5604,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns a new column-by-column scaled matrix
-	         * @param {Number} [min=0] - Minimum scaled value
-	         * @param {Number} [max=1] - Maximum scaled value
-	         * @returns {Matrix} - The new scaled matrix
+	         * @param {number} [min=0] - Minimum scaled value
+	         * @param {number} [max=1] - Maximum scaled value
+	         * @return {Matrix} - The new scaled matrix
 	         * @example
 	         * var matrix = new Matrix([[1,2],[-1,0]]);
 	         * var scaledMatrix = matrix.scaleColumns(); // [[1,1],[0,0]]
@@ -5670,7 +5658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Transposes the matrix and returns a new one containing the result
-	         * @returns {Matrix}
+	         * @return {Matrix}
 	         */
 	        transpose() {
 	            var result = new this.constructor[Symbol.species](this.columns, this.rows);
@@ -5685,7 +5673,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Sorts the rows (in place)
 	         * @param {function} compareFunction - usual Array.prototype.sort comparison function
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        sortRows(compareFunction) {
 	            if (compareFunction === undefined) compareFunction = compareNumbers;
@@ -5698,7 +5686,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Sorts the columns (in place)
 	         * @param {function} compareFunction - usual Array.prototype.sort comparison function
-	         * @returns {Matrix} this
+	         * @return {Matrix} this
 	         */
 	        sortColumns(compareFunction) {
 	            if (compareFunction === undefined) compareFunction = compareNumbers;
@@ -5714,7 +5702,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {number} endRow - Last row index
 	         * @param {number} startColumn - First column index
 	         * @param {number} endColumn - Last column index
-	         * @returns {Matrix}
+	         * @return {Matrix}
 	         */
 	        subMatrix(startRow, endRow, startColumn, endColumn) {
 	            util.checkRange(this, startRow, endRow, startColumn, endColumn);
@@ -5732,7 +5720,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {Array} indices - Array containing the row indices
 	         * @param {number} [startColumn = 0] - First column index
 	         * @param {number} [endColumn = this.columns-1] - Last column index
-	         * @returns {Matrix}
+	         * @return {Matrix}
 	         */
 	        subMatrixRow(indices, startColumn, endColumn) {
 	            if (startColumn === undefined) startColumn = 0;
@@ -5758,7 +5746,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {Array} indices - Array containing the column indices
 	         * @param {number} [startRow = 0] - First row index
 	         * @param {number} [endRow = this.rows-1] - Last row index
-	         * @returns {Matrix}
+	         * @return {Matrix}
 	         */
 	        subMatrixColumn(indices, startRow, endRow) {
 	            if (startRow === undefined) startRow = 0;
@@ -5782,9 +5770,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Set a part of the matrix to the given sub-matrix
 	         * @param {Matrix|Array< Array >} matrix - The source matrix from which to extract values.
-	         * @param startRow - The index of the first row to set
-	         * @param startColumn - The index of the first column to set
-	         * @returns {Matrix}
+	         * @param {number} startRow - The index of the first row to set
+	         * @param {number} startColumn - The index of the first column to set
+	         * @return {Matrix}
 	         */
 	        setSubMatrix(matrix, startRow, startColumn) {
 	            matrix = this.constructor.checkMatrix(matrix);
@@ -5803,7 +5791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Return a new matrix based on a selection of rows and columns
 	         * @param {Array<number>} rowIndices - The row indices to select. Order matters and an index can be more than once.
 	         * @param {Array<number>} columnIndices - The column indices to select. Order matters and an index can be use more than once.
-	         * @returns {Matrix} The new matrix
+	         * @return {Matrix} The new matrix
 	         */
 	        selection(rowIndices, columnIndices) {
 	            var indices = util.checkIndices(this, rowIndices, columnIndices);
@@ -5820,7 +5808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns the trace of the matrix (sum of the diagonal elements)
-	         * @returns {number}
+	         * @return {number}
 	         */
 	        trace() {
 	            var min = Math.min(this.rows, this.columns);
@@ -5837,7 +5825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns a view of the transposition of the matrix
-	         * @returns {MatrixTransposeView}
+	         * @return {MatrixTransposeView}
 	         */
 	        transposeView() {
 	            return new MatrixTransposeView(this);
@@ -5846,7 +5834,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns a view of the row vector with the given index
 	         * @param {number} row - row index of the vector
-	         * @returns {MatrixRowView}
+	         * @return {MatrixRowView}
 	         */
 	        rowView(row) {
 	            util.checkRowIndex(this, row);
@@ -5856,7 +5844,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Returns a view of the column vector with the given index
 	         * @param {number} column - column index of the vector
-	         * @returns {MatrixColumnView}
+	         * @return {MatrixColumnView}
 	         */
 	        columnView(column) {
 	            util.checkColumnIndex(this, column);
@@ -5865,7 +5853,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns a view of the matrix flipped in the row axis
-	         * @returns {MatrixFlipRowView}
+	         * @return {MatrixFlipRowView}
 	         */
 	        flipRowView() {
 	            return new MatrixFlipRowView(this);
@@ -5873,7 +5861,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Returns a view of the matrix flipped in the column axis
-	         * @returns {MatrixFlipColumnView}
+	         * @return {MatrixFlipColumnView}
 	         */
 	        flipColumnView() {
 	            return new MatrixFlipColumnView(this);
@@ -5885,7 +5873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {number} endRow - last row index of the submatrix
 	         * @param {number} startColumn - first column index of the submatrix
 	         * @param {number} endColumn - last column index of the submatrix
-	         * @returns {MatrixSubView}
+	         * @return {MatrixSubView}
 	         */
 	        subMatrixView(startRow, endRow, startColumn, endColumn) {
 	            return new MatrixSubView(this, startRow, endRow, startColumn, endColumn);
@@ -5898,10 +5886,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * var matrix = new Matrix([[1,2,3], [4,5,6]]).selectionView([0, 0], [1])
 	         * @param {Array<number>} rowIndices
 	         * @param {Array<number>} columnIndices
-	         * @returns {MatrixSelectionView}
+	         * @return {MatrixSelectionView}
 	         */
 	        selectionView(rowIndices, columnIndices) {
 	            return new MatrixSelectionView(this, rowIndices, columnIndices);
+	        }
+
+
+	        /**
+	        * Calculates and returns the determinant of a matrix as a Number
+	        * @example
+	        *   new Matrix([[1,2,3], [4,5,6]]).det()
+	        * @return {number}
+	        */
+	        det() {
+	            if (this.isSquare()) {
+	                var a, b, c, d;
+	                if (this.columns === 2) {
+	                    // 2 x 2 matrix
+	                    a = this.get(0, 0);
+	                    b = this.get(0, 1);
+	                    c = this.get(1, 0);
+	                    d = this.get(1, 1);
+
+	                    return a * d - (b * c);
+	                } else if (this.columns === 3) {
+	                    // 3 x 3 matrix
+	                    var subMatrix0, subMatrix1, subMatrix2;
+	                    subMatrix0 = this.selectionView([1, 2], [1, 2]);
+	                    subMatrix1 = this.selectionView([1, 2], [0, 2]);
+	                    subMatrix2 = this.selectionView([1, 2], [0, 1]);
+	                    a = this.get(0, 0);
+	                    b = this.get(0, 1);
+	                    c = this.get(0, 2);
+
+	                    return a * subMatrix0.det() - b * subMatrix1.det() + c * subMatrix2.det();
+	                } else {
+	                    // general purpose determinant using the LU decomposition
+	                    return new LuDecomposition(this).determinant;
+	                }
+
+	            } else {
+	                throw Error('Determinant can only be calculated for a square matrix.');
+	            }
 	        }
 	    }
 
@@ -5913,7 +5940,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Matrix} matrix
 	     * @param {Matrix} otherMatrix
 	     */
-	    function checkDimensions(matrix, otherMatrix) {
+	    function checkDimensions(matrix, otherMatrix) { // eslint-disable-line no-unused-vars
 	        if (matrix.rows !== otherMatrix.rows ||
 	            matrix.columns !== otherMatrix.columns) {
 	            throw new RangeError('Matrices dimensions must be equal');
@@ -5934,6 +5961,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Matrix.identity = Matrix.eye;
 	    Matrix.prototype.negate = Matrix.prototype.neg;
 	    Matrix.prototype.tensorProduct = Matrix.prototype.kroneckerProduct;
+	    Matrix.prototype.determinant = Matrix.prototype.det;
 
 	    /*
 	     Add dynamically instance and static methods for mathematical operations
@@ -6062,12 +6090,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ['>>>', 'rightShift', 'zeroFillRightShift']
 	    ];
 
+	    var i;
+
 	    for (var operator of operators) {
 	        var inplaceOp = eval(fillTemplateFunction(inplaceOperator, {name: operator[1], op: operator[0]}));
 	        var inplaceOpS = eval(fillTemplateFunction(inplaceOperatorScalar, {name: operator[1] + 'S', op: operator[0]}));
 	        var inplaceOpM = eval(fillTemplateFunction(inplaceOperatorMatrix, {name: operator[1] + 'M', op: operator[0]}));
 	        var staticOp = eval(fillTemplateFunction(staticOperator, {name: operator[1]}));
-	        for (var i = 1; i < operator.length; i++) {
+	        for (i = 1; i < operator.length; i++) {
 	            Matrix.prototype[operator[i]] = inplaceOp;
 	            Matrix.prototype[operator[i] + 'S'] = inplaceOpS;
 	            Matrix.prototype[operator[i] + 'M'] = inplaceOpM;
@@ -6090,7 +6120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    for (var method of methods) {
 	        var inplaceMeth = eval(fillTemplateFunction(inplaceMethod, {name: method[1], method: method[0]}));
 	        var staticMeth = eval(fillTemplateFunction(staticMethod, {name: method[1]}));
-	        for (var i = 1; i < method.length; i++) {
+	        for (i = 1; i < method.length; i++) {
 	            Matrix.prototype[method[i]] = inplaceMeth;
 	            Matrix[method[i]] = staticMeth;
 	        }
@@ -6102,7 +6132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    for (var methodWithArg of methodsWithArgs) {
 	        var args = 'arg0';
-	        for (var i = 1; i < methodWithArg[1]; i++) {
+	        for (i = 1; i < methodWithArg[1]; i++) {
 	            args += `, arg${i}`;
 	        }
 	        if (methodWithArg[1] !== 1) {
@@ -6112,7 +6142,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                args: args
 	            }));
 	            var staticMethWithArgs = eval(fillTemplateFunction(staticMethodWithArgs, {name: methodWithArg[2], args: args}));
-	            for (var i = 2; i < methodWithArg.length; i++) {
+	            for (i = 2; i < methodWithArg.length; i++) {
 	                Matrix.prototype[methodWithArg[i]] = inplaceMethWithArgs;
 	                Matrix[methodWithArg[i]] = staticMethWithArgs;
 	            }
@@ -6122,22 +6152,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	                args: args,
 	                method: methodWithArg[0]
 	            };
-	            var inplaceMethod = eval(fillTemplateFunction(inplaceMethodWithOneArg, tmplVar));
+	            var inplaceMethod2 = eval(fillTemplateFunction(inplaceMethodWithOneArg, tmplVar));
 	            var inplaceMethodS = eval(fillTemplateFunction(inplaceMethodWithOneArgScalar, tmplVar));
 	            var inplaceMethodM = eval(fillTemplateFunction(inplaceMethodWithOneArgMatrix, tmplVar));
-	            var staticMethod = eval(fillTemplateFunction(staticMethodWithOneArg, tmplVar));
-	            for (var i = 2; i < methodWithArg.length; i++) {
-	                Matrix.prototype[methodWithArg[i]] = inplaceMethod;
+	            var staticMethod2 = eval(fillTemplateFunction(staticMethodWithOneArg, tmplVar));
+	            for (i = 2; i < methodWithArg.length; i++) {
+	                Matrix.prototype[methodWithArg[i]] = inplaceMethod2;
 	                Matrix.prototype[methodWithArg[i] + 'M'] = inplaceMethodM;
 	                Matrix.prototype[methodWithArg[i] + 'S'] = inplaceMethodS;
-	                Matrix[methodWithArg[i]] = staticMethod;
+	                Matrix[methodWithArg[i]] = staticMethod2;
 	            }
 	        }
 	    }
 
 	    function fillTemplateFunction(template, values) {
-	        for (var i in values) {
-	            template = template.replace(new RegExp('%' + i + '%', 'g'), values[i]);
+	        for (var value in values) {
+	            template = template.replace(new RegExp('%' + value + '%', 'g'), values[value]);
 	        }
 	        return template;
 	    }
@@ -6150,20 +6180,200 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = exports = __webpack_require__(25);
+	'use strict';
 
+	var Matrix = __webpack_require__(21);
 
-	exports.getEquallySpacedData = __webpack_require__(29).getEquallySpacedData;
-	exports.SNV = __webpack_require__(30).SNV;
+	// https://github.com/lutzroeder/Mapack/blob/master/Source/LuDecomposition.cs
+	function LuDecomposition(matrix) {
+	    if (!(this instanceof LuDecomposition)) {
+	        return new LuDecomposition(matrix);
+	    }
+
+	    matrix = Matrix.Matrix.checkMatrix(matrix);
+
+	    var lu = matrix.clone(),
+	        rows = lu.rows,
+	        columns = lu.columns,
+	        pivotVector = new Array(rows),
+	        pivotSign = 1,
+	        i, j, k, p, s, t, v,
+	        LUrowi, LUcolj, kmax;
+
+	    for (i = 0; i < rows; i++) {
+	        pivotVector[i] = i;
+	    }
+
+	    LUcolj = new Array(rows);
+
+	    for (j = 0; j < columns; j++) {
+
+	        for (i = 0; i < rows; i++) {
+	            LUcolj[i] = lu[i][j];
+	        }
+
+	        for (i = 0; i < rows; i++) {
+	            LUrowi = lu[i];
+	            kmax = Math.min(i, j);
+	            s = 0;
+	            for (k = 0; k < kmax; k++) {
+	                s += LUrowi[k] * LUcolj[k];
+	            }
+	            LUrowi[j] = LUcolj[i] -= s;
+	        }
+
+	        p = j;
+	        for (i = j + 1; i < rows; i++) {
+	            if (Math.abs(LUcolj[i]) > Math.abs(LUcolj[p])) {
+	                p = i;
+	            }
+	        }
+
+	        if (p !== j) {
+	            for (k = 0; k < columns; k++) {
+	                t = lu[p][k];
+	                lu[p][k] = lu[j][k];
+	                lu[j][k] = t;
+	            }
+
+	            v = pivotVector[p];
+	            pivotVector[p] = pivotVector[j];
+	            pivotVector[j] = v;
+
+	            pivotSign = -pivotSign;
+	        }
+
+	        if (j < rows && lu[j][j] !== 0) {
+	            for (i = j + 1; i < rows; i++) {
+	                lu[i][j] /= lu[j][j];
+	            }
+	        }
+	    }
+
+	    this.LU = lu;
+	    this.pivotVector = pivotVector;
+	    this.pivotSign = pivotSign;
+	}
+
+	LuDecomposition.prototype = {
+	    isSingular: function () {
+	        var data = this.LU,
+	            col = data.columns;
+	        for (var j = 0; j < col; j++) {
+	            if (data[j][j] === 0) {
+	                return true;
+	            }
+	        }
+	        return false;
+	    },
+	    get determinant() {
+	        var data = this.LU;
+	        if (!data.isSquare()) {
+	            throw new Error('Matrix must be square');
+	        }
+	        var determinant = this.pivotSign, col = data.columns;
+	        for (var j = 0; j < col; j++) {
+	            determinant *= data[j][j];
+	        }
+	        return determinant;
+	    },
+	    get lowerTriangularMatrix() {
+	        var data = this.LU,
+	            rows = data.rows,
+	            columns = data.columns,
+	            X = new Matrix.Matrix(rows, columns);
+	        for (var i = 0; i < rows; i++) {
+	            for (var j = 0; j < columns; j++) {
+	                if (i > j) {
+	                    X[i][j] = data[i][j];
+	                } else if (i === j) {
+	                    X[i][j] = 1;
+	                } else {
+	                    X[i][j] = 0;
+	                }
+	            }
+	        }
+	        return X;
+	    },
+	    get upperTriangularMatrix() {
+	        var data = this.LU,
+	            rows = data.rows,
+	            columns = data.columns,
+	            X = new Matrix.Matrix(rows, columns);
+	        for (var i = 0; i < rows; i++) {
+	            for (var j = 0; j < columns; j++) {
+	                if (i <= j) {
+	                    X[i][j] = data[i][j];
+	                } else {
+	                    X[i][j] = 0;
+	                }
+	            }
+	        }
+	        return X;
+	    },
+	    get pivotPermutationVector() {
+	        return this.pivotVector.slice();
+	    },
+	    solve: function (value) {
+	        value = Matrix.Matrix.checkMatrix(value);
+
+	        var lu = this.LU,
+	            rows = lu.rows;
+
+	        if (rows !== value.rows) {
+	            throw new Error('Invalid matrix dimensions');
+	        }
+	        if (this.isSingular()) {
+	            throw new Error('LU matrix is singular');
+	        }
+
+	        var count = value.columns;
+	        var X = value.subMatrixRow(this.pivotVector, 0, count - 1);
+	        var columns = lu.columns;
+	        var i, j, k;
+
+	        for (k = 0; k < columns; k++) {
+	            for (i = k + 1; i < columns; i++) {
+	                for (j = 0; j < count; j++) {
+	                    X[i][j] -= X[k][j] * lu[i][k];
+	                }
+	            }
+	        }
+	        for (k = columns - 1; k >= 0; k--) {
+	            for (j = 0; j < count; j++) {
+	                X[k][j] /= lu[k][k];
+	            }
+	            for (i = 0; i < k; i++) {
+	                for (j = 0; j < count; j++) {
+	                    X[i][j] -= X[k][j] * lu[i][k];
+	                }
+	            }
+	        }
+	        return X;
+	    }
+	};
+
+	module.exports = LuDecomposition;
 
 
 /***/ },
 /* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = exports = __webpack_require__(26);
+
+
+	exports.getEquallySpacedData = __webpack_require__(30).getEquallySpacedData;
+	exports.SNV = __webpack_require__(31).SNV;
+
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
 
-	const Stat = __webpack_require__(26).array;
+	const Stat = __webpack_require__(27).array;
 	/**
 	 * Function that returns an array of points given 1D array as follows:
 	 *
@@ -6389,17 +6599,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	exports.array = __webpack_require__(27);
-	exports.matrix = __webpack_require__(28);
+	exports.array = __webpack_require__(28);
+	exports.matrix = __webpack_require__(29);
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6884,12 +7094,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var arrayStat = __webpack_require__(27);
+	var arrayStat = __webpack_require__(28);
 
 	function compareNumbers(a, b) {
 	    return a - b;
@@ -7501,7 +7711,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7760,13 +7970,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.integral = integral;
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.SNV = SNV;
-	var Stat = __webpack_require__(26).array;
+	var Stat = __webpack_require__(27).array;
 
 	/**
 	 * Function that applies the standard normal variate (SNV) to an array of values.
@@ -7786,10 +7996,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 31 */
-/***/ function(module, exports) {
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+
+	var Matrix = __webpack_require__(21);
 
 	/**
 	 * @private
@@ -7824,7 +8036,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Check that the provided vector is an array with the right length
 	 * @param {Matrix} matrix
 	 * @param {Array|Matrix} vector
-	 * @returns {Array}
+	 * @return {Array}
 	 * @throws {RangeError}
 	 */
 	exports.checkRowVector = function checkRowVector(matrix, vector) {
@@ -7842,7 +8054,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Check that the provided vector is an array with the right length
 	 * @param {Matrix} matrix
 	 * @param {Array|Matrix} vector
-	 * @returns {Array}
+	 * @return {Array}
 	 * @throws {RangeError}
 	 */
 	exports.checkColumnVector = function checkColumnVector(matrix, vector) {
@@ -7866,7 +8078,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 
 	    if (rowOut || columnOut) {
-	        throw new RangeError('Indices are out of range')
+	        throw new RangeError('Indices are out of range');
 	    }
 
 	    if (typeof rowIndices !== 'object' || typeof columnIndices !== 'object') {
@@ -7900,14 +8112,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return arr;
 	};
 
+	exports.sumByRow = function sumByRow(matrix) {
+	    var sum = Matrix.Matrix.zeros(matrix.rows, 1);
+	    for (var i = 0; i < matrix.rows; ++i) {
+	        for (var j = 0; j < matrix.columns; ++j) {
+	            sum.set(i, 0, sum.get(i, 0) + matrix.get(i, j));
+	        }
+	    }
+	    return sum;
+	};
+
+	exports.sumByColumn = function sumByColumn(matrix) {
+	    var sum = Matrix.Matrix.zeros(1, matrix.columns);
+	    for (var i = 0; i < matrix.rows; ++i) {
+	        for (var j = 0; j < matrix.columns; ++j) {
+	            sum.set(0, j, sum.get(0, j) + matrix.get(i, j));
+	        }
+	    }
+	    return sum;
+	};
+
+	exports.sumAll = function sumAll(matrix) {
+	    var v = 0;
+	    for (var i = 0; i < matrix.rows; i++) {
+	        for (var j = 0; j < matrix.columns; j++) {
+	            v += matrix.get(i, j);
+	        }
+	    }
+	    return v;
+	};
+
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(33);
+	var BaseView = __webpack_require__(34);
 
 	class MatrixTransposeView extends BaseView {
 	    constructor(matrix) {
@@ -7928,13 +8170,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var abstractMatrix = __webpack_require__(23);
-	var Matrix;
+	var Matrix = __webpack_require__(21);
 
 	class BaseView extends abstractMatrix() {
 	    constructor(matrix, rows, columns) {
@@ -7945,10 +8187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    static get [Symbol.species]() {
-	        if (!Matrix) {
-	            Matrix = __webpack_require__(21);
-	        }
-	        return Matrix;
+	        return Matrix.Matrix;
 	    }
 	}
 
@@ -7956,12 +8195,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(33);
+	var BaseView = __webpack_require__(34);
 
 	class MatrixRowView extends BaseView {
 	    constructor(matrix, row) {
@@ -7983,13 +8222,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(33);
-	var util = __webpack_require__(31);
+	var BaseView = __webpack_require__(34);
+	var util = __webpack_require__(32);
 
 	class MatrixSubView extends BaseView {
 	    constructor(matrix, startRow, endRow, startColumn, endColumn) {
@@ -8000,7 +8239,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    set(rowIndex, columnIndex, value) {
-	        this.matrix.set(this.startRow + rowIndex, this.startColumn + columnIndex , value);
+	        this.matrix.set(this.startRow + rowIndex, this.startColumn + columnIndex, value);
 	        return this;
 	    }
 
@@ -8013,13 +8252,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(33);
-	var util = __webpack_require__(31);
+	var BaseView = __webpack_require__(34);
+	var util = __webpack_require__(32);
 
 	class MatrixSelectionView extends BaseView {
 	    constructor(matrix, rowIndices, columnIndices) {
@@ -8030,7 +8269,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    set(rowIndex, columnIndex, value) {
-	        this.matrix.set(this.rowIndices[rowIndex], this.columnIndices[columnIndex] , value);
+	        this.matrix.set(this.rowIndices[rowIndex], this.columnIndices[columnIndex], value);
 	        return this;
 	    }
 
@@ -8043,12 +8282,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(33);
+	var BaseView = __webpack_require__(34);
 
 	class MatrixColumnView extends BaseView {
 	    constructor(matrix, column) {
@@ -8061,7 +8300,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this;
 	    }
 
-	    get(rowIndex, columnIndex) {
+	    get(rowIndex) {
 	        return this.matrix.get(rowIndex, this.column);
 	    }
 	}
@@ -8070,12 +8309,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(33);
+	var BaseView = __webpack_require__(34);
 
 	class MatrixFlipRowView extends BaseView {
 	    constructor(matrix) {
@@ -8096,12 +8335,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var BaseView = __webpack_require__(33);
+	var BaseView = __webpack_require__(34);
 
 	class MatrixFlipColumnView extends BaseView {
 	    constructor(matrix) {
@@ -8122,16 +8361,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Matrix = __webpack_require__(21);
+	var Matrix = __webpack_require__(21).Matrix;
 
-	var SingularValueDecomposition = __webpack_require__(41);
-	var EigenvalueDecomposition = __webpack_require__(43);
-	var LuDecomposition = __webpack_require__(44);
+	var SingularValueDecomposition = __webpack_require__(42);
+	var EigenvalueDecomposition = __webpack_require__(44);
+	var LuDecomposition = __webpack_require__(24);
 	var QrDecomposition = __webpack_require__(45);
 	var CholeskyDecomposition = __webpack_require__(46);
 
@@ -8190,13 +8429,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Matrix = __webpack_require__(21);
-	var util = __webpack_require__(42);
+	var Matrix = __webpack_require__(21).Matrix;
+	var util = __webpack_require__(43);
 	var hypotenuse = util.hypotenuse;
 	var getFilled2DArray = util.getFilled2DArray;
 
@@ -8214,10 +8453,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        nu = Math.min(m, n);
 
 	    var wantu = true, wantv = true;
-	    if (options.computeLeftSingularVectors === false)
-	        wantu = false;
-	    if (options.computeRightSingularVectors === false)
-	        wantv = false;
+	    if (options.computeLeftSingularVectors === false) wantu = false;
+	    if (options.computeRightSingularVectors === false) wantv = false;
 	    var autoTranspose = options.autoTranspose === true;
 
 	    var swapped = false;
@@ -8225,6 +8462,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (m < n) {
 	        if (!autoTranspose) {
 	            a = value.clone();
+	            // eslint-disable-next-line no-console
 	            console.warn('Computing SVD on a matrix with more columns than rows. Consider enabling autoTranspose');
 	        } else {
 	            a = value.transpose();
@@ -8295,8 +8533,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                e[k] = hypotenuse(e[k], e[i]);
 	            }
 	            if (e[k] !== 0) {
-	                if (e[k + 1] < 0)
-	                    e[k] = -e[k];
+	                if (e[k + 1] < 0) {
+	                    e[k] = 0 - e[k];
+	                }
 	                for (i = k + 1; i < n; i++) {
 	                    e[i] /= e[k];
 	                }
@@ -8569,6 +8808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                p--;
 	                break;
 	            }
+	            // no default
 	        }
 	    }
 
@@ -8709,18 +8949,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports) {
 
 	'use strict';
 
 	exports.hypotenuse = function hypotenuse(a, b) {
+	    var r;
 	    if (Math.abs(a) > Math.abs(b)) {
-	        var r = b / a;
+	        r = b / a;
 	        return Math.abs(a) * Math.sqrt(1 + r * r);
 	    }
 	    if (b !== 0) {
-	        var r = a / b;
+	        r = a / b;
 	        return Math.abs(b) * Math.sqrt(1 + r * r);
 	    }
 	    return 0;
@@ -8751,13 +8992,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const Matrix = __webpack_require__(21);
-	const util = __webpack_require__(42);
+	const Matrix = __webpack_require__(21).Matrix;
+	const util = __webpack_require__(43);
 	const hypotenuse = util.hypotenuse;
 	const getFilled2DArray = util.getFilled2DArray;
 
@@ -8798,8 +9039,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        tred2(n, e, d, V);
 	        tql2(n, e, d, V);
-	    }
-	    else {
+	    } else {
 	        var H = getFilled2DArray(n, n, 0),
 	            ort = new Array(n);
 	        for (j = 0; j < n; j++) {
@@ -8843,8 +9083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            X[i][i] = d[i];
 	            if (e[i] > 0) {
 	                X[i][i + 1] = e[i];
-	            }
-	            else if (e[i] < 0) {
+	            } else if (e[i] < 0) {
 	                X[i][i - 1] = e[i];
 	            }
 	        }
@@ -9528,8 +9767,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        r = yi / yr;
 	        d = yr + r * yi;
 	        return [(xr + r * xi) / d, (xi - r * xr) / d];
-	    }
-	    else {
+	    } else {
 	        r = yr / yi;
 	        d = yi + r * yr;
 	        return [(r * xr + xi) / d, (r * xi - xr) / d];
@@ -9540,188 +9778,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 44 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var Matrix = __webpack_require__(21);
-
-	// https://github.com/lutzroeder/Mapack/blob/master/Source/LuDecomposition.cs
-	function LuDecomposition(matrix) {
-	    if (!(this instanceof LuDecomposition)) {
-	        return new LuDecomposition(matrix);
-	    }
-	    matrix = Matrix.checkMatrix(matrix);
-
-	    var lu = matrix.clone(),
-	        rows = lu.rows,
-	        columns = lu.columns,
-	        pivotVector = new Array(rows),
-	        pivotSign = 1,
-	        i, j, k, p, s, t, v,
-	        LUrowi, LUcolj, kmax;
-
-	    for (i = 0; i < rows; i++) {
-	        pivotVector[i] = i;
-	    }
-
-	    LUcolj = new Array(rows);
-
-	    for (j = 0; j < columns; j++) {
-
-	        for (i = 0; i < rows; i++) {
-	            LUcolj[i] = lu[i][j];
-	        }
-
-	        for (i = 0; i < rows; i++) {
-	            LUrowi = lu[i];
-	            kmax = Math.min(i, j);
-	            s = 0;
-	            for (k = 0; k < kmax; k++) {
-	                s += LUrowi[k] * LUcolj[k];
-	            }
-	            LUrowi[j] = LUcolj[i] -= s;
-	        }
-
-	        p = j;
-	        for (i = j + 1; i < rows; i++) {
-	            if (Math.abs(LUcolj[i]) > Math.abs(LUcolj[p])) {
-	                p = i;
-	            }
-	        }
-
-	        if (p !== j) {
-	            for (k = 0; k < columns; k++) {
-	                t = lu[p][k];
-	                lu[p][k] = lu[j][k];
-	                lu[j][k] = t;
-	            }
-
-	            v = pivotVector[p];
-	            pivotVector[p] = pivotVector[j];
-	            pivotVector[j] = v;
-
-	            pivotSign = -pivotSign;
-	        }
-
-	        if (j < rows && lu[j][j] !== 0) {
-	            for (i = j + 1; i < rows; i++) {
-	                lu[i][j] /= lu[j][j];
-	            }
-	        }
-	    }
-
-	    this.LU = lu;
-	    this.pivotVector = pivotVector;
-	    this.pivotSign = pivotSign;
-	}
-
-	LuDecomposition.prototype = {
-	    isSingular: function () {
-	        var data = this.LU,
-	            col = data.columns;
-	        for (var j = 0; j < col; j++) {
-	            if (data[j][j] === 0) {
-	                return true;
-	            }
-	        }
-	        return false;
-	    },
-	    get determinant() {
-	        var data = this.LU;
-	        if (!data.isSquare())
-	            throw new Error('Matrix must be square');
-	        var determinant = this.pivotSign, col = data.columns;
-	        for (var j = 0; j < col; j++)
-	            determinant *= data[j][j];
-	        return determinant;
-	    },
-	    get lowerTriangularMatrix() {
-	        var data = this.LU,
-	            rows = data.rows,
-	            columns = data.columns,
-	            X = new Matrix(rows, columns);
-	        for (var i = 0; i < rows; i++) {
-	            for (var j = 0; j < columns; j++) {
-	                if (i > j) {
-	                    X[i][j] = data[i][j];
-	                } else if (i === j) {
-	                    X[i][j] = 1;
-	                } else {
-	                    X[i][j] = 0;
-	                }
-	            }
-	        }
-	        return X;
-	    },
-	    get upperTriangularMatrix() {
-	        var data = this.LU,
-	            rows = data.rows,
-	            columns = data.columns,
-	            X = new Matrix(rows, columns);
-	        for (var i = 0; i < rows; i++) {
-	            for (var j = 0; j < columns; j++) {
-	                if (i <= j) {
-	                    X[i][j] = data[i][j];
-	                } else {
-	                    X[i][j] = 0;
-	                }
-	            }
-	        }
-	        return X;
-	    },
-	    get pivotPermutationVector() {
-	        return this.pivotVector.slice();
-	    },
-	    solve: function (value) {
-	        value = Matrix.checkMatrix(value);
-
-	        var lu = this.LU,
-	            rows = lu.rows;
-
-	        if (rows !== value.rows)
-	            throw new Error('Invalid matrix dimensions');
-	        if (this.isSingular())
-	            throw new Error('LU matrix is singular');
-
-	        var count = value.columns,
-	            X = value.subMatrixRow(this.pivotVector, 0, count - 1),
-	            columns = lu.columns,
-	            i, j, k;
-
-	        for (k = 0; k < columns; k++) {
-	            for (i = k + 1; i < columns; i++) {
-	                for (j = 0; j < count; j++) {
-	                    X[i][j] -= X[k][j] * lu[i][k];
-	                }
-	            }
-	        }
-	        for (k = columns - 1; k >= 0; k--) {
-	            for (j = 0; j < count; j++) {
-	                X[k][j] /= lu[k][k];
-	            }
-	            for (i = 0; i < k; i++) {
-	                for (j = 0; j < count; j++) {
-	                    X[i][j] -= X[k][j] * lu[i][k];
-	                }
-	            }
-	        }
-	        return X;
-	    }
-	};
-
-	module.exports = LuDecomposition;
-
-
-/***/ },
 /* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Matrix = __webpack_require__(21);
-	var hypotenuse = __webpack_require__(42).hypotenuse;
+	var Matrix = __webpack_require__(21).Matrix;
+	var hypotenuse = __webpack_require__(43).hypotenuse;
 
 	//https://github.com/lutzroeder/Mapack/blob/master/Source/QrDecomposition.cs
 	function QrDecomposition(value) {
@@ -9774,15 +9837,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var qr = this.QR,
 	            m = qr.rows;
 
-	        if (value.rows !== m)
+	        if (value.rows !== m) {
 	            throw new Error('Matrix row dimensions must agree');
-	        if (!this.isFullRank())
+	        }
+	        if (!this.isFullRank()) {
 	            throw new Error('Matrix is rank deficient');
+	        }
 
-	        var count = value.columns,
-	            X = value.clone(),
-	            n = qr.columns,
-	            i, j, k, s;
+	        var count = value.columns;
+	        var X = value.clone();
+	        var n = qr.columns;
+	        var i, j, k, s;
 
 	        for (k = 0; k < n; k++) {
 	            for (j = 0; j < count; j++) {
@@ -9876,7 +9941,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var Matrix = __webpack_require__(21);
+	var Matrix = __webpack_require__(21).Matrix;
 
 	// https://github.com/lutzroeder/Mapack/blob/master/Source/CholeskyDecomposition.cs
 	function CholeskyDecomposition(value) {
@@ -9884,8 +9949,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return new CholeskyDecomposition(value);
 	    }
 	    value = Matrix.checkMatrix(value);
-	    if (!value.isSymmetric())
+	    if (!value.isSymmetric()) {
 	        throw new Error('Matrix is not symmetric');
+	    }
 
 	    var a = value,
 	        dimension = a.rows,
@@ -10022,6 +10088,91 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 49 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/**
+	 * Calculate the molecular formula in 'chemcalc' notation taking into account fragments, isotopes and charges
+	 * @returns {String}
+	 */
+
+	module.exports = function getMF() {
+	    var entries=this.getFragments();
+	    var result={};
+	    var parts=[];
+	    var allAtoms=[];
+	    entries.forEach( function(entry) {
+	        var mf=getFragmentMF(entry);
+	        parts.push(mf);
+	    });
+	    // need to join the entries if they have the same molecular formula
+	    parts.sort();
+	    
+	    result.parts=parts;
+	    result.mf=getMF(allAtoms);
+	    return result;
+
+	    function getFragmentMF(molecule) {
+	        var atoms=[];
+	        for (var i=0; i<molecule.getAllAtoms(); i++) {
+	            var atom={};
+	            atom.charge=molecule.getAtomCharge(i);
+	            atom.label=molecule.getAtomLabel(i);
+	            atom.mass=molecule.getAtomMass(i);
+	            atom.implicitHydrogens=molecule.getImplicitHydrogens(i);
+	            atoms.push(atom);
+	            allAtoms.push(atom);
+	        }
+	        return getMF(atoms);
+	    }
+
+
+	    function getMF(atoms) {
+	        var charge=0;
+	        var mfs={};
+	        for (var atom of atoms) {
+	            var label=atom.label;
+	            charge+=atom.charge;
+	            if (atom.mass) {
+	                label='['+atom.mass+label+']';
+	            }
+	            var mfAtom=mfs[label];
+	            if (!mfAtom) {
+	                mfs[label]=0;
+	            }
+	            mfs[label]+=1;
+	            if (atom.implicitHydrogens) {
+	                if (! mfs.H) mfs.H=0;
+	                mfs.H+=atom.implicitHydrogens;
+	            }
+	        }
+
+
+	        var mf="";
+	        var keys=Object.keys(mfs).sort(function(a,b) {
+	            if (a==="C") return -1;
+	            if (a==="H" && b!=="C") return -1;
+	            if (a<b) return -1;
+	            return 1;
+	        });
+	        for (var key of keys) {
+	            mf+=key;
+	            if (mfs[key]>1) mf+=mfs[key];
+	        }
+
+	        if (charge>0) {
+	            mf+='(+'+charge+')';
+	        } else if (charge<0) {
+	            mf+='('+charge+')';
+	        }
+	        return mf;
+	    }
+
+	};
+
+/***/ },
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -10165,13 +10316,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var getFunctionCodes=__webpack_require__(49);
-	var functionIndex=__webpack_require__(51);
+	var getFunctionCodes=__webpack_require__(50);
+	var functionIndex=__webpack_require__(52);
 
 	module.exports = function getFunctions() {
 	    var currentFunctionCodes=this.getFunctionCodes();
@@ -10187,7 +10338,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports) {
 
 	'use strict';
