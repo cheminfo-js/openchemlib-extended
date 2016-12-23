@@ -10106,9 +10106,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var mf=getFragmentMF(entry);
 	        parts.push(mf);
 	    });
-	    // need to join the entries if they have the same molecular formula
-	    parts.sort();
 	    
+	    var counts={};
+	    for (var part of parts) {
+	        if (! counts[part]) counts[part]=0;
+	        counts[part]++;
+	    }
+	    parts=[];
+	    for (var key of Object.keys(counts).sort()) {
+	        if (counts[key]>1) {
+	            parts.push(counts[key]+key);
+	        } else {
+	            parts.push(key);
+	        }
+	    }
+
 	    result.parts=parts;
 	    result.mf=getMF(allAtoms);
 	    return result;
@@ -10148,11 +10160,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 
-
 	        var mf="";
 	        var keys=Object.keys(mfs).sort(function(a,b) {
 	            if (a==="C") return -1;
+	            if (b==="C") return 1;
 	            if (a==="H" && b!=="C") return -1;
+	            if (a!=="C" && b==="H") return 1;
 	            if (a<b) return -1;
 	            return 1;
 	        });
@@ -10162,9 +10175,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        if (charge>0) {
-	            mf+='(+'+charge+')';
+	            mf+='(+'+((charge>1)?charge:'')+')';
 	        } else if (charge<0) {
-	            mf+='('+charge+')';
+	            mf+='('+((charge>1)?charge:'')+')';
 	        }
 	        return mf;
 	    }
