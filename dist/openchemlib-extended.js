@@ -10177,7 +10177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (charge>0) {
 	            mf+='(+'+((charge>1)?charge:'')+')';
 	        } else if (charge<0) {
-	            mf+='('+((charge>1)?charge:'')+')';
+	            mf+='('+((charge<-1)?charge:'-')+')';
 	        }
 	        return mf;
 	    }
