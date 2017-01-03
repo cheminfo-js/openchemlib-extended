@@ -45,7 +45,24 @@ describe('getMF test', function () {
         result.parts.length.should.equal(2);
         result.parts[0].should.equal('4H2O');
         result.parts[1].should.equal('HCl');
-
-
     });
+
+    it('check Li+ OH-', function () {
+        var molecule=OCLE.Molecule.fromIDCode('eDJRpCjP@');
+        var result=molecule.getMF();
+        result.mf.should.equal('HLiO');
+        result.parts.length.should.equal(2);
+        result.parts[0].should.equal('HO(-)');
+        result.parts[1].should.equal('Li(+)');
+    });
+
+    it('check O--', function () {
+        var molecule=OCLE.Molecule.fromSmiles('[O--]');
+        var result=molecule.getMF();
+        result.mf.should.equal('O(-2)');
+        result.parts.length.should.equal(1);
+        result.parts[0].should.equal('O(-2)');
+    });
+    
+
 });

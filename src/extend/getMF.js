@@ -85,7 +85,7 @@ module.exports = function getMF() {
         if (charge>0) {
             mf+='(+'+((charge>1)?charge:'')+')';
         } else if (charge<0) {
-            mf+='('+((charge>1)?charge:'')+')';
+            mf+='('+((charge<-1)?charge:'-')+')';
         }
         return mf;
     }
