@@ -56,6 +56,15 @@ describe('getMF test', function () {
         result.parts[1].should.equal('Li(+)');
     });
 
+    it('check 2 atoms of cobalt', function () {
+        // if we have the same molecular formula we group them and count in front
+        var molecule=OCLE.Molecule.fromIDCode('eDACXm`@@');
+        var result=molecule.getMF();
+        result.mf.should.equal('Co2');
+        result.parts.length.should.equal(1);
+        result.parts[0].should.equal('2Co');
+    });
+    
     it('check O--', function () {
         var molecule=OCLE.Molecule.fromSmiles('[O--]');
         var result=molecule.getMF();
