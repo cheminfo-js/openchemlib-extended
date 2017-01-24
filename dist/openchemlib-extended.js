@@ -8921,18 +8921,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var OCL = __webpack_require__(3);
 
-	module.exports = function getConnectivityMatrix(options={}) {
-	    var {
-	        sdt,
-	        mass
-	    } = options;
+	module.exports = function getConnectivityMatrix(options) {
+	    var options = options || {};
+	    var sdt=options.sdt;
+	    var mass=options.mass;
+	    var atomicNo=options.atomicNo;
 
 	    this.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
 	    var nbAtoms=this.getAllAtoms();
 	    var result=new Array(nbAtoms);
 	    for (var i=0; i<nbAtoms; i++) {
 	        result[i]=new Array(nbAtoms).fill(0);
-	        result[i][i]=(mass) ? OCL.Molecule.cRoundedMass[this.getAtomicNo(i)] : 1;
+	        if (atomicNo) {
+	            result[i][i]=this.getAtomicNo(i);
+	        } else {
+	            result[i][i]=(mass) ? OCL.Molecule.cRoundedMass[this.getAtomicNo(i)] : 1;
+	        }
+	        
 	    }
 
 	    for (var i=0; i<nbAtoms; i++) {
