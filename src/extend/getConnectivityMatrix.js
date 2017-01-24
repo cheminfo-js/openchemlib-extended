@@ -2,11 +2,10 @@
 
 var OCL = require('openchemlib');
 
-module.exports = function getConnectivityMatrix(options={}) {
-    var {
-        sdt,
-        mass
-    } = options;
+module.exports = function getConnectivityMatrix(options) {
+    var options = options || {};
+    var sdt=options.sdt;
+    var mass=options.mass;
 
     this.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
     var nbAtoms=this.getAllAtoms();
