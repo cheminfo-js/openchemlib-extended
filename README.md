@@ -87,6 +87,7 @@ An atom is considered connected to itself (dialog is equal to 1)
 Options:
 * sdt: put the bond order outside the diagonal (default: false)
 * mass: put the rounded mass on the diagonal (default: false)
+* atomicNo: put the atomic number on the diagonal (default: false)
 
 Example using npm:
 ```

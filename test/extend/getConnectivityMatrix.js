@@ -74,8 +74,24 @@ describe('getConnectivityMatrix test propane', function () {
                 [ 0, 0, 0, 1,12, 1 ],
                 [ 1, 0, 0, 0, 1,12 ]
             ]
-
         );
     });
-    
+
+    it('benzene with atomic number on diagonal', function () {
+        var molecule=OCLE.Molecule.fromSmiles('c1ccccc1');
+        var connectivityMatrix=molecule.getConnectivityMatrix({
+            atomicNo: true
+        });
+        connectivityMatrix.should.be.eql(
+            [
+                [ 6, 1, 0, 0, 0, 1 ],
+                [ 1, 6, 1, 0, 0, 0 ],
+                [ 0, 1, 6, 1, 0, 0 ],
+                [ 0, 0, 1, 6, 1, 0 ],
+                [ 0, 0, 0, 1, 6, 1 ],
+                [ 1, 0, 0, 0, 1, 6 ]
+            ]
+        );
+    });
+
 });
