@@ -76,13 +76,14 @@ options:
 
 ### getExtendedDiastereotopicAtomIDs()
 
-Return an array of explicit hydrogens added molecule of diastereotopicAtomIDs.
+Returns an array of explicit hydrogens added molecule of diastereotopicAtomIDs.
 Extra information like the diastereotopicIDs of the molecule are added
 
 ### getConnectivityMatrix(options)
 
 Returns an array of array (matrix) containing a '1' for all the connected atoms.
-An atom is considered connected to itself (dialog is equal to 1)
+An atom is considered connected to itself (dialog is equal to 1). Options allows to
+tune the values you want in the matrix.
 
 Options:
 * sdt: put the bond order outside the diagonal (default: false)
