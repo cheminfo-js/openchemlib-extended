@@ -88,6 +88,15 @@ Options:
 * sdt: put the bond order outside the diagonal (default: false)
 * mass: put the rounded mass on the diagonal (default: false)
 
+Example using npm:
+```
+var OCLE = require('openchemlib-extended');
+var molecule = OCLE.Molecule.fromSmiles('c1ccccc1');
+var matrix = molecule.getConnectivityMatrix({mass: true, sdt: true});
+console.log(matrix);
+```
+
+
 
 ### getMF()
 
