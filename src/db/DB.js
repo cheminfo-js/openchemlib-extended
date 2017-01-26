@@ -2,7 +2,6 @@
 
 const OCL = require('openchemlib');
 const Molecule = OCL.Molecule;
-const parseSDF = require('sdf-parser');
 const Papa = require('papaparse');
 
 const moleculeCreator = require('./moleculeCreator');
@@ -13,14 +12,14 @@ const defaultDBOptions = {
 };
 
 const defaultSDFOptions = {
-    onStep(current, total){}
+    onStep: function (current, total) {}
 };
 
 const defaultCSVOptions = {
     header: true,
     dynamicTyping: true,
     skipEmptyLines: true,
-    onStep(current, total) {}
+    onStep: function (current, total) {}
 };
 
 const defaultSearchOptions = {

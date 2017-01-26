@@ -6,10 +6,10 @@ module.exports = function getAtomsInfo() {
 
     this.ensureHelperArrays(OCL.Molecule.cHelperRings);
 
-    var diaIDs=this.getDiastereotopicAtomIDs();
+    var diaIDs = this.getDiastereotopicAtomIDs();
 
-    var results=[];
-    for (var i=0; i<diaIDs.length; i++) {
+    var results = [];
+    for (var i = 0; i < diaIDs.length; i++) {
         var result = {
             oclID: diaIDs[i],
             extra: {
@@ -50,7 +50,7 @@ module.exports = function getAtomsInfo() {
         result.connAtoms = this.getConnAtoms(i);
         result.allConnAtoms = this.getAllConnAtoms(i);
 
-        result.implicitHydrogens=result.allHydrogens+result.connAtoms-result.allConnAtoms;
+        result.implicitHydrogens = result.allHydrogens + result.connAtoms - result.allConnAtoms;
 
         result.isAromatic = this.isAromaticAtom(i);
         result.isAllylic = this.isAllylicAtom(i);
@@ -60,7 +60,7 @@ module.exports = function getAtomsInfo() {
         result.isStabilized = this.isStabilizedAtom(i);
 
         // todo HACK to circumvent bug in OCL that consider than an hydrogen is connected to itself
-        result.extra.singleBonds = (result.atomicNo===1) ? 0 : result.implicitHydrogens;
+        result.extra.singleBonds = (result.atomicNo === 1) ? 0 : result.implicitHydrogens;
         for (var j = 0; j < this.getAllConnAtoms(i); j++) {
             var bond = this.getConnBond(i, j);
             var bondOrder = this.getBondOrder(bond);
@@ -85,7 +85,7 @@ module.exports = function getAtomsInfo() {
         } else if (result.atomicNo === 8) {
             result.extra.cnoHybridation = result.extra.totalBonds + 1;
         } else if (result.atomicNo === 1) {
-            var connectedAtom=(this.getAllConnAtoms(i)===0) ? 0 : this.getAtomicNo(this.getConnAtom(i,0));
+            var connectedAtom = (this.getAllConnAtoms(i) === 0) ? 0 : this.getAtomicNo(this.getConnAtom(i, 0));
             result.extra.hydrogenOnAtomicNo = connectedAtom;
             if (connectedAtom === 7 || connectedAtom === 8) {
                 result.extra.labileHydrogen = true;

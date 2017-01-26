@@ -1,61 +1,61 @@
 'use strict';
 
 module.exports = {
-    "gJQLBEeKNVTfjh@": {
-        "name": "tertiary alcohol"
+    'gJQLBEeKNVTfjh@': {
+        'name': 'tertiary alcohol'
     },
-    "eF@HxP": {
-        "name": "alkyne"
+    'eF@HxP': {
+        'name': 'alkyne'
     },
-    "eF@HhP": {
-        "name": "alkene"
+    'eF@HhP': {
+        'name': 'alkene'
     },
-    "eM`BN`p`": {
-        "name": "secondary amine"
+    'eM`BN`p`': {
+        'name': 'secondary amine'
     },
-    "gC``@deZ@~d\\": {
-        "name": "ester"
+    'gC``@deZ@~d\\': {
+        'name': 'ester'
     },
-    "eMHBN``": {
-        "name": "ether"
+    'eMHBN``': {
+        'name': 'ether'
     },
-    "gC``Adij@pf}IX": {
-        "name": "hemiacetal"
+    'gC``Adij@pf}IX': {
+        'name': 'hemiacetal'
     },
-    "gJP`AdizhCzRp": {
-        "name": "acetal"
+    'gJP`AdizhCzRp': {
+        'name': 'acetal'
     },
-    "gCh@AGj@`": {
-        "name": "tertiary amine"
+    'gCh@AGj@`': {
+        'name': 'tertiary amine'
     },
-    "gJP`AdizhCzQp": {
-        "name": "cetal"
+    'gJP`AdizhCzQp': {
+        'name': 'cetal'
     },
-    "gJP`AdizhCzSP": {
-        "name": "acetal"
+    'gJP`AdizhCzSP': {
+        'name': 'acetal'
     },
-    "gJY@DDefhCzQp": {
-        "name": "tertiary amide"
+    'gJY@DDefhCzQp': {
+        'name': 'tertiary amide'
     },
-    "eMJDVTfP@": {
-        "name": "aldehyde"
+    'eMJDVTfP@': {
+        'name': 'aldehyde'
     },
-    "gCaDLEeKJST`@": {
-        "name": "ketone"
+    'gCaDLEeKJST`@': {
+        'name': 'ketone'
     },
-    "eF`BLFD@": {
-        "name": "primary amine"
+    'eF`BLFD@': {
+        'name': 'primary amine'
     },
-    "eFHBLFD@": {
-        "name": ""
+    'eFHBLFD@': {
+        'name': ''
     },
-    "eMJDVTf`@": {
-        "name": "primary alcohol"
+    'eMJDVTf`@': {
+        'name': 'primary alcohol'
     },
-    "gCaDLEeKJSU@@": {
-        "name": "secondary alcohol"
+    'gCaDLEeKJSU@@': {
+        'name': 'secondary alcohol'
     },
-    "eMDARVCB_Tx": {
-        "name": "carboxylic acid"
+    'eMDARVCB_Tx': {
+        'name': 'carboxylic acid'
     }
 };

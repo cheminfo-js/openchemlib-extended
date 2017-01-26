@@ -23,4 +23,3 @@ OCL.Molecule.prototype.getMF = require('./extend/getMF');
 OCL.Molecule.prototype.getFunctionCodes = require('./extend/getFunctionCodes');
 OCL.Molecule.prototype.getFunctions = require('./extend/getFunctions');
 
-
