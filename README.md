@@ -79,6 +79,16 @@ options:
 Returns an array of explicit hydrogens added molecule of diastereotopicAtomIDs.
 Extra information like the diastereotopicIDs of the molecule are added
 
+### getAllPaths(options)
+
+Returns an array containing all-pairs shortest paths from a connectivity matrix using the FloydWarshall algorithm.
+options:
+* fromLabel: filter the pairs that start from this specific atom (default: '')
+* toLabel: filter the pairs that end at this specific atom (default: '')
+* minLength: min path length to report (default: 1)
+* maxLength: max path length to report (default: 4)
+
+
 ### getConnectivityMatrix(options)
 
 Returns an array of array (matrix) containing a '1' for all the connected atoms.
