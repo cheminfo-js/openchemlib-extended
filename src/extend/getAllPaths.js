@@ -3,8 +3,7 @@
 var floydWarshall = require('ml-floyd-warshall');
 var Matrix = require('ml-matrix');
 
-module.exports = function getAllPaths(options) {
-    var options = options || [];
+module.exports = function getAllPaths(options = {}) {
     var fromLabel = options.fromLabel || '';
     var toLabel = options.toLabel || '';
     var minLength = (options.minLength === undefined) ? 1 : options.minLength;
@@ -46,7 +45,7 @@ module.exports = function getAllPaths(options) {
     }
 
     var finalResults = [];
-    for (var key in results) {
+    for (let key in results) {
         finalResults.push(results[key]);
     }
     return finalResults;

@@ -1,6 +1,5 @@
 'use strict';
 
-var getFunctionCodes = require('./getFunctionCodes');
 var functionIndex = require('./functions');
 
 module.exports = function getFunctions() {

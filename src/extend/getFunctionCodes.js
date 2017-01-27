@@ -5,7 +5,7 @@ var OCL = require('openchemlib');
 module.exports = function getFunctionCodes() {
     var molecule = this.getCompactCopy();
     var atoms = molecule.getAtomsInfo();
-    for (var i = 0; i < molecule.getAllAtoms(); i++) {
+    for (let i = 0; i < molecule.getAllAtoms(); i++) {
         var atom = atoms[i];
         atom.i = i;
         atom.mapNo = molecule.getAtomMapNo(i);
@@ -13,7 +13,7 @@ module.exports = function getFunctionCodes() {
     }
 
     var bonds = [];
-    for (var i = 0; i < molecule.getAllBonds(); i++) {
+    for (let i = 0; i < molecule.getAllBonds(); i++) {
         var bond = {};
         bonds.push(bond);
         bond.i = i;
@@ -40,7 +40,7 @@ module.exports = function getFunctionCodes() {
     }
 
     var brokenMolecule = molecule.getCompactCopy();
-    for (var bond of bonds) {
+    for (let bond of bonds) {
         if (bond.selected) {
             brokenMolecule.markBondForDeletion(bond.i);
         }
@@ -52,7 +52,7 @@ module.exports = function getFunctionCodes() {
 
     var results = {};
 
-    for (var i = 0; i < nbFragments; i++) {
+    for (let i = 0; i < nbFragments; i++) {
         var result = {};
         result.atomMap = [];
         var includeAtom = fragmentMap.map(function (id) {
@@ -64,13 +64,13 @@ module.exports = function getFunctionCodes() {
         var parent = fragment.getCompactCopy();
         parent.setFragment(true);
         // we will remove the hydrogens of the broken carbon
-        for (var j = 0; j < atomMap.length; j++) {
+        for (let j = 0; j < atomMap.length; j++) {
             if (atomMap[j] > -1) {
-                var numberDeletedHydrogens = 0;
+//                var numberDeletedHydrogens = 0;
                 if (atoms[j].links.length > 0) {
-                    for (var k = 0; k < atoms[j].links.length; k++) {
+                    for (let k = 0; k < atoms[j].links.length; k++) {
                         if (parent.getAtomicNo(atoms[j].links[k]) === 1) {
-                            numberDeletedHydrogens++;
+ //                           numberDeletedHydrogens++;
                             fragment.deleteAtom(atoms[j].links[k]);
                         }
                     }
@@ -95,11 +95,11 @@ module.exports = function getFunctionCodes() {
         fragment.setFragment(false); // required for small molecules like methanol
 
         // we will add some R groups at the level of the broken bonds
-        for (var j = 0; j < atomMap.length; j++) {
+        for (let j = 0; j < atomMap.length; j++) {
             if (atomMap[j] > -1) {
                 result.atomMap.push(j);
                 if (atoms[j].links.length > 0) {
-                    for (var k = 0; k < atoms[j].links.length; k++) {
+                    for (let k = 0; k < atoms[j].links.length; k++) {
                         var rGroup = fragment.addAtom(154);
                         var x = molecule.getAtomX(atoms[j].links[k]);
                         var y = molecule.getAtomY(atoms[j].links[k]);

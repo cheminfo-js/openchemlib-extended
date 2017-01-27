@@ -2,6 +2,7 @@
 
 const OCL = require('openchemlib');
 const Molecule = OCL.Molecule;
+const parseSDF = require('sdf-parser');
 const Papa = require('papaparse');
 
 const moleculeCreator = require('./moleculeCreator');
@@ -77,7 +78,7 @@ class MoleculeDB {
             var stats = new Array(fields.length);
             var firstElement = parsed.data[0];
             var datatype, datafield;
-            for (var i = 0; i < fields.length; i++) {
+            for (let i = 0; i < fields.length; i++) {
                 stats[i] = {
                     label: fields[i],
                     isNumeric: typeof firstElement[fields[i]] === 'number'
@@ -176,7 +177,7 @@ class MoleculeDB {
         var queryIdcode = query.getIDCode();
         var result = new MoleculeDB();
         limit = limit || Number.MAX_SAFE_INTEGER;
-        for (var i = 0; i < this.length; i++) {
+        for (let i = 0; i < this.length; i++) {
             if (this.molecules[i].idcode === queryIdcode) {
                 result.push(this.molecules[i], this.data[i]);
                 if (result.length >= limit) break;
@@ -198,7 +199,7 @@ class MoleculeDB {
 
         searcher.setFragment(query, queryIndex);
         var searchResult = [];
-        for (var i = 0; i < this.length; i++) {
+        for (let i = 0; i < this.length; i++) {
             searcher.setMolecule(this.molecules[i], this.molecules[i].index);
             if (searcher.isFragmentInMolecule()) {
                 searchResult.push([this.molecules[i], i]);
@@ -210,7 +211,7 @@ class MoleculeDB {
 
         var length = Math.min(limit || searchResult.length, searchResult.length);
         var result = new MoleculeDB({length: length});
-        for (var i = 0; i < length; i++) {
+        for (let i = 0; i < length; i++) {
             result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
         }
 
@@ -227,7 +228,7 @@ class MoleculeDB {
 
         var searchResult = new Array(this.length);
         var similarity;
-        for (var i = 0; i < this.length; i++) {
+        for (let i = 0; i < this.length; i++) {
             if (this.molecules[i].idcode === queryIDCode) {
                 similarity = 1e10;
             } else {
@@ -242,7 +243,7 @@ class MoleculeDB {
 
         var length = Math.min(limit || searchResult.length, searchResult.length);
         var result = new MoleculeDB({length: length});
-        for (var i = 0; i < length; i++) {
+        for (let i = 0; i < length; i++) {
             result.push(this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
         }
         return result;

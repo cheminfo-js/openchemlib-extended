@@ -3,7 +3,7 @@
 var OCLE = require('../..');
 
 describe('getFunctions test acetone', function () {
-    it('should yield to ketone', function () {;
+    it('should yield to ketone', function () {
         var molecule=OCLE.Molecule.fromSmiles('CC(=O)C');
         var functions=molecule.getFunctions();
 

@@ -2,8 +2,7 @@
 
 var OCL = require('openchemlib');
 
-module.exports = function getConnectivityMatrix(options) {
-    var options = options || {};
+module.exports = function getConnectivityMatrix(options = {}) {
     var sdt = options.sdt;
     var mass = options.mass;
     var atomicNo = options.atomicNo;
@@ -11,7 +10,7 @@ module.exports = function getConnectivityMatrix(options) {
     this.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
     var nbAtoms = this.getAllAtoms();
     var result = new Array(nbAtoms);
-    for (var i = 0; i < nbAtoms; i++) {
+    for (let i = 0; i < nbAtoms; i++) {
         result[i] = new Array(nbAtoms).fill(0);
         if (atomicNo) {
             result[i][i] = this.getAtomicNo(i);
@@ -21,8 +20,8 @@ module.exports = function getConnectivityMatrix(options) {
 
     }
 
-    for (var i = 0; i < nbAtoms; i++) {
-        for (var j = 0; j < this.getAllConnAtoms(i); j++) {
+    for (let i = 0; i < nbAtoms; i++) {
+        for (let j = 0; j < this.getAllConnAtoms(i); j++) {
             result[i][this.getConnAtom(i, j)] = (sdt) ? this.getConnBondOrder(i, j) : 1;
         }
     }
