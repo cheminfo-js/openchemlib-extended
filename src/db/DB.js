@@ -13,14 +13,18 @@ const defaultDBOptions = {
 };
 
 const defaultSDFOptions = {
-    onStep: function (current, total) {}
+    onStep: function (current, total) {
+        // empty function
+    }
 };
 
 const defaultCSVOptions = {
     header: true,
     dynamicTyping: true,
     skipEmptyLines: true,
-    onStep: function (current, total) {}
+    onStep: function (current, total) {
+        // empty function
+    }
 };
 
 const defaultSearchOptions = {
@@ -50,7 +54,8 @@ class MoleculeDB {
             var molecules = parsed.molecules;
             var db = new MoleculeDB(options);
             db.statistics = parsed.statistics;
-            var i = 0, l = molecules.length;
+            var i = 0;
+            var l = molecules.length;
             parseNext();
             function parseNext() {
                 if (i === l) {
@@ -95,7 +100,8 @@ class MoleculeDB {
             var db = new MoleculeDB(options);
             db.statistics = stats;
 
-            var i = 0, l = parsed.data.length;
+            var i = 0;
+            var l = parsed.data.length;
             parseNext();
             function parseNext() {
                 if (i === l) {
