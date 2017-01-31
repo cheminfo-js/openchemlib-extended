@@ -19,7 +19,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --require should --reporter mocha-better-spec-reporter --recursive",
+    "test": "npm run testonly && npm run eslint",
+    "testonly": "mocha --require should --reporter mocha-better-spec-reporter --recursive",
     "build": "cheminfo build -u --babel",
     "eslint": "eslint src --cache",
     "eslint-fix": "npm run eslint -- --fix"
@@ -36,7 +37,7 @@
   "dependencies": {
     "ml-floyd-warshall": "^1.0.0",
     "ml-matrix": "^2.0.0",
-    "openchemlib": "^4.6.2",
+    "openchemlib": "^5.1.1",
     "papaparse": "^4.1.2",
     "rxn-parser": "0.0.2",
     "sdf-parser": "^1.0.0",

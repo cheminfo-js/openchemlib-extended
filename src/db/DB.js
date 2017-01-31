@@ -13,7 +13,7 @@ const defaultDBOptions = {
 };
 
 const defaultSDFOptions = {
-    onStep: function (current, total) {
+    onStep: function (/*current, total*/) {
         // empty function
     }
 };
@@ -22,7 +22,7 @@ const defaultCSVOptions = {
     header: true,
     dynamicTyping: true,
     skipEmptyLines: true,
-    onStep: function (current, total) {
+    onStep: function (/*current, total*/) {
         // empty function
     }
 };
@@ -59,12 +59,14 @@ class MoleculeDB {
             parseNext();
             function parseNext() {
                 if (i === l) {
-                    return resolve(db);
+                    resolve(db);
+                    return;
                 }
                 try {
                     db.push(Molecule.fromMolfile(molecules[i].molfile), molecules[i]);
                 } catch (e) {
-                    return reject(e);
+                    reject(e);
+                    return;
                 }
                 options.onStep(++i, l);
                 setImmediate(parseNext);
@@ -105,12 +107,14 @@ class MoleculeDB {
             parseNext();
             function parseNext() {
                 if (i === l) {
-                    return resolve(db);
+                    resolve(db);
+                    return;
                 }
                 try {
                     db.push(datatype(parsed.data[i][datafield]), parsed.data[i]);
                 } catch (e) {
-                    return reject(e);
+                    reject(e);
+                    return;
                 }
                 options.onStep(++i, l);
                 setImmediate(parseNext);
@@ -137,7 +141,7 @@ class MoleculeDB {
             if (!molecularFormula) {
                 molecularFormula = molecule.getMolecularFormula();
             }
-            var properties = molecule.getProperties();
+            var properties = new OCL.MoleculeProperties(molecule);
             data.properties = {
                 absoluteWeight: molecularFormula.absoluteWeight,
                 relativeWeight: molecule.mw,
