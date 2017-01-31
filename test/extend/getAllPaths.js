@@ -5,7 +5,7 @@ var OCLE = require('../..');
 
 
 describe('getAllPaths test propane', function () {
-    it('should yield the right result', function () {
+    it('min:1, max:2', function () {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         molecule.addImplicitHydrogens();
         
@@ -45,5 +45,18 @@ describe('getAllPaths test propane', function () {
                 toLabel: 'H',
                 pathLength: 1 } ]
         );
+    });
+    
+    it('min:2, max:2', function () {
+        var molecule = OCLE.Molecule.fromSmiles('CCC');
+        molecule.addImplicitHydrogens();
+
+        var paths = molecule.getAllPaths({
+            fromLabel: 'C',
+            toLabel: 'H',
+            minLength: 2,
+            maxLength: 2
+        });
+        paths[1].toAtoms.should.eql([3,4,5,8,9,10]);
     });
 });

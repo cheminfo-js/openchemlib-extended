@@ -46,6 +46,8 @@ module.exports = function getAllPaths(options = {}) {
 
     var finalResults = [];
     for (let key in results) {
+        results[key].fromAtoms.sort((a, b) => a - b);
+        results[key].toAtoms.sort((a, b) => a - b);
         finalResults.push(results[key]);
     }
     return finalResults;
