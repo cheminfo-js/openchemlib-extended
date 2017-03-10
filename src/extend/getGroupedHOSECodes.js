@@ -1,22 +1,22 @@
 'use strict';
 
-var Util = require('openchemlib').Util;
+module.exports = function (OCL) {
+    const Util = OCL.Util;
+    return function getGroupedHOSECodes(options = {}) {
+        const diaIDs = this.getGroupedDiastereotopicAtomIDs(options);
+        diaIDs.forEach(function (diaID) {
+            const hoses = Util.getHoseCodesFromDiastereotopicID(diaID.oclID, options);
 
-module.exports = function getGroupedHOSECodes(options = {}) {
-    var diaIDs = this.getGroupedDiastereotopicAtomIDs(options);
-    diaIDs.forEach(function (diaID) {
-        var hoses = Util.getHoseCodesFromDiastereotopicID(diaID.oclID, options);
-
-        diaID.hoses = [];
-        var level = 1;
-        for (var hose of hoses) {
-            diaID.hoses.push(
-                {
+            diaID.hoses = [];
+            let level = 1;
+            for (const hose of hoses) {
+                diaID.hoses.push({
                     level: level++,
                     oclID: hose
                 });
-        }
-    });
+            }
+        });
 
-    return diaIDs;
+        return diaIDs;
+    };
 };

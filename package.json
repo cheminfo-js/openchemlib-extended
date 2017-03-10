@@ -1,6 +1,6 @@
 {
   "name": "openchemlib-extended",
-  "version": "1.14.4",
+  "version": "2.1.0",
   "description": "Openchemlib extended",
   "keywords": [
     "openchemlib",
@@ -24,7 +24,8 @@
   "scripts": {
     "test": "npm run compile && npm run testonly && npm run eslint",
     "testonly": "mocha --require should --reporter mocha-better-spec-reporter --recursive",
-    "build": "cheminfo build -u --babel",
+    "build": "npm run compile && npm run build-dist",
+    "build-dist": "cheminfo build -u --babel",
     "eslint": "eslint src --cache",
     "eslint-fix": "npm run eslint -- --fix",
     "compile": "babel src --out-dir lib --quiet",
