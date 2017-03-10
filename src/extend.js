@@ -40,4 +40,5 @@ module.exports = function extend(OCL) {
     for (key in moleculePrototypeMethodsNeedOCL) {
         MoleculePrototype[key] = moleculePrototypeMethodsNeedOCL[key](OCL);
     }
+    return OCL;
 };
