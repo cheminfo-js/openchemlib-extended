@@ -128,6 +128,8 @@ module.exports = function (OCL) {
         push(molecule, data) {
             if (data === undefined) data = {};
             this.molecules[this.length] = molecule;
+            // ensure helper arrays needed for substructure search
+            molecule.ensureHelperArrays(3);
             let molecularFormula;
             if (!molecule.index) {
                 molecule.index = molecule.getIndex();
