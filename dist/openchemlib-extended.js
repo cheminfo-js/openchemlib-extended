@@ -3994,6 +3994,7 @@ var Papa = __webpack_require__(49);
 var getMoleculeCreators = __webpack_require__(15);
 
 module.exports = function (OCL) {
+    var cHelperRings = OCL.Molecule.cHelperRings;
     var Molecule = OCL.Molecule;
 
     var moleculeCreators = getMoleculeCreators(Molecule);
@@ -4043,7 +4044,7 @@ module.exports = function (OCL) {
                 if (data === undefined) data = {};
                 this.molecules[this.length] = molecule;
                 // ensure helper arrays needed for substructure search
-                molecule.ensureHelperArrays(3);
+                molecule.ensureHelperArrays(cHelperRings);
                 var molecularFormula = void 0;
                 if (!molecule.index) {
                     molecule.index = molecule.getIndex();
@@ -4120,13 +4121,15 @@ module.exports = function (OCL) {
             key: 'subStructureSearch',
             value: function subStructureSearch(query, limit) {
                 var needReset = false;
+
                 if (!query.isFragment()) {
                     needReset = true;
                     query.setFragment(true);
                 }
 
+                var queryMW = getMW(query);
+
                 var queryIndex = query.getIndex();
-                var queryMW = query.getMolecularFormula().relativeWeight;
                 var searcher = this.getSearcher();
 
                 searcher.setFragment(query, queryIndex);
@@ -4156,7 +4159,8 @@ module.exports = function (OCL) {
             key: 'similaritySearch',
             value: function similaritySearch(query, limit) {
                 var queryIndex = query.getIndex();
-                var queryMW = query.getMolecularFormula().relativeWeight;
+
+                var queryMW = getMW(query);
                 var queryIDCode = query.getIDCode();
 
                 var searchResult = new Array(this.length);
@@ -4273,6 +4277,12 @@ module.exports = function (OCL) {
 
     return MoleculeDB;
 };
+
+function getMW(query) {
+    var copy = query.getCompactCopy();
+    copy.setFragment(false);
+    return copy.getMolecularFormula().relativeWeight;
+}
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(53).setImmediate))
 
 /***/ }),
