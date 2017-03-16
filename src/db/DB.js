@@ -6,6 +6,7 @@ const Papa = require('papaparse');
 const getMoleculeCreators = require('./moleculeCreators');
 
 module.exports = function (OCL) {
+    const cHelperRings = OCL.Molecule.cHelperRings;
     const Molecule = OCL.Molecule;
 
     const moleculeCreators = getMoleculeCreators(Molecule);
@@ -129,7 +130,7 @@ module.exports = function (OCL) {
             if (data === undefined) data = {};
             this.molecules[this.length] = molecule;
             // ensure helper arrays needed for substructure search
-            molecule.ensureHelperArrays(3);
+            molecule.ensureHelperArrays(cHelperRings);
             let molecularFormula;
             if (!molecule.index) {
                 molecule.index = molecule.getIndex();
@@ -203,13 +204,15 @@ module.exports = function (OCL) {
 
         subStructureSearch(query, limit) {
             let needReset = false;
+
             if (!query.isFragment()) {
                 needReset = true;
                 query.setFragment(true);
             }
 
+            const queryMW = getMW(query);
+
             const queryIndex = query.getIndex();
-            const queryMW = query.getMolecularFormula().relativeWeight;
             const searcher = this.getSearcher();
 
             searcher.setFragment(query, queryIndex);
@@ -238,7 +241,8 @@ module.exports = function (OCL) {
 
         similaritySearch(query, limit) {
             const queryIndex = query.getIndex();
-            const queryMW = query.getMolecularFormula().relativeWeight;
+
+            const queryMW = getMW(query);
             const queryIDCode = query.getIDCode();
 
             const searchResult = new Array(this.length);
@@ -271,3 +275,9 @@ module.exports = function (OCL) {
 
     return MoleculeDB;
 };
+
+function getMW(query) {
+    let copy = query.getCompactCopy();
+    copy.setFragment(false);
+    return copy.getMolecularFormula().relativeWeight;
+}
