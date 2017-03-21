@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 54);
+/******/ 	return __webpack_require__(__webpack_require__.s = 55);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -83,7 +83,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-__webpack_require__(40);
+__webpack_require__(41);
 var abstractMatrix = __webpack_require__(5);
 var util = __webpack_require__(2);
 
@@ -634,7 +634,7 @@ exports.getFilled2DArray = function (rows, columns, value) {
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11), __webpack_require__(50)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11), __webpack_require__(51)))
 
 /***/ }),
 /* 5 */
@@ -647,15 +647,15 @@ module.exports = abstractMatrix;
 
 var LuDecomposition = __webpack_require__(6);
 var SvDecomposition = __webpack_require__(7);
-var arrayUtils = __webpack_require__(33);
+var arrayUtils = __webpack_require__(34);
 var util = __webpack_require__(2);
-var MatrixTransposeView = __webpack_require__(47);
-var MatrixRowView = __webpack_require__(44);
-var MatrixSubView = __webpack_require__(46);
-var MatrixSelectionView = __webpack_require__(45);
-var MatrixColumnView = __webpack_require__(41);
-var MatrixFlipRowView = __webpack_require__(43);
-var MatrixFlipColumnView = __webpack_require__(42);
+var MatrixTransposeView = __webpack_require__(48);
+var MatrixRowView = __webpack_require__(45);
+var MatrixSubView = __webpack_require__(47);
+var MatrixSelectionView = __webpack_require__(46);
+var MatrixColumnView = __webpack_require__(42);
+var MatrixFlipRowView = __webpack_require__(44);
+var MatrixFlipColumnView = __webpack_require__(43);
 
 function abstractMatrix(superCtor) {
     if (superCtor === undefined) superCtor = Object;
@@ -3171,7 +3171,7 @@ module.exports = SingularValueDecomposition;
 
 
 module.exports = __webpack_require__(0).Matrix;
-module.exports.Decompositions = module.exports.DC = __webpack_require__(39);
+module.exports.Decompositions = module.exports.DC = __webpack_require__(40);
 
 
 /***/ }),
@@ -3668,7 +3668,7 @@ exports.cumulativeSum = function cumulativeSum(array) {
 
 
 exports.array = __webpack_require__(9);
-exports.matrix = __webpack_require__(48);
+exports.matrix = __webpack_require__(49);
 
 
 /***/ }),
@@ -3707,7 +3707,7 @@ module.exports = g;
 
 var staticMethods = {
     DB: __webpack_require__(14),
-    RXN: __webpack_require__(30)
+    RXN: __webpack_require__(31)
 };
 
 // These methods don't need to directly access OCL
@@ -3718,7 +3718,7 @@ var moleculePrototypeMethods = {
     getMF: __webpack_require__(26),
     getNumberOfAtoms: __webpack_require__(27),
     toDiastereotopicSVG: __webpack_require__(28),
-    toVisualizerMolfile: __webpack_require__(29)
+    toVisualizerMolfile: __webpack_require__(30)
 };
 
 // These methods need a direct access to OCL. The must be exported as a function
@@ -3729,7 +3729,8 @@ var moleculePrototypeMethodsNeedOCL = {
     getDiastereotopicHoseCodes: __webpack_require__(20),
     getExtendedDiastereotopicAtomIDs: __webpack_require__(21),
     getFunctionCodes: __webpack_require__(22),
-    getGroupedHOSECodes: __webpack_require__(25)
+    getGroupedHOSECodes: __webpack_require__(25),
+    toSVG: __webpack_require__(29)
 };
 
 module.exports = function extend(OCL) {
@@ -3988,8 +3989,8 @@ function _classCallCheck(instance, Constructor) {
     }
 }
 
-var _parseSDF = __webpack_require__(52);
-var Papa = __webpack_require__(49);
+var _parseSDF = __webpack_require__(53);
+var Papa = __webpack_require__(50);
 
 var getMoleculeCreators = __webpack_require__(15);
 
@@ -4283,7 +4284,7 @@ function getMW(query) {
     copy.setFragment(false);
     return copy.getMolecularFormula().relativeWeight;
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(53).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(54).setImmediate))
 
 /***/ }),
 /* 15 */
@@ -4377,7 +4378,7 @@ module.exports = {
 "use strict";
 
 
-var floydWarshall = __webpack_require__(35);
+var floydWarshall = __webpack_require__(36);
 var Matrix = __webpack_require__(8);
 
 module.exports = function getAllPaths() {
@@ -5258,6 +5259,29 @@ module.exports = function toDiastereotopicSVG() {
 "use strict";
 
 
+module.exports = function (OCL) {
+    var originalToSVG = OCL.Molecule.prototype.toSVG;
+    return function (width, height, id, options) {
+        options = options || {};
+        var svg = originalToSVG.call(this, width, height, id, options);
+
+        if (options.bold) {
+            svg = svg.replace(/font-family=" Helvetica" /g, 'font-family=" Helvetica" font-weight="bold" ');
+        }
+        if (options.strokeWidth) {
+            svg = svg.replace(/stroke-width:1/g, `stroke-width:${options.strokeWidth}`);
+        }
+        return svg;
+    };
+};
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 module.exports = function toVisualizerMolfile() {
     var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
@@ -5306,13 +5330,13 @@ module.exports = function toVisualizerMolfile() {
 };
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var parseRXN = __webpack_require__(51);
+var parseRXN = __webpack_require__(52);
 
 module.exports = function (OCL) {
     function RXN(rxn) {
@@ -5384,7 +5408,7 @@ module.exports = function (OCL) {
 };
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5616,7 +5640,7 @@ module.exports = {
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5876,18 +5900,18 @@ exports.getEquallySpacedData = getEquallySpacedData;
 exports.integral = integral;
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = exports = __webpack_require__(31);
+module.exports = exports = __webpack_require__(32);
 
 
-exports.getEquallySpacedData = __webpack_require__(32).getEquallySpacedData;
-exports.SNV = __webpack_require__(34).SNV;
+exports.getEquallySpacedData = __webpack_require__(33).getEquallySpacedData;
+exports.SNV = __webpack_require__(35).SNV;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5914,7 +5938,7 @@ function SNV(data) {
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5967,7 +5991,7 @@ module.exports = floydWarshall;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6064,7 +6088,7 @@ module.exports = CholeskyDecomposition;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6851,7 +6875,7 @@ module.exports = EigenvalueDecomposition;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7010,7 +7034,7 @@ module.exports = QrDecomposition;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7019,10 +7043,10 @@ module.exports = QrDecomposition;
 var Matrix = __webpack_require__(0).Matrix;
 
 var SingularValueDecomposition = __webpack_require__(7);
-var EigenvalueDecomposition = __webpack_require__(37);
+var EigenvalueDecomposition = __webpack_require__(38);
 var LuDecomposition = __webpack_require__(6);
-var QrDecomposition = __webpack_require__(38);
-var CholeskyDecomposition = __webpack_require__(36);
+var QrDecomposition = __webpack_require__(39);
+var CholeskyDecomposition = __webpack_require__(37);
 
 function inverse(matrix) {
     matrix = Matrix.checkMatrix(matrix);
@@ -7079,7 +7103,7 @@ module.exports = {
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7091,7 +7115,7 @@ if (!Symbol.species) {
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7119,7 +7143,7 @@ module.exports = MatrixColumnView;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7146,7 +7170,7 @@ module.exports = MatrixFlipColumnView;
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7173,7 +7197,7 @@ module.exports = MatrixFlipRowView;
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7201,7 +7225,7 @@ module.exports = MatrixRowView;
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7232,7 +7256,7 @@ module.exports = MatrixSelectionView;
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7263,7 +7287,7 @@ module.exports = MatrixSubView;
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7290,7 +7314,7 @@ module.exports = MatrixTransposeView;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7908,12 +7932,12 @@ exports.weightedScatter = function weightedScatter(matrix, weights, means, facto
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 	Papa Parse
-	v4.1.4
+	v4.2.0
 	https://github.com/mholt/PapaParse
 */
 (function(root, factory)
@@ -7984,6 +8008,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 	Papa.NetworkStreamer = NetworkStreamer;
 	Papa.FileStreamer = FileStreamer;
 	Papa.StringStreamer = StringStreamer;
+	Papa.ReadableStreamStreamer = ReadableStreamStreamer;
 
 	if (global.jQuery)
 	{
@@ -8141,6 +8166,10 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 				streamer = new NetworkStreamer(_config);
 			else
 				streamer = new StringStreamer(_config);
+		}
+		else if (_input.readable === true && typeof _input.read === 'function' && typeof _input.on === 'function')
+		{
+			streamer = new ReadableStreamStreamer(_config);
 		}
 		else if ((global.File && _input instanceof File) || _input instanceof Object)	// ...Safari. (see issue #106)
 			streamer = new FileStreamer(_config);
@@ -8640,6 +8669,77 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 	StringStreamer.prototype = Object.create(StringStreamer.prototype);
 	StringStreamer.prototype.constructor = StringStreamer;
 
+
+	function ReadableStreamStreamer(config)
+	{
+		config = config || {};
+
+		ChunkStreamer.call(this, config);
+
+		var queue = [];
+		var parseOnData = true;
+
+		this.stream = function(stream)
+		{
+			this._input = stream;
+
+			this._input.on('data', this._streamData);
+			this._input.on('end', this._streamEnd);
+			this._input.on('error', this._streamError);
+		}
+
+		this._nextChunk = function()
+		{
+			if (queue.length)
+			{
+				this.parseChunk(queue.shift());
+			}
+			else
+			{
+				parseOnData = true;
+			}
+		}
+
+		this._streamData = bindFunction(function(chunk)
+		{
+			try
+			{
+				queue.push(typeof chunk === 'string' ? chunk : chunk.toString(this._config.encoding));
+
+				if (parseOnData)
+				{
+					parseOnData = false;
+					this.parseChunk(queue.shift());
+				}
+			}
+			catch (error)
+			{
+				this._streamError(error);
+			}
+		}, this);
+
+		this._streamError = bindFunction(function(error)
+		{
+			this._streamCleanUp();
+			this._sendError(error.message);
+		}, this);
+
+		this._streamEnd = bindFunction(function()
+		{
+			this._streamCleanUp();
+			this._finished = true;
+			this._streamData('');
+		}, this);
+
+		this._streamCleanUp = bindFunction(function()
+		{
+			this._input.removeListener('data', this._streamData);
+			this._input.removeListener('end', this._streamEnd);
+			this._input.removeListener('error', this._streamError);
+		}, this);
+	}
+	ReadableStreamStreamer.prototype = Object.create(ChunkStreamer.prototype);
+	ReadableStreamStreamer.prototype.constructor = ReadableStreamStreamer;
 
 
 	// Use one ParserHandle per entire CSV file or string
@@ -9386,7 +9486,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -9572,7 +9672,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9633,7 +9733,7 @@ module.exports = parse;
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9742,7 +9842,7 @@ module.exports = parse;
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -9801,7 +9901,7 @@ exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
