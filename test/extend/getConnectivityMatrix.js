@@ -24,7 +24,6 @@ describe('getConnectivityMatrix test propane', function () {
                 [ 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0 ],
                 [ 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1 ]
             ]
-
         );
     });
 
@@ -94,4 +93,18 @@ describe('getConnectivityMatrix test propane', function () {
         );
     });
 
+    it('benzene pathLength matrix', function () {
+        var molecule=OCLE.Molecule.fromSmiles('c1ccccc1');
+        var connectivityMatrix=molecule.getConnectivityMatrix({pathLength: true});
+        connectivityMatrix.should.be.eql(
+            [
+                [ 0, 1, 2, 3, 2, 1 ],
+                [ 1, 0, 1, 2, 3, 2 ],
+                [ 2, 1, 0, 1, 2, 3 ],
+                [ 3, 2, 1, 0, 1, 2 ],
+                [ 2, 3, 2, 1, 0, 1 ],
+                [ 1, 2, 3, 2, 1, 0 ]
+            ]
+        );
+    });
 });
