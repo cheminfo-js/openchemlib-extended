@@ -8,7 +8,7 @@ module.exports = function (OCL) {
         var nbAtoms = this.getAllAtoms();
         var i = nbAtoms;
         var result = new Array(nbAtoms).fill();
-        result = result.map(i => {return new Array(nbAtoms).fill(0)});
+        result = result.map(() => new Array(nbAtoms).fill(0));
 
         if (!options.pathLength) {
             if (options.atomicNo) {
