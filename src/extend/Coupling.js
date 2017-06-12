@@ -69,11 +69,11 @@ class Coupling {
     }
 
     getFromAtom() {
-        return atoms[0];
+        return this.atoms[0];
     }
 
     getToAtom() {
-        return this.atoms[atoms.length - 1];
+        return this.atoms[this.atoms.length - 1];
     }
 
     equals(obj) {
@@ -85,7 +85,7 @@ class Coupling {
             if (this.getFromAtom() === obj.atoms[0]
                 && this.getToAtom() === obj.atoms[obj.atoms.length - 1]) {
                 result = true;
-            }else if (this.getFromAtom() === obj.atoms[obj.atoms.length - 1]
+            } else if (this.getFromAtom() === obj.atoms[obj.atoms.length - 1]
                 && this.getToAtom() === obj.atoms[0]) {
                 result = true;
             }
@@ -95,7 +95,7 @@ class Coupling {
     }
 
     getFromDiaID() {
-        return fromDiaID;
+        return this.fromDiaID;
     }
 
     setFromDiaID(diaID1) {
@@ -103,7 +103,7 @@ class Coupling {
     }
 
     getToDiaID() {
-        return toDiaID;
+        return this.toDiaID;
     }
 
     setToDiaID(diaID2) {

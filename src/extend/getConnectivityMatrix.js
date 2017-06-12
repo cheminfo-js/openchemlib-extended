@@ -6,39 +6,37 @@ module.exports = function (OCL) {
     return function getConnectivityMatrix(options = {}) {
         this.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
         var nbAtoms = this.getAllAtoms();
-        var i = nbAtoms;
+        var i, j, l;
         var result = new Array(nbAtoms).fill();
-        result = result.map(i => {return new Array(nbAtoms).fill(0)});
+        result = result.map(() => new Array(nbAtoms).fill(0));
 
         if (!options.pathLength) {
             if (options.atomicNo) {
-                while (i--) {
+                for (i = 0; i < nbAtoms; i++) {
                     result[i][i] = this.getAtomicNo(i);
                 }
             } else if (options.mass) {
-                while (i--) {
+                for (i = 0; i < nbAtoms; i++) {
                     result[i][i] = OCL.Molecule.cRoundedMass[this.getAtomicNo(i)];
                 }
             } else {
-                while (i--) {
+                for (i = 0; i < nbAtoms; i++) {
                     result[i][i] = 1;
                 }
             }
         }
 
-        var j;
-        i = nbAtoms;
         if (options.sdt) {
-            while (i--) {
-                j = this.getAllConnAtoms(i);
-                while (j--) {
+            for (i = 0; i < nbAtoms; i++) {
+                l = this.getAllConnAtoms(i);
+                for (j = 0; j < l; j++) {
                     result[i][this.getConnAtom(i, j)] = this.getConnBondOrder(i, j);
                 }
             }
         } else {
-            while (i--) {
-                j = this.getAllConnAtoms(i);
-                while (j--) {
+            for (i = 0; i < nbAtoms; i++) {
+                l = this.getAllConnAtoms(i);
+                for (j = 0; j < l; j++) {
                     result[i][this.getConnAtom(i, j)] = 1;
                 }
             }
