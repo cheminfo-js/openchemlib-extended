@@ -3,7 +3,7 @@
 const Coupling = require('./Coupling');
 const Matrix = require('ml-matrix');
 
-module.exports = function (OCL) {
+module.exports = function () {
     return function getAllCouplings() {
         var molecule = this.getCompactCopy();
         var diaIDs = molecule.getDiastereotopicAtomIDs();
@@ -14,7 +14,7 @@ module.exports = function (OCL) {
             if (molecule.getAtomLabel(i) === 'H') {
                 for (let j = i + 1; j < molecule.getAllAtoms(); j++) {
                     if (molecule.getAtomLabel(j) === 'H') {
-                        if (!isAttachedToHeteroAtom(i) && !isAttachedToHeteroAtom(j)) {
+                        if (!isAttachedToHeteroAtom(molecule, i) && !isAttachedToHeteroAtom(molecule, j)) {
                             if (!(diaIDs[i].toLowerCase() === diaIDs[j].toLowerCase())) {
                                 var atoms = [];
                                 var xyz = []; //TODO
@@ -155,7 +155,7 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
             break;
         case 3: {
             var angle, xyz, coords;
-            if (isDoubleBond(atoms[1], atoms[2])) {
+            if (isDoubleBond(molecule, atoms[1], atoms[2])) {
                 // coupling
                 // through
                 // double
@@ -175,10 +175,10 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
 
                 if (angle > 60) {
                     couple.setType(22);
-                    couple.setCoupling(doubleBondCoupling(2, atoms));
+                    couple.setCoupling(doubleBondCoupling(molecule, 2, atoms));
                 } else {
                     couple.setType(21);
-                    couple.setCoupling(doubleBondCoupling(1, atoms));
+                    couple.setCoupling(doubleBondCoupling(molecule, 1, atoms));
                 }
             } else {
                 var sumZ = 0;
@@ -192,7 +192,7 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
                     }
                     sumZ += Math.abs(coords[i][2]);
                 }
-                if (sumZ === 0 && !isDoubleOrTripleBond(atoms[1], atoms[2])) {// If
+                if (sumZ === 0 && !isDoubleOrTripleBond(molecule, atoms[1], atoms[2])) {// If
                     // it
                     // is
                     // single
@@ -205,7 +205,7 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
                     angle = getDihedralAngle(coords);
                 }
                 // vynilcoupling
-                if (true === checkVynilicCoupling(atoms)) {
+                if (true === checkVynilicCoupling(molecule, atoms)) {
                     couple.setType(3);
                     couple.setCoupling(vinylCoupling(angle));
                 } else {
@@ -218,26 +218,26 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
         }
         case 4: {// allylic Coupling
             couple.setType(5);
-            if (isDoubleOrTripleBond(atoms[1], atoms[2])
-                && isNotAromatic(atoms[1], atoms[2])) {
+            if (isDoubleOrTripleBond(molecule, atoms[1], atoms[2])
+                && isNotAromatic(molecule, atoms[1], atoms[2])) {
                 couple.setCoupling(2);
-            } else if (isDoubleOrTripleBond(atoms[2], atoms[3])
-                && isNotAromatic(atoms[2], atoms[3])) {
+            } else if (isDoubleOrTripleBond(molecule, atoms[2], atoms[3])
+                && isNotAromatic(molecule, atoms[2], atoms[3])) {
                 couple.setCoupling(2);
-            } else if (isAromatic(atoms[1], atoms[2])
-                && isAromatic(atoms[2], atoms[3])) {
+            } else if (isAromatic(molecule, atoms[1], atoms[2])
+                && isAromatic(molecule, atoms[2], atoms[3])) {
                 couple.setCoupling(2);
             } else {
-                if ((isAromatic(atoms[1], atoms[1])
-                    && !isAromatic(atoms[2], atoms[3]))) {
-                    if (isOnlyAttachedToHC(atoms[3])) {
+                if ((isAromatic(molecule, atoms[1], atoms[1])
+                    && !isAromatic(molecule, atoms[2], atoms[3]))) {
+                    if (isOnlyAttachedToHC(molecule, atoms[3])) {
                         couple.setCoupling(1.5);
                         return true;
                     }
                 } else {
-                    if (!isAromatic(atoms[1], atoms[1])
-                        && isAromatic(atoms[2], atoms[3])) {
-                        if (isOnlyAttachedToHC(atoms[1])) {
+                    if (!isAromatic(molecule, atoms[1], atoms[1])
+                        && isAromatic(molecule, atoms[2], atoms[3])) {
+                        if (isOnlyAttachedToHC(molecule, atoms[1])) {
                             couple.setCoupling(1.5);
                             return true;
                         }
@@ -255,28 +255,6 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
 
     return true;
 
-}
-
-function getAngle(xyz) {
-    // double sum=0;
-    // Check if we have the Z coordinate
-    // for (int i=0;i<xyz.length;i++)
-    // sum+=Math.abs(xyz[i][2]);
-    // if(sum==0)
-    // return 60;
-    var dotProduct = 0;
-    var magnitudes = new Array(xyz.length);
-    var mult;
-
-    for (let i = 0; i < xyz[0].length; i++) {
-        mult = 1;
-        for (let j = 0; j < xyz.length; j++) {
-            mult *= xyz[j][i];
-            magnitudes[j] += xyz[j][i] * xyz[j][i];
-        }
-        dotProduct += mult;
-    }
-    return Math.acos(dotProduct / (magnitudes[0] * magnitudes[1])) * 180 / Math.PI;
 }
 
 function getDihedralAngle(xyz) {
@@ -376,8 +354,6 @@ function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
                     I = delta + p[6] * I;
                 }
 
-                // 3J = p1 cos2(f) + p2 cos(f) + p3 + S i (p4 + p5 cos2(ei f +
-                // p6 |i|))
                 J += I * (p[3] + p[4] * (Math.cos(direction[j] * dihedralAngle + p[5] * Math.abs(I))
                     * Math.cos(direction[j] * dihedralAngle + p[5] * Math.abs(I))));
             }
@@ -390,9 +366,6 @@ function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
     return J;
 }
 
-function fourBondCoupling() {
-    return 0;
-}
 
 function vinylCoupling(phi) {
     var J = 0.0;
@@ -404,21 +377,11 @@ function vinylCoupling(phi) {
     return J;
 }
 
-function allylicCoupling(phi) {
-    var J;
-    if (phi <= 90) {
-        J = 1.3 * Math.cos(phi) * Math.cos(phi) - 2.6 * Math.sin(phi) * Math.sin(phi);
-    } else {
-        J = -2.6 * Math.sin(phi) * Math.sin(phi);
-    }
-    return J;
-}
-
 function geminalCoupling() {
     return 1.6; // average over a sample of experimental spectra
 }
 
-function doubleBondCoupling(type, atoms) {
+function doubleBondCoupling(molecule, type, atoms) {
     var x = 0;
     var nbConnectedAtoms;
     for (let j = 1; j < atoms.size() - 1; j++) {
@@ -445,7 +408,7 @@ function doubleBondCoupling(type, atoms) {
     return result;
 }
 
-function checkVynilicCoupling(atoms) {
+function checkVynilicCoupling(molecule, atoms) {
     var nbConnectedAtoms;
     var result = false;
     for (var j = 1, l = atoms.length - 1; j < l; j++) {
@@ -458,29 +421,29 @@ function checkVynilicCoupling(atoms) {
     return result;
 }
 
-function isDoubleBond(atom1, atom2) {
+function isDoubleBond(molecule, atom1, atom2) {
     var bond = molecule.getBond(atom1, atom2);
     var bondType = molecule.getBondType(bond);
     return (bondType === 2);
 }
 
-function isDoubleOrTripleBond(atom1, atom2) {
+function isDoubleOrTripleBond(molecule, atom1, atom2) {
     var bond = molecule.getBond(atom1, atom2);
     var bondType = molecule.getBondType(bond);
     return (bondType === 2 || bondType === 4);
 }
 
-function isNotAromatic(atom1, atom2) {
+function isNotAromatic(molecule, atom1, atom2) {
     var bond = molecule.getBond(atom1, atom2);
     return !molecule.isAromaticBond(bond);
 }
 
-function isAromatic(atom1, atom2) {
+function isAromatic(molecule, atom1, atom2) {
     var bond = molecule.getBond(atom1, atom2);
     return molecule.isAromaticBond(bond);
 }
 
-function isAttachedToHeteroAtom(atom) {
+function isAttachedToHeteroAtom(molecule, atom) {
     var result = false;
     var nbConnectedAtoms = molecule.getAllConnAtoms(atom);
     for (var j = 0; j < nbConnectedAtoms; j++) {
@@ -493,7 +456,7 @@ function isAttachedToHeteroAtom(atom) {
     return result;
 }
 
-function isOnlyAttachedToHC(atom) {
+function isOnlyAttachedToHC(molecule, atom) {
     var nbConnectedAtoms = molecule.getAllConnAtoms(atom);
     for (var j = 0; j < nbConnectedAtoms; j++) {
         var connAtom = molecule.getConnAtom(atom, j);
@@ -503,7 +466,41 @@ function isOnlyAttachedToHC(atom) {
     }
     return true;
 }
+// function getAngle(xyz) {
+//     // double sum=0;
+//     // Check if we have the Z coordinate
+//     // for (int i=0;i<xyz.length;i++)
+//     // sum+=Math.abs(xyz[i][2]);
+//     // if(sum==0)
+//     // return 60;
+//     var dotProduct = 0;
+//     var magnitudes = new Array(xyz.length);
+//     var mult;
+//
+//     for (let i = 0; i < xyz[0].length; i++) {
+//         mult = 1;
+//         for (let j = 0; j < xyz.length; j++) {
+//             mult *= xyz[j][i];
+//             magnitudes[j] += xyz[j][i] * xyz[j][i];
+//         }
+//         dotProduct += mult;
+//     }
+//     return Math.acos(dotProduct / (magnitudes[0] * magnitudes[1])) * 180 / Math.PI;
+// }
 
+// function fourBondCoupling() {
+//     return 0;
+// }
+
+// function allylicCoupling(phi) {
+//     var J;
+//     if (phi <= 90) {
+//         J = 1.3 * Math.cos(phi) * Math.cos(phi) - 2.6 * Math.sin(phi) * Math.sin(phi);
+//     } else {
+//         J = -2.6 * Math.sin(phi) * Math.sin(phi);
+//     }
+//     return J;
+// }
 const electronegativities = {
     'H': 2.20,
     'Li': 0.98,
