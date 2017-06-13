@@ -11,6 +11,7 @@ const moleculePrototypeMethods = {
     getFunctions: require('./extend/getFunctions'),
     getGroupedDiastereotopicAtomIDs: require('./extend/getGroupedDiastereotopicAtomIDs'),
     getMF: require('./extend/getMF'),
+    getCouplings: require('./extend/getCouplings'),
     getNumberOfAtoms: require('./extend/getNumberOfAtoms'),
     toDiastereotopicSVG: require('./extend/toDiastereotopicSVG'),
     toVisualizerMolfile: require('./extend/toVisualizerMolfile')
