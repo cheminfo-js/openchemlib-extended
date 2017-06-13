@@ -1,40 +1,38 @@
 'use strict';
 
-const Coupling = require('./Coupling');
-const Matrix = require('ml-matrix');
+const electronegativities = require('./electronegativities');
+const fragments = require('./fragments');
 
-module.exports = function () {
-    return function getAllCouplings() {
-        var molecule = this.getCompactCopy();
-        var diaIDs = molecule.getDiastereotopicAtomIDs();
-        var matchFragments = molecule.getFragments();
-        var fragmentsId = {}; //TODO
-        var couplings = [];
-        for (let i = 0; i < molecule.getAllAtoms(); i++) {
-            if (molecule.getAtomLabel(i) === 'H') {
-                for (let j = i + 1; j < molecule.getAllAtoms(); j++) {
-                    if (molecule.getAtomLabel(j) === 'H') {
-                        if (!isAttachedToHeteroAtom(molecule, i) && !isAttachedToHeteroAtom(molecule, j)) {
-                            if (!(diaIDs[i].toLowerCase() === diaIDs[j].toLowerCase())) {
-                                var atoms = [];
-                                var xyz = []; //TODO
-                                getPath(i, i, j, 0, atoms, xyz);
+module.exports = function getAllCouplings() {
+    var molecule = this.getCompactCopy();
+    var diaIDs = molecule.getDiastereotopicAtomIDs();
+    var matchFragments = molecule.getFragments();
+    var fragmentsId = {}; //TODO
+    var couplings = [];
+    for (let i = 0; i < molecule.getAllAtoms(); i++) {
+        if (molecule.getAtomLabel(i) === 'H') {
+            for (let j = i + 1; j < molecule.getAllAtoms(); j++) {
+                if (molecule.getAtomLabel(j) === 'H') {
+                    if (!isAttachedToHeteroAtom(molecule, i) && !isAttachedToHeteroAtom(molecule, j)) {
+                        if (!(diaIDs[i].toLowerCase() === diaIDs[j].toLowerCase())) {
+                            var atoms = [];
+                            var xyz = []; //TODO
+                            getPath(i, i, j, 0, atoms, xyz);
 
-                                if (atoms.length !== 0) {
-                                    var fragmentId = -1;
-                                    var couple = new Coupling();
-                                    couple.setAtoms(atoms);
-                                    couple.setXYZ(xyz);
-                                    couple.setFromDiaID(diaIDs[j]);
-                                    couple.setToDiaID(diaIDs[i]);
-                                    if (matchFragments !== null) {
-                                        fragmentId = couplingBelongToFragment(atoms, matchFragments);
-                                        couple.setFragmentId(fragmentId);
-                                    }
+                            if (atoms.length !== 0) {
+                                var fragmentId = -1;
+                                var couple = {};
+                                couple.atoms = atoms;
+                                couple.xyz = xyz;
+                                couple.fromDiaID = diaIDs[j];
+                                couple.toDiaID = diaIDs[i];
+                                if (matchFragments !== null) {
+                                    fragmentId = couplingBelongToFragment(atoms, matchFragments);
+                                    couple.setFragmentId(fragmentId);
+                                }
 
-                                    if (calculatedCoupling(molecule, couple, fragmentsId, matchFragments)) {
-                                        couplings.push(couple);
-                                    }
+                                if (calculatedCoupling(molecule, couple, fragmentsId, matchFragments)) {
+                                    couplings.push(couple);
                                 }
                             }
                         }
@@ -42,8 +40,8 @@ module.exports = function () {
                 }
             }
         }
-        return couplings;
-    };
+    }
+    return couplings;
 };
 
 function getPath(molecule, parent, idInit, idEnd, pathLength, atoms, xyz) {
@@ -113,11 +111,11 @@ function couplingBelongToFragment(atoms, matchFragments) {
 }
 
 function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
-    var atoms = couple.getAtoms();
+    var atoms = couple.atoms;
     var bondLength = atoms.length - 1;
-    var fragmentId = couple.getFragmentId();
+    var fragmentId = couple.fragmentId;
     if (fragmentId !== -1) {
-        couple.setType(0);
+        couple.type = 0;
         var C1 = -1;
         var C2 = -1;
         var couplings = fragments[fragmentsId[fragmentId]];
@@ -138,7 +136,7 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
         if (couplings !== null) {
             C1 = C1 + '';
             C2 = C2 + '';
-            couple.setCoupling(couplings[C1 + '-' + C2]);
+            couple.coupling = couplings[C1 + '-' + C2];
         }
 
         return true;
@@ -147,10 +145,10 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
     switch (bondLength) {
         case 2:
             if (molecule.getAllConnAtoms(atoms[1]) < 4) {
-                couple.setType(1); // geminal coupling of alkene
-                couple.setCoupling(geminalCoupling());
+                couple.type = 1; // geminal coupling of alkene
+                couple.coupling = geminalCoupling();
             } else {
-                couple.setCoupling(16); // generic coupling between geminal hydrogens
+                couple.coupling = 16; // generic coupling between geminal hydrogens
             }
             break;
         case 3: {
@@ -161,11 +159,11 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
                 // double
                 // bond
                 // It have to be plain
-                couple.setType(2);
-
-                coords = new Matrix(4, 3);
-                xyz = couple.getXYZ();
+                couple.type = 2;
+                coords = new Array(4);
+                xyz = couple.xyz;
                 for (let i = 0; i < xyz.length; i++) {
+                    coords[i] = new Array(3);
                     for (let j = 0; j < 3; j++) {
                         coords[i][j] = xyz[i][j];
                     }
@@ -174,19 +172,20 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
                 angle = getDihedralAngle(coords);
 
                 if (angle > 60) {
-                    couple.setType(22);
-                    couple.setCoupling(doubleBondCoupling(molecule, 2, atoms));
+                    couple.type = 22;
+                    couple.coupling = doubleBondCoupling(molecule, 2, atoms);
                 } else {
-                    couple.setType(21);
-                    couple.setCoupling(doubleBondCoupling(molecule, 1, atoms));
+                    couple.type = 21;
+                    couple.coupling = doubleBondCoupling(molecule, 1, atoms);
                 }
             } else {
                 var sumZ = 0;
                 angle = 0.0;
-                xyz = couple.getXYZ();
-                coords = new Matrix(xyz.length, 3);
+                xyz = couple.xyz;
+                coords = new Array(3);
 
                 for (let i = 0; i < xyz.length; i++) {
+                    coords[i] = new Array(3);
                     for (let j = 0; j < 3; j++) {
                         coords[i][j] = xyz[i][j];
                     }
@@ -206,50 +205,50 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
                 }
                 // vynilcoupling
                 if (true === checkVynilicCoupling(molecule, atoms)) {
-                    couple.setType(3);
-                    couple.setCoupling(vinylCoupling(angle));
+                    couple.type = 3;
+                    couple.coupling = vinylCoupling(angle);
                 } else {
-                    couple.setType(4);
+                    couple.type = 4;
                     // vicinal coupling
-                    couple.setCoupling(jCouplingVicinal(molecule, angle, 1, atoms));
+                    couple.coupling = jCouplingVicinal(molecule, angle, 1, atoms);
                 }
             }
             break;
         }
         case 4: {// allylic Coupling
-            couple.setType(5);
+            couple.type = 5;
             if (isDoubleOrTripleBond(molecule, atoms[1], atoms[2])
                 && isNotAromatic(molecule, atoms[1], atoms[2])) {
-                couple.setCoupling(2);
+                couple.coupling = 2;
             } else if (isDoubleOrTripleBond(molecule, atoms[2], atoms[3])
                 && isNotAromatic(molecule, atoms[2], atoms[3])) {
-                couple.setCoupling(2);
+                couple.coupling = 2;
             } else if (isAromatic(molecule, atoms[1], atoms[2])
                 && isAromatic(molecule, atoms[2], atoms[3])) {
-                couple.setCoupling(2);
+                couple.coupling = 2;
             } else {
                 if ((isAromatic(molecule, atoms[1], atoms[1])
                     && !isAromatic(molecule, atoms[2], atoms[3]))) {
                     if (isOnlyAttachedToHC(molecule, atoms[3])) {
-                        couple.setCoupling(1.5);
+                        couple.coupling = 1.5;
                         return true;
                     }
                 } else {
                     if (!isAromatic(molecule, atoms[1], atoms[1])
                         && isAromatic(molecule, atoms[2], atoms[3])) {
                         if (isOnlyAttachedToHC(molecule, atoms[1])) {
-                            couple.setCoupling(1.5);
+                            couple.coupling = 1.5;
                             return true;
                         }
                     }
                 }
-                couple.setCoupling(0);
+                couple.coupling = 0;
                 return false;
             }
             break;
         }
         default:
-            couple.setCoupling(7); // check default value
+            couple.coupling = 7; // check default value
             break;
     }
 
@@ -466,151 +465,3 @@ function isOnlyAttachedToHC(molecule, atom) {
     }
     return true;
 }
-// function getAngle(xyz) {
-//     // double sum=0;
-//     // Check if we have the Z coordinate
-//     // for (int i=0;i<xyz.length;i++)
-//     // sum+=Math.abs(xyz[i][2]);
-//     // if(sum==0)
-//     // return 60;
-//     var dotProduct = 0;
-//     var magnitudes = new Array(xyz.length);
-//     var mult;
-//
-//     for (let i = 0; i < xyz[0].length; i++) {
-//         mult = 1;
-//         for (let j = 0; j < xyz.length; j++) {
-//             mult *= xyz[j][i];
-//             magnitudes[j] += xyz[j][i] * xyz[j][i];
-//         }
-//         dotProduct += mult;
-//     }
-//     return Math.acos(dotProduct / (magnitudes[0] * magnitudes[1])) * 180 / Math.PI;
-// }
-
-// function fourBondCoupling() {
-//     return 0;
-// }
-
-// function allylicCoupling(phi) {
-//     var J;
-//     if (phi <= 90) {
-//         J = 1.3 * Math.cos(phi) * Math.cos(phi) - 2.6 * Math.sin(phi) * Math.sin(phi);
-//     } else {
-//         J = -2.6 * Math.sin(phi) * Math.sin(phi);
-//     }
-//     return J;
-// }
-const electronegativities = {
-    'H': 2.20,
-    'Li': 0.98,
-    'Be': 1.57,
-    'B': 2.04,
-    'C': 2.55,
-    'N': 3.04,
-    'O': 3.44,
-    'F': 3.98,
-    'Na': 0.93,
-    'Mg': 1.31,
-    'Al': 1.61,
-    'Si': 1.90,
-    'P': 2.19,
-    'S': 2.58,
-    'Cl': 3.16,
-    'K': 0.82,
-    'Ca': 1.00,
-    'Sc': 1.36,
-    'Ti': 1.54,
-    'V': 1.63,
-    'Cr': 1.66,
-    'Mn': 1.55,
-    'Fe': 1.83,
-    'Co': 1.88,
-    'Ni': 1.91,
-    'Cu': 1.90,
-    'Zn': 1.65,
-    'Ga': 1.81,
-    'Ge': 2.01,
-    'As': 2.18,
-    'Se': 2.55,
-    'Br': 2.96,
-    'Kr': 3.00,
-    'Rb': 0.82,
-    'Sr': 0.95,
-    'Y': 1.22,
-    'Zr': 1.33,
-    'Nb': 1.6,
-    'Mo': 2.16,
-    'Tc': 1.9,
-    'Ru': 2.2,
-    'Rh': 2.28,
-    'Pd': 2.20,
-    'Ag': 1.93,
-    'Cd': 1.69,
-    'In': 1.78,
-    'Sn': 1.96,
-    'Sb': 2.05,
-    'Te': 2.1,
-    'I': 2.66,
-    'Xe': 2.6,
-    'Cs': 0.79,
-    'Ba': 0.89,
-    'La': 1.10,
-    'Ce': 1.12,
-    'Pr': 1.13,
-    'Nd': 1.14,
-    'Sm': 1.17,
-    'Gd': 1.20,
-    'Dy': 1.22,
-    'Ho': 1.23,
-    'Er': 1.24,
-    'Tm': 1.25,
-    'Lu': 1.27,
-    'Hf': 1.3,
-    'Ta': 1.5,
-    'W': 2.36,
-    'Re': 1.9,
-    'Os': 2.2,
-    'Ir': 2.20,
-    'Pt': 2.28,
-    'Au': 2.54,
-    'Hg': 2.00,
-    'Tl': 1.62,
-    'Pb': 2.33,
-    'Bi': 2.02,
-    'Po': 2.0,
-    'At': 2.2,
-    'Fr': 0.7,
-    'Ra': 0.9,
-    'Ac': 1.1,
-    'Th': 1.3,
-    'Pa': 1.5,
-    'U': 1.38,
-    'Np': 1.36,
-    'Pu': 1.28,
-    'Am': 1.3,
-    'Cm': 1.3,
-    'Bk': 1.3,
-    'Cf': 1.3,
-    'Es': 1.3,
-    'Fm': 1.3,
-    'Md': 1.3,
-    'No': 1.3
-};
-
-const fragments = {
-    'gFp@DiTt@@B !Bg~wK_}mvw@`': {'0-1': 8, '0-2': 8, '1-3': 8, '3-5': 8, '4-5': 8, '2-4': 8, '0-3': 2.5, '0-4': 2.5, '3-4': 2.5, '1-2': 2.5, '1-5': 2.5, '2-5': 2.5, '2-3': 1, '1-4': 1, '0-5': 1},
-    'gKQ@@eKcRpD !BcLbLypAe@Bh': {'1-3': 1.8, '2-4': 1.8, '1-4': 0.5, '2-3': 0.5, '1-2': 1.55, '3-4': 3.5},
-    'gKX@@eKcRpD !BcLbLipBe@Lh': {'1-3': 2.2, '2-4': 2.2, '1-4': 1.25, '2-3': 1.25, '1-2': 2.05, '3-4': 3.4},
-    'gKPH@DIRxtlA@ !BcLbLqp@e@Dh': {'1-3': 5.2, '2-4': 5.2, '1-4': 1.25, '2-3': 1.25, '1-2': 2.7, '3-4': 3.6},
-    'gFx@@eJf`@@P !BbOsWGx@_`CW@': {'1-3': 5.3, '2-4': 5.3, '1-4': 0.9, '2-3': 0.9, '1-2': 0.35, '3-4': 1.65, '1-5': 1.8, '2-5': 1.8, '3-5': 7.85, '4-5': 7.85},
-    'gKT@Adi\\Vf@` !Bo`@oIR}jXq`': {'2-4': 1.5, '1-4': 1.5, '1-2': 0.75},
-    'gKT@ADi\\Yi@` !BKrk~_qLgKtT': {'2-4': 1.5, '3-4': 2.5, '2-3': 0.75},
-    'gKY@LDi\\ZV@` !BXNTSIwysA\\\\': {'1-2': 0.5, '2-4': 0.8},
-    'gKXHL@aJWFe`H !BXNTSIwysA\\\\': {'1-2': 1.9, '2-4': 3.2},
-    'gKXHL@aJWFe`H !BHFTSI{ycA\\\\': {'2-4': 4.7, '3-4': 1.7},
-    'gFxA@IReSP@@H !BlCvwO[yog~wOP': {'1-3': 6, '2-4': 6, '2-5': 1.5, '1-5': 2.5, '2-3': 0.8, '1-4': 0.8, '1-2': 1, '3-5': 8, '4-5': 8, '3-4': 1.4},
-    'gFt@ADiTt@@B !Bmsr~_{_}mv~_p': {'2-4': 4.9, '3-5': 4.9, '2-5': 2, '3-4': 2, '2-3': 3.5, '4-5': 8.4},
-    'gFt@AdiTt@@B !Bo`BWoY_|epJWoP': {'4-5': 5, '2-5': 2.5, '1-5': 1.5, '1-4': 0},
-    'gFt@ATiTt@@B !Br@KgCx@O`Cg@': {'1-3': 1.8, '2-4': 1.8, '1-4': 1.8, '2-3': 1.8, '1-2': 0.5, '3-4': 0.5}
-};
