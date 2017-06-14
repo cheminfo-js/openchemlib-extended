@@ -7,7 +7,7 @@ module.exports = function getAllCouplings() {
     var molecule = this.getCompactCopy();
     var diaIDs = molecule.getDiastereotopicAtomIDs();
     var matchFragments = molecule.getFragments();
-    var fragmentsId = {}; //TODO
+    var fragmentsId = {};
     var couplings = [];
     for (let i = 0; i < molecule.getAllAtoms(); i++) {
         if (molecule.getAtomLabel(i) === 'H') {
@@ -17,7 +17,7 @@ module.exports = function getAllCouplings() {
                         if (!(diaIDs[i].toLowerCase() === diaIDs[j].toLowerCase())) {
                             var atoms = [];
                             var xyz = []; //TODO
-                            getPath(i, i, j, 0, atoms, xyz);
+                            getPath(molecule, i, i, j, 0, atoms, xyz);
 
                             if (atoms.length !== 0) {
                                 var fragmentId = -1;
@@ -28,7 +28,7 @@ module.exports = function getAllCouplings() {
                                 couple.toDiaID = diaIDs[i];
                                 if (matchFragments !== null) {
                                     fragmentId = couplingBelongToFragment(atoms, matchFragments);
-                                    couple.setFragmentId(fragmentId);
+                                    couple.fragmentId = fragmentId;
                                 }
 
                                 if (calculatedCoupling(molecule, couple, fragmentsId, matchFragments)) {
@@ -74,7 +74,7 @@ function getPath(molecule, parent, idInit, idEnd, pathLength, atoms, xyz) {
     for (let i = 0; i < nbConnectedAtoms; i++) {
         var connectivityAtom = molecule.getConnAtom(idInit, i);
         if (connectivityAtom !== parent) {
-            getPath(idInit, connectivityAtom, idEnd, pathLength, atoms, xyz);
+            getPath(molecule, idInit, connectivityAtom, idEnd, pathLength, atoms, xyz);
             if (atoms.length !== 0) {
                 coordinates = new Array(3);
                 coordinates[0] = molecule.getAtomX(idInit);
@@ -411,7 +411,7 @@ function checkVynilicCoupling(molecule, atoms) {
     var nbConnectedAtoms;
     var result = false;
     for (var j = 1, l = atoms.length - 1; j < l; j++) {
-        nbConnectedAtoms = molecule.getAllConnAtoms(atoms.get(j));
+        nbConnectedAtoms = molecule.getAllConnAtoms(atoms[j]);
         if (nbConnectedAtoms < 4) {
             result = true;
             j = l;
