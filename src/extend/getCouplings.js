@@ -18,21 +18,21 @@ module.exports = function getAllCouplings() {
                             var atoms = [];
                             var xyz = []; //TODO
                             getPath(molecule, i, i, j, 0, atoms, xyz);
-
                             if (atoms.length !== 0) {
                                 var fragmentId = -1;
-                                var couple = {};
-                                couple.atoms = atoms;
-                                couple.xyz = xyz;
-                                couple.fromDiaID = diaIDs[j];
-                                couple.toDiaID = diaIDs[i];
+                                var coupling = {};
+                                coupling.atoms = atoms;
+                                coupling.xyz = xyz;
+                                coupling.angle = getDihedralAngle(xyz);
+                                coupling.fromDiaID = diaIDs[j];
+                                coupling.toDiaID = diaIDs[i];
                                 if (matchFragments !== null) {
                                     fragmentId = couplingBelongToFragment(atoms, matchFragments);
-                                    couple.fragmentId = fragmentId;
+                                    coupling.fragmentId = fragmentId;
                                 }
 
-                                if (calculatedCoupling(molecule, couple, fragmentsId, matchFragments)) {
-                                    couplings.push(couple);
+                                if (calculatedCoupling(molecule, coupling, fragmentsId, matchFragments)) {
+                                    couplings.push(coupling);
                                 }
                             }
                         }
@@ -110,17 +110,17 @@ function couplingBelongToFragment(atoms, matchFragments) {
     return result;
 }
 
-function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
-    var atoms = couple.atoms;
+function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
+    var atoms = coupling.atoms;
     var bondLength = atoms.length - 1;
-    var fragmentId = couple.fragmentId;
+    var fragmentId = coupling.fragmentId;
     if (fragmentId !== -1) {
-        couple.type = 0;
-        var C1 = -1;
+        coupling.type = 0;
+        var  C1 = -1;
         var C2 = -1;
-        var couplings = fragments[fragmentsId[fragmentId]];
+        var posiblesCouplings = fragments[fragmentsId[fragmentId]];
 
-        for (var i = 0; i < matchFragments[couple.getFragmentId()].length; i++) {
+        for (var i = 0; i < matchFragments[coupling.getFragmentId()].length; i++) {
             if (atoms[1] === matchFragments[fragmentId][i]) {
                 C1 = i;
             }
@@ -133,10 +133,8 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
             [C1, C2] = [C2, C1];
         }
 
-        if (couplings !== null) {
-            C1 = C1 + '';
-            C2 = C2 + '';
-            couple.coupling = couplings[C1 + '-' + C2];
+        if (posiblesCouplings !== null) {
+            coupling.value = posiblesCouplings[C1 + '-' + C2];
         }
 
         return true;
@@ -145,10 +143,10 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
     switch (bondLength) {
         case 2:
             if (molecule.getAllConnAtoms(atoms[1]) < 4) {
-                couple.type = 1; // geminal coupling of alkene
-                couple.coupling = geminalCoupling();
+                coupling.type = 1; // geminal coupling of alkene
+                coupling.value = geminalCoupling();
             } else {
-                couple.coupling = 16; // generic coupling between geminal hydrogens
+                coupling.value = 16; // generic coupling between geminal hydrogens
             }
             break;
         case 3: {
@@ -159,9 +157,9 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
                 // double
                 // bond
                 // It have to be plain
-                couple.type = 2;
-                coords = new Array(4);
-                xyz = couple.xyz;
+                coupling.type = 2;
+                coords = new Array(3);
+                xyz = coupling.xyz;
                 for (let i = 0; i < xyz.length; i++) {
                     coords[i] = new Array(3);
                     for (let j = 0; j < 3; j++) {
@@ -172,16 +170,16 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
                 angle = getDihedralAngle(coords);
 
                 if (angle > 60) {
-                    couple.type = 22;
-                    couple.coupling = doubleBondCoupling(molecule, 2, atoms);
+                    coupling.type = 22;
+                    coupling.value = doubleBondCoupling(molecule, 2, atoms);
                 } else {
-                    couple.type = 21;
-                    couple.coupling = doubleBondCoupling(molecule, 1, atoms);
+                    coupling.type = 21;
+                    coupling.value = doubleBondCoupling(molecule, 1, atoms);
                 }
             } else {
                 var sumZ = 0;
                 angle = 0.0;
-                xyz = couple.xyz;
+                xyz = coupling.xyz;
                 coords = new Array(3);
 
                 for (let i = 0; i < xyz.length; i++) {
@@ -205,50 +203,50 @@ function calculatedCoupling(molecule, couple, fragmentsId, matchFragments) {
                 }
                 // vynilcoupling
                 if (true === checkVynilicCoupling(molecule, atoms)) {
-                    couple.type = 3;
-                    couple.coupling = vinylCoupling(angle);
+                    coupling.type = 3;
+                    coupling.value = vinylCoupling(angle);
                 } else {
-                    couple.type = 4;
+                    coupling.type = 4;
                     // vicinal coupling
-                    couple.coupling = jCouplingVicinal(molecule, angle, 1, atoms);
+                    coupling.value = jCouplingVicinal(molecule, angle, 1, atoms);
                 }
             }
             break;
         }
         case 4: {// allylic Coupling
-            couple.type = 5;
+            coupling.type = 5;
             if (isDoubleOrTripleBond(molecule, atoms[1], atoms[2])
                 && isNotAromatic(molecule, atoms[1], atoms[2])) {
-                couple.coupling = 2;
+                coupling.value = 2;
             } else if (isDoubleOrTripleBond(molecule, atoms[2], atoms[3])
                 && isNotAromatic(molecule, atoms[2], atoms[3])) {
-                couple.coupling = 2;
+                coupling.value = 2;
             } else if (isAromatic(molecule, atoms[1], atoms[2])
                 && isAromatic(molecule, atoms[2], atoms[3])) {
-                couple.coupling = 2;
+                coupling.value = 2;
             } else {
                 if ((isAromatic(molecule, atoms[1], atoms[1])
                     && !isAromatic(molecule, atoms[2], atoms[3]))) {
                     if (isOnlyAttachedToHC(molecule, atoms[3])) {
-                        couple.coupling = 1.5;
+                        coupling.value = 1.5;
                         return true;
                     }
                 } else {
                     if (!isAromatic(molecule, atoms[1], atoms[1])
                         && isAromatic(molecule, atoms[2], atoms[3])) {
                         if (isOnlyAttachedToHC(molecule, atoms[1])) {
-                            couple.coupling = 1.5;
+                            coupling.value = 1.5;
                             return true;
                         }
                     }
                 }
-                couple.coupling = 0;
+                coupling.value = 0;
                 return false;
             }
             break;
         }
         default:
-            couple.coupling = 7; // check default value
+            coupling.value = 7; // check default value
             break;
     }
 
