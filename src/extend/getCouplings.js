@@ -39,6 +39,21 @@ module.exports = function getAllCouplings() {
             }
         }
     }
+    var groupedCouplings = {};
+    for (coupling of couplings) {
+        if (!groupedCouplings[coupling.atoms[0]]) {
+            let tempCoupling = {};
+            groupedCouplings[coupling.atoms[0]] = tempCoupling;
+            tempCoupling[coupling.atoms.length] = [coupling];
+        } else {
+            let tempCoupling = groupedCouplings[coupling.atoms[0]];
+            if (!tempCoupling[coupling.atoms.length]) {
+                tempCoupling[coupling.atoms.length] = [coupling];
+            } else {
+                tempCoupling[coupling.atoms.length].push(coupling);
+            }
+        }
+    }
     return couplings;
 };
 
