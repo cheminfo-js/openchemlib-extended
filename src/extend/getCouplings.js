@@ -23,14 +23,12 @@ module.exports = function getAllCouplings() {
                                 var coupling = {};
                                 coupling.atoms = atoms;
                                 coupling.xyz = xyz;
-                                coupling.angle = getDihedralAngle(xyz);
                                 coupling.fromDiaID = diaIDs[j];
                                 coupling.toDiaID = diaIDs[i];
                                 if (matchFragments !== null) {
                                     fragmentId = couplingBelongToFragment(atoms, matchFragments);
                                     coupling.fragmentId = fragmentId;
                                 }
-
                                 if (calculatedCoupling(molecule, coupling, fragmentsId, matchFragments)) {
                                     couplings.push(coupling);
                                 }
@@ -116,9 +114,9 @@ function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
     var fragmentId = coupling.fragmentId;
     if (fragmentId !== -1) {
         coupling.type = 0;
-        var  C1 = -1;
+        var C1 = -1;
         var C2 = -1;
-        var posiblesCouplings = fragments[fragmentsId[fragmentId]];
+        var possibleCouplings = fragments[fragmentsId[fragmentId]];
 
         for (var i = 0; i < matchFragments[coupling.getFragmentId()].length; i++) {
             if (atoms[1] === matchFragments[fragmentId][i]) {
@@ -133,8 +131,8 @@ function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
             [C1, C2] = [C2, C1];
         }
 
-        if (posiblesCouplings !== null) {
-            coupling.value = posiblesCouplings[C1 + '-' + C2];
+        if (possibleCouplings !== null) {
+            coupling.value = possibleCouplings[C1 + '-' + C2];
         }
 
         return true;
@@ -201,16 +199,15 @@ function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
                 } else {
                     angle = getDihedralAngle(coords);
                 }
-                // vynilcoupling
                 if (true === checkVynilicCoupling(molecule, atoms)) {
                     coupling.type = 3;
                     coupling.value = vinylCoupling(angle);
                 } else {
                     coupling.type = 4;
-                    // vicinal coupling
                     coupling.value = jCouplingVicinal(molecule, angle, 1, atoms);
                 }
             }
+            coupling.angle = angle;
             break;
         }
         case 4: {// allylic Coupling
@@ -300,7 +297,6 @@ function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
     var electH = electronegativities.H;
     var direction = [1, -1, 1, -1];
     var p = [];
-
     switch (model) {
         case 1:
             // type = "karplus";
@@ -315,7 +311,7 @@ function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
 
             // p = [13.88, -0.81, 0, 0.56, -2.32, 17.9];
             p = [13.7, -0.73, 0, 0.56, -2.47, 16.9];
-            for (let j = 1; j < atoms.size() - 1; j++) {
+            for (let j = 1; j < atoms.length - 1; j++) {
                 nbConnectedAtoms = molecule.getAllConnAtoms(j);
                 for (let i = 0; i < nbConnectedAtoms; i++) {
                     delta = electronegativities[molecule.getAtomLabel(molecule.getConnAtom(j, i))]
@@ -335,7 +331,7 @@ function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
             var atom2;
             var nbConnectedAtoms2;
 
-            for (let j = 1; j < atoms.size() - 1; j++) {
+            for (let j = 1; j < atoms.length - 1; j++) {
                 nbConnectedAtoms = molecule.getAllConnAtoms(j);
                 I = 0;
                 for (let i = 0; i < nbConnectedAtoms; i++) {
@@ -356,7 +352,6 @@ function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
             }
             J += p[0] * Math.cos(dihedralAngle) * Math.cos(dihedralAngle) + p[1] * Math.cos(dihedralAngle) + p[2];
             break;
-
         default:
             J = 0.0;
     }
@@ -381,7 +376,7 @@ function geminalCoupling() {
 function doubleBondCoupling(molecule, type, atoms) {
     var x = 0;
     var nbConnectedAtoms;
-    for (let j = 1; j < atoms.size() - 1; j++) {
+    for (let j = 1; j < atoms.length - 1; j++) {
         nbConnectedAtoms = molecule.getAllConnAtoms(j);
         for (let i = 0; i < nbConnectedAtoms; i++) {
             x += (electronegativities[molecule.getAtomLabel(molecule.getConnAtom(j, i))]
