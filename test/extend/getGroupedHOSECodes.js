@@ -12,8 +12,8 @@ describe('getGroupedHOSECodes test propane', function () {
         diaIDs.length.should.equal(4);
         diaIDs[0].counter.should.equal(2);
         diaIDs[0].atoms.length.should.equal(2);
-        diaIDs[0].oclID.should.equal('eMBBYRZA~d`xUP' );
-        diaIDs[0].hoses.length.should.equal(3);
+        diaIDs[0].oclID.should.equal('eM@HzA~ddxUP' );
+        diaIDs[0].hoses.length.should.equal(2);
     });
 
     it('should yield the right table only C', function () {
@@ -25,8 +25,8 @@ describe('getGroupedHOSECodes test propane', function () {
         diaIDs.length.should.equal(2);
         diaIDs[0].counter.should.equal(2);
         diaIDs[0].atoms.length.should.equal(2);
-        diaIDs[0].oclID.should.equal('eMBBYRZA~d`xUP');
-        diaIDs[0].hoses.length.should.equal(3);
+        diaIDs[0].oclID.should.equal('eM@HzA~ddxUP');
+        diaIDs[0].hoses.length.should.equal(2);
     });
 
     it('should yield the right table only H', function () {

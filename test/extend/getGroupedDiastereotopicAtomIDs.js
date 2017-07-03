@@ -12,7 +12,7 @@ describe('getGroupedDiastereotopicIDs test propane', function () {
         diaIDs.length.should.equal(4);
         diaIDs[0].counter.should.equal(2);
         diaIDs[0].atoms.length.should.equal(2);
-        diaIDs[0].oclID.should.equal('eMBBYRZA~d`xUP' );
+        diaIDs[0].oclID.should.equal('eM@HzA~ddxUP' );
     });
 
     it('should yield the right table for carbons', function () {
@@ -24,7 +24,7 @@ describe('getGroupedDiastereotopicIDs test propane', function () {
         diaIDs.length.should.equal(2);
         diaIDs[0].counter.should.equal(2);
         diaIDs[0].atoms.length.should.equal(2);
-        diaIDs[0].oclID.should.equal('eMBBYRZA~d`xUP' );
+        diaIDs[0].oclID.should.equal('eM@HzA~ddxUP' );
     });
 
     it('should yield the right table for hydrogens', function () {

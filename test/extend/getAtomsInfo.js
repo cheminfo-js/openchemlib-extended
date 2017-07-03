@@ -11,7 +11,7 @@ describe('getAtomsInfo test propane', function () {
         molecule.addImplicitHydrogens();
         var atoms=molecule.getAtomsInfo();
         
-        atoms[0].should.eql({ oclID: 'eFJHfXpOtdGBj@',
+        atoms[0].should.eql({ oclID: 'eFHBLC}IIpj`',
             extra:
             { singleBonds: 4,
                 doubleBonds: 0,
@@ -86,7 +86,7 @@ describe('getAtomsInfo test propane', function () {
         // molecule.addImplicitHydrogens();
         var atoms=molecule.getAtomsInfo();
 
-        atoms[2].should.eql({ oclID: 'eMBBYRYA~d`xUP',
+        atoms[2].should.eql({ oclID: 'eM@HvA~dbxUP',
             extra:
             { singleBonds: 4,
                 doubleBonds: 0,

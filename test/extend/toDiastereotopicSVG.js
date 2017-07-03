@@ -7,8 +7,8 @@ var testSVG='<svg id="ocl" xmlns="http://www.w3.org/2000/svg" version="1.1" widt
 describe('toDiastereotopicSVG on propane', function () {
     var molecule=OCLE.Molecule.fromSmiles('CCC');
     var svg=molecule.toDiastereotopicSVG({svg: testSVG});
-    
+
     it('check that is contains the diastereotopicID', function () {
-        svg.indexOf('data-atomid="eMBBYchGzRCaU@"').should.equal(730);
+        svg.indexOf('data-atomid="eM@HzA~ddxUP"').should.equal(619);
     });
 });

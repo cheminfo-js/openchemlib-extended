@@ -28,14 +28,12 @@ JME 2017-03-21 Wed Jun 14 14:53:08 GMT+200 2017
   1 11  1  0  0  0
 M  END`;
 
-describe.only('getCouplings test propane', function () {
+describe('getCouplings test propane', function () {
     it('should yield the right table without atom filtering', function () {
         var molecule = OCLE.Molecule.fromMolfile(molfile);
-        console.log(molecule.getAllAtoms());
      //   var molecule = OCLE.Molecule.fromSmiles('CCCC');
        // molecule.addImplicitHydrogens();
         var couplings = molecule.getCouplings();
-        console.log(couplings);
-        couplings.map(a => console.log(a.xyz))
+       //  couplings.map(a => console.log(a.xyz))
     });
 });

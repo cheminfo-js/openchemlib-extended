@@ -9,11 +9,10 @@ describe('toVisualizerMolfile on propane', function () {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         var molfile=molecule.toVisualizerMolfile({diastereotopic: true});
 
-        molfile._atoms.should.eql({ 'eMBBYRZA~d`xUP': [ 0, 2 ], 'eMBBYchGzRCaU@': [ 1 ] });
-        molfile._highlight.should.eql( [ 'eMBBYRZA~d`xUP', 'eMBBYchGzRCaU@' ])
+        molfile._atoms.should.eql({ 'eM@HzA~ddxUP': [ 0, 2 ], 'eM@HzA~d`xUP': [ 1 ] });
+        molfile._highlight.should.eql( ['eM@HzA~ddxUP', 'eM@HzA~d`xUP'  ])
     });
 
-    
     it('should yield the right molfile with ID on the heavy atom', function () {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         var molfile=molecule.toVisualizerMolfile({
@@ -21,15 +20,15 @@ describe('toVisualizerMolfile on propane', function () {
             diastereotopic: true
         });
         molfile._atoms.should.eql({
-            'eMBBYRZA~d`xUP': [ 0, 2 ],
+            'eM@HzA~ddxUP': [ 0, 2 ],
             'gC`HALiKT@RHDRj@': [ 0, 2 ],
-            'eMBBYchGzRCaU@': [ 1 ],
+            'eM@HzA~d`xUP': [ 1 ],
             'gC`HALiMT@RHDRj@': [ 1 ]
         });
-        molfile._highlight.should.eql( [ 
-            'eMBBYRZA~d`xUP',
+        molfile._highlight.should.eql( [
+            'eM@HzA~ddxUP',
             'gC`HALiKT@RHDRj@',
-            'eMBBYchGzRCaU@',
+            'eM@HzA~d`xUP',
             'gC`HALiMT@RHDRj@'
         ])
     });
