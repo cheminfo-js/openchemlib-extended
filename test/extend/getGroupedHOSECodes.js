@@ -13,20 +13,20 @@ describe('getGroupedHOSECodes test propane', function () {
         diaIDs[0].counter.should.equal(2);
         diaIDs[0].atoms.length.should.equal(2);
         diaIDs[0].oclID.should.equal('eM@HzA~ddxUP' );
-        diaIDs[0].hoses.length.should.equal(2);
+        diaIDs[0].hoses.length.should.equal(3);
     });
 
     it('should yield the right table only C', function () {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
-        molecule.addImplicitHydro
+        molecule.addImplicitHydrogens();
         var diaIDs=molecule.getGroupedHOSECodes({
-            atomLable: 'C'
+            atomLabel: 'C'
         });
         diaIDs.length.should.equal(2);
         diaIDs[0].counter.should.equal(2);
         diaIDs[0].atoms.length.should.equal(2);
         diaIDs[0].oclID.should.equal('eM@HzA~ddxUP');
-        diaIDs[0].hoses.length.should.equal(2);
+        diaIDs[0].hoses.length.should.equal(3);
     });
 
     it('should yield the right table only H', function () {

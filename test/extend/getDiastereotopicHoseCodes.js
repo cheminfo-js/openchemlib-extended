@@ -10,7 +10,6 @@ describe('getCouplings test propane', function () {
         var diaIDs=molecule.getDiastereotopicHoseCodes();
         diaIDs.length.should.equal(3);
         diaIDs[0].oclID.should.equal('eM@HzA~ddxUP' );
-        diaIDs[0].hoses.length.should.equal(2);
-        var couplings = molecule.getCouplings();
+        diaIDs[0].hoses.length.should.equal(3);
     });
 });
