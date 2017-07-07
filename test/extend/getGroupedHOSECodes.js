@@ -12,7 +12,7 @@ describe('getGroupedHOSECodes test propane', function () {
         diaIDs.length.should.equal(4);
         diaIDs[0].counter.should.equal(2);
         diaIDs[0].atoms.length.should.equal(2);
-        diaIDs[0].oclID.should.equal('eM@HzA~ddxUP' );
+        diaIDs[0].oclID.should.equal('eM@Df`Xb`RP\\Jh' );
         diaIDs[0].hoses.length.should.equal(3);
     });
 
@@ -25,7 +25,7 @@ describe('getGroupedHOSECodes test propane', function () {
         diaIDs.length.should.equal(2);
         diaIDs[0].counter.should.equal(2);
         diaIDs[0].atoms.length.should.equal(2);
-        diaIDs[0].oclID.should.equal('eM@HzA~ddxUP');
+        diaIDs[0].oclID.should.equal('eM@Df`Xb`RP\\Jh');
         diaIDs[0].hoses.length.should.equal(3);
     });
 
