@@ -4177,9 +4177,9 @@ onetime@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/onetime/-/onetime-1.1.0.tgz#a1f7838f8314c516f05ecefcbc4ccfe04b4ed789"
 
-openchemlib@^5.2.9:
-  version "5.2.9"
-  resolved "https://registry.yarnpkg.com/openchemlib/-/openchemlib-5.2.9.tgz#5c5aad7fcfebccfd9879914b3d74f2648286f8d6"
+openchemlib@^5.2.10:
+  version "5.2.10"
+  resolved "https://registry.yarnpkg.com/openchemlib/-/openchemlib-5.2.10.tgz#627d43d8fbcd4893764ac217621e4dcd48b94c55"
 
 optimist@0.6.1, optimist@^0.6.1:
   version "0.6.1"
