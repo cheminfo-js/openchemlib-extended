@@ -47,6 +47,15 @@ describe('getMF test', function () {
         result.parts[1].should.equal('HCl');
     });
 
+    it('check 4 H2O', function () {
+        var molecule=OCLE.Molecule.fromSmiles('O.O.O.O');
+
+        var result=molecule.getMF();
+        result.mf.should.equal('H8O4');
+        result.parts.length.should.equal(1);
+        result.parts[0].should.equal('4H2O');
+    });
+
     it('check Li+ OH-', function () {
         var molecule=OCLE.Molecule.fromIDCode('eDJRpCjP@');
         var result=molecule.getMF();
