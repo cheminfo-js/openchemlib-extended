@@ -1,6 +1,6 @@
 /**
  * openchemlib-extended - Openchemlib extended
- * @version v2.6.0
+ * @version v3.0.0
  * @link https://github.com/cheminfo-js/openchemlib-extended
  * @license BSD-3-Clause
  */
