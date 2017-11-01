@@ -1,6 +1,6 @@
 /**
  * openchemlib-extended - Openchemlib extended
- * @version v2.5.0
+ * @version v3.0.0
  * @link https://github.com/cheminfo-js/openchemlib-extended
  * @license BSD-3-Clause
  */
@@ -10063,15 +10063,43 @@ module.exports = function toDiastereotopicSVG() {
         _options$height = options.height,
         height = _options$height === undefined ? 200 : _options$height,
         _options$prefix = options.prefix,
-        prefix = _options$prefix === undefined ? 'ocl' : _options$prefix;
+        prefix = _options$prefix === undefined ? 'ocl' : _options$prefix,
+        _options$heavyAtomHyd = options.heavyAtomHydrogen,
+        heavyAtomHydrogen = _options$heavyAtomHyd === undefined ? false : _options$heavyAtomHyd;
 
     var svg = options.svg;
-    var diaIDs = this.getDiastereotopicAtomIDs();
+    var diaIDs = [];
+
+    var hydrogenInfo = {};
+    this.getExtendedDiastereotopicAtomIDs().forEach(function (line) {
+        hydrogenInfo[line.oclID] = line;
+    });
+
+    if (heavyAtomHydrogen) {
+        for (var i = 0; i < this.getAtoms(); i++) {
+            diaIDs.push([]);
+        }
+        var groupedDiaIDs = this.getGroupedDiastereotopicAtomIDs();
+        groupedDiaIDs.forEach(function (diaID) {
+            if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens > 0) {
+                diaID.atoms.forEach(function (atom) {
+                    hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach(function (id) {
+                        if (!diaIDs[atom * 1].includes(id)) diaIDs[atom].push(id);
+                    });
+                });
+            }
+        });
+    } else {
+        diaIDs = this.getDiastereotopicAtomIDs().map(function (a) {
+            return [a];
+        });
+    }
+
     if (!svg) svg = this.toSVG(width, height, prefix);
 
     svg = svg.replace(/Atom:[0-9]+\"/g, function (value) {
         var atom = value.replace(/[^0-9]/g, '');
-        return value + ' data-atomid="' + diaIDs[atom] + '"';
+        return value + ' data-atomid="' + diaIDs[atom].join(',') + '"';
     });
 
     return svg;
