@@ -8,10 +8,10 @@ const staticMethods = {
 // These methods don't need to directly access OCL
 const moleculePrototypeMethods = {
   getAllPaths: require('./extend/getAllPaths'),
-  getFunctions: require('./extend/getFunctions'),
+  getFunctions: require('./extend/functions/getFunctions'),
   getGroupedDiastereotopicAtomIDs: require('./extend/getGroupedDiastereotopicAtomIDs'),
   getMF: require('./extend/getMF'),
-  getCouplings: require('./extend/getCouplings'),
+  getCouplings: require('./extend/couplings/getCouplings'),
   getNumberOfAtoms: require('./extend/getNumberOfAtoms'),
   toDiastereotopicSVG: require('./extend/toDiastereotopicSVG'),
   toVisualizerMolfile: require('./extend/toVisualizerMolfile')
@@ -24,7 +24,7 @@ const moleculePrototypeMethodsNeedOCL = {
   getConnectivityMatrix: require('./extend/getConnectivityMatrix'),
   getDiastereotopicHoseCodes: require('./extend/getDiastereotopicHoseCodes'),
   getExtendedDiastereotopicAtomIDs: require('./extend/getExtendedDiastereotopicAtomIDs'),
-  getFunctionCodes: require('./extend/getFunctionCodes'),
+  getFunctionCodes: require('./extend/functions/getFunctionCodes'),
   getGroupedHOSECodes: require('./extend/getGroupedHOSECodes')
 };
 
