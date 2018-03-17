@@ -1,3 +1,4 @@
+'use strict';
 
 var parseRXN = require('rxn-parser');
 

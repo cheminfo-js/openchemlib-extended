@@ -1,3 +1,4 @@
+'use strict';
 
 const electronegativities = require('./electronegativities');
 const fragments = require('./fragments');

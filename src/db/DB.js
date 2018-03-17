@@ -1,3 +1,4 @@
+'use strict';
 
 const parseSDF = require('sdf-parser');
 const Papa = require('papaparse');

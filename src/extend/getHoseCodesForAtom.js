@@ -1,5 +1,6 @@
 
 // This is a javascript COPY of the java class !!!!
+'use strict';
 
 
 module.exports = function (OCL) {

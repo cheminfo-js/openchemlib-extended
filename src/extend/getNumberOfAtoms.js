@@ -1,3 +1,4 @@
+'use strict';
 
 module.exports = function getNumberOfAtoms(options = {}) {
   var label = options.atomLabel;

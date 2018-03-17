@@ -1,3 +1,4 @@
+'use strict';
 
 module.exports = function toVisualizerMolfile(options = {}) {
   var diastereotopic = options.diastereotopic;
