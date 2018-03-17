@@ -1,4 +1,3 @@
-'use strict';
 
 module.exports = function (OCL) {
   const Util = OCL.Util;

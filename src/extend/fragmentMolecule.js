@@ -1,5 +1,3 @@
-'use strict';
-
 
 /**
  * @returns [array] array of extended bond bonds

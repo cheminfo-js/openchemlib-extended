@@ -1,4 +1,3 @@
-'use strict';
 
 require('setimmediate');
 var OCL = require('openchemlib');

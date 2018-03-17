@@ -1,4 +1,4 @@
-'use strict';
+
 var floydWarshall = require('ml-floyd-warshall');
 var Matrix = require('ml-matrix');
 

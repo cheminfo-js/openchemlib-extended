@@ -1,4 +1,3 @@
-'use strict';
 
 /**
  * Calculate the molecular formula in 'chemcalc' notation taking into account fragments, isotopes and charges

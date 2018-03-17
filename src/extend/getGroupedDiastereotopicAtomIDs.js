@@ -1,4 +1,3 @@
-'use strict';
 
 module.exports = function getGroupedDiastereotopicAtomIDs(options = {}) {
   var label = options.atomLabel;

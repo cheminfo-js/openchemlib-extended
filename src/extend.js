@@ -1,5 +1,3 @@
-'use strict';
-
 const staticMethods = {
   DB: require('./db/DB'),
   RXN: require('./rxn/RXN')
@@ -26,7 +24,7 @@ const moleculePrototypeMethodsNeedOCL = {
   getExtendedDiastereotopicAtomIDs: require('./extend/getExtendedDiastereotopicAtomIDs'),
   getFunctionCodes: require('./extend/functions/getFunctionCodes'),
   getGroupedHOSECodes: require('./extend/getGroupedHOSECodes'),
-  getHoseCodesForAtom: require('./extend/getHoseCodesForAtom')m
+  getHoseCodesForAtom: require('./extend/getHoseCodesForAtom'),
 };
 
 module.exports = function extend(OCL) {

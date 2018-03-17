@@ -1,4 +1,3 @@
-'use strict';
 
 // This is a javascript COPY of the java class !!!!
 

@@ -1,4 +1,3 @@
-'use strict';
 
 module.exports = {
   H: 2.20,

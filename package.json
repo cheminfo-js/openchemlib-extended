@@ -22,11 +22,11 @@
     "test": "test"
   },
   "scripts": {
-    "test": "npm run compile && npm run testonly && npm run eslint",
-    "testonly": "mocha --require should --reporter mocha-better-spec-reporter --recursive",
+    "test": "run-s testonly eslint",
+    "testonly": "jest",
     "build": "npm run compile && npm run build-dist",
     "build-dist": "cheminfo build -u --babel",
-    "eslint": "eslint src --cache",
+    "eslint": "eslint src",
     "eslint-fix": "npm run eslint -- --fix",
     "compile": "babel src --out-dir lib --quiet",
     "prepublish": "npm run compile"
@@ -41,8 +41,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-jest": "^21.9.0",
     "eslint-plugin-no-only-tests": "^1.1.0",
-    "mocha": "^3.0.2",
-    "mocha-better-spec-reporter": "^3.0.2",
+    "jest": "^22.4.2",
     "should": "^11.2.1"
   },
   "dependencies": {
