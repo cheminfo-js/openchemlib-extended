@@ -1,3 +1,5 @@
+'use strict';
+
 const staticMethods = {
   DB: require('./db/DB'),
   RXN: require('./rxn/RXN')

@@ -1,14 +1,14 @@
 'use strict';
 
-var OCLE = require('../..');
+const OCLE = require('../..');
 
 describe('getFunctions test acetone', () => {
-    test('should yield to ketone', () => {
-        var molecule=OCLE.Molecule.fromSmiles('CC(=O)C');
-        var functions=molecule.getFunctions();
+  test('should yield to ketone', () => {
+    var molecule = OCLE.Molecule.fromSmiles('CC(=O)C');
+    var functions = molecule.getFunctions();
 
-        functions.length.should.equal(1);
-        functions[0].name.should.equal('ketone');
-        functions[0].atomMap.should.eql([ 1, 2 ]);
-    });
+    expect(functions).toHaveLength(1);
+    expect(functions[0].name).toBe('ketone');
+    expect(functions[0].atomMap).toEqual([1, 2]);
+  });
 });

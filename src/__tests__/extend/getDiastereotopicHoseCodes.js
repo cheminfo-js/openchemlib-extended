@@ -1,15 +1,13 @@
 'use strict';
 
-
-var OCLE = require('../..');
-
+const OCLE = require('../..');
 
 describe('getCouplings test propane', () => {
-    test('should yield the right table without atom filtering', () => {
-        var molecule=OCLE.Molecule.fromSmiles('CCC');
-        var diaIDs=molecule.getDiastereotopicHoseCodes();
-        diaIDs.length.should.equal(3);
-        diaIDs[0].oclID.should.equal('eM@Df`Xb`RP\\Jh' );
-        diaIDs[0].hoses.length.should.equal(3);
-    });
+  test('should yield the right table without atom filtering', () => {
+    var molecule = OCLE.Molecule.fromSmiles('CCC');
+    var diaIDs = molecule.getDiastereotopicHoseCodes();
+    expect(diaIDs).toHaveLength(3);
+    expect(diaIDs[0].oclID).toBe('eM@Df`Xb`RP\\Jh');
+    expect(diaIDs[0].hoses).toHaveLength(3);
+  });
 });
