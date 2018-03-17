@@ -42,7 +42,7 @@ module.exports = function (OCL) {
                   atomList[newMax++] = connAtom;
                   break;
                 case HOSE_CODE_CUT_C_SP3_SP3:
-                  if (!(isCsp3(mol, atom) && isCsp3(mol, connAtom))) {
+                  if (!(isCsp3(molecule, atom) && isCsp3(molecule, connAtom))) {
                     atomMask[connAtom] = true;
                     atomList[newMax++] = connAtom;
                   }
@@ -59,8 +59,15 @@ module.exports = function (OCL) {
 
       molecule.copyMoleculeByAtoms(fragment, atomMask, true, null);
 
-	    results.push(fragment.getCanonizedIDCode(OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS));
+      results.push(fragment.getCanonizedIDCode(OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS));
     }
     return results;
   };
+
+  function isCsp3(molecule, atomID) {
+    if (molecule.getAtomicNo(atomID) !== 6) return false;
+    if (molecule.getAtomCharge(atomID) !== 0) return false;
+    if ((molecule.getImplicitHydrogens(atomID) + molecule.getConnAtoms(atomID)) !== 4) return false;
+    return true;
+  }
 };

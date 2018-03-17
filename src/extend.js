@@ -25,7 +25,8 @@ const moleculePrototypeMethodsNeedOCL = {
   getDiastereotopicHoseCodes: require('./extend/getDiastereotopicHoseCodes'),
   getExtendedDiastereotopicAtomIDs: require('./extend/getExtendedDiastereotopicAtomIDs'),
   getFunctionCodes: require('./extend/functions/getFunctionCodes'),
-  getGroupedHOSECodes: require('./extend/getGroupedHOSECodes')
+  getGroupedHOSECodes: require('./extend/getGroupedHOSECodes'),
+  getHoseCodesForAtom: require('./extend/getHoseCodesForAtom')m
 };
 
 module.exports = function extend(OCL) {
