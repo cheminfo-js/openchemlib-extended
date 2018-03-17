@@ -4,8 +4,8 @@
 var OCLE = require('../..');
 
 
-describe('toVisualizerMolfile on propane', function () {
-    it('should yield the right molfile', function () {
+describe('toVisualizerMolfile on propane', () => {
+    test('should yield the right molfile', () => {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         var molfile=molecule.toVisualizerMolfile({diastereotopic: true});
 
@@ -13,7 +13,7 @@ describe('toVisualizerMolfile on propane', function () {
         molfile._highlight.should.eql( [ 'eM@Df`Xb`RP\\Jh', 'eM@HzAbJC}IApj`' ])
     });
 
-    it('should yield the right molfile with ID on the heavy atom', function () {
+    test('should yield the right molfile with ID on the heavy atom', () => {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         var molfile=molecule.toVisualizerMolfile({
             heavyAtomHydrogen: true,

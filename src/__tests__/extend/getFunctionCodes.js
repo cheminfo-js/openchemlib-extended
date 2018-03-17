@@ -2,8 +2,8 @@
 
 var OCLE = require('../..');
 
-describe('getFunctionCodes test acetone', function () {
-    it('should yield the right table function codes', function () {;
+describe('getFunctionCodes test acetone', () => {
+    test('should yield the right table function codes', () => {;
         var molecule=OCLE.Molecule.fromSmiles('CC(=O)C');
         var functionCodes=molecule.getFunctionCodes();
         

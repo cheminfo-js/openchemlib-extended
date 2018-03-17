@@ -4,9 +4,9 @@
 var OCLE = require('../..');
 
 
-describe('getNumberOfAtoms test 1-chloropropane', function () {
+describe('getNumberOfAtoms test 1-chloropropane', () => {
 
-    it('check 1-chloropropane', function () {
+    test('check 1-chloropropane', () => {
         var molecule=OCLE.Molecule.fromSmiles('CCCCl');
         molecule.getNumberOfAtoms({atomLabel:'H'}).should.equal(7);
         molecule.getNumberOfAtoms({atomLabel:'Cl'}).should.equal(1);

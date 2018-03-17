@@ -4,9 +4,9 @@
 var OCLE = require('../..');
 
 
-describe('getAtomsInfo test propane', function () {
+describe('getAtomsInfo test propane', () => {
 
-    it('should yield the right table - methanol', function () {
+    test('should yield the right table - methanol', () => {
         var molecule=OCLE.Molecule.fromSmiles('CO');
         molecule.addImplicitHydrogens();
         var atoms=molecule.getAtomsInfo();
@@ -81,7 +81,7 @@ describe('getAtomsInfo test propane', function () {
             isStabilized: false } );
     });
     
-    it('should yield the right table', function () {
+    test('should yield the right table', () => {
         var molecule=OCLE.Molecule.fromSmiles('C=CC');
         // molecule.addImplicitHydrogens();
         var atoms=molecule.getAtomsInfo();

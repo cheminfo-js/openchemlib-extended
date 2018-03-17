@@ -4,8 +4,8 @@
 var OCLE = require('../..');
 
 
-describe('getGroupedDiastereotopicIDs test propane', function () {
-    it('should yield the right table for all atoms', function () {
+describe('getGroupedDiastereotopicIDs test propane', () => {
+    test('should yield the right table for all atoms', () => {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         molecule.addImplicitHydrogens();
         var diaIDs=molecule.getGroupedDiastereotopicAtomIDs();
@@ -15,7 +15,7 @@ describe('getGroupedDiastereotopicIDs test propane', function () {
         diaIDs[0].oclID.should.equal('eM@Df`Xb`RP\\Jh' );
     });
 
-    it('should yield the right table for carbons', function () {
+    test('should yield the right table for carbons', () => {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         molecule.addImplicitHydrogens();
         var diaIDs=molecule.getGroupedDiastereotopicAtomIDs({
@@ -27,7 +27,7 @@ describe('getGroupedDiastereotopicIDs test propane', function () {
         diaIDs[0].oclID.should.equal('eM@Df`Xb`RP\\Jh' );
     });
 
-    it('should yield the right table for hydrogens', function () {
+    test('should yield the right table for hydrogens', () => {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         molecule.addImplicitHydrogens();
         var diaIDs=molecule.getGroupedDiastereotopicAtomIDs({

@@ -28,8 +28,8 @@ JME 2017-03-21 Wed Jun 14 14:53:08 GMT+200 2017
   1 11  1  0  0  0
 M  END`;
 
-describe('getCouplings test propane', function () {
-    it('should yield the right table without atom filtering', function () {
+describe('getCouplings test propane', () => {
+    test('should yield the right table without atom filtering', () => {
         var molecule = OCLE.Molecule.fromMolfile(molfile);
      //   var molecule = OCLE.Molecule.fromSmiles('CCCC');
        // molecule.addImplicitHydrogens();

@@ -4,8 +4,8 @@
 var OCLE = require('../..');
 
 
-describe('getConnectivityMatrix test propane', function () {
-    it('propane with expanded hydrogens', function () {
+describe('getConnectivityMatrix test propane', () => {
+    test('propane with expanded hydrogens', () => {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         molecule.addImplicitHydrogens();
         
@@ -27,7 +27,7 @@ describe('getConnectivityMatrix test propane', function () {
         );
     });
 
-    it('benzene', function () {
+    test('benzene', () => {
         var molecule=OCLE.Molecule.fromSmiles('c1ccccc1');
         var connectivityMatrix=molecule.getConnectivityMatrix();
         connectivityMatrix.should.be.eql(
@@ -42,7 +42,7 @@ describe('getConnectivityMatrix test propane', function () {
         );
     });
 
-    it('benzene with single, double, triple', function () {
+    test('benzene with single, double, triple', () => {
         var molecule=OCLE.Molecule.fromSmiles('c1ccccc1');
         var connectivityMatrix=molecule.getConnectivityMatrix({
             sdt: true
@@ -59,7 +59,7 @@ describe('getConnectivityMatrix test propane', function () {
         );
     });
 
-    it('benzene with mass diagonal', function () {
+    test('benzene with mass diagonal', () => {
         var molecule=OCLE.Molecule.fromSmiles('c1ccccc1');
         var connectivityMatrix=molecule.getConnectivityMatrix({
             mass: true
@@ -76,7 +76,7 @@ describe('getConnectivityMatrix test propane', function () {
         );
     });
 
-    it('benzene with atomic number on diagonal', function () {
+    test('benzene with atomic number on diagonal', () => {
         var molecule=OCLE.Molecule.fromSmiles('c1ccccc1');
         var connectivityMatrix=molecule.getConnectivityMatrix({
             atomicNo: true
@@ -93,7 +93,7 @@ describe('getConnectivityMatrix test propane', function () {
         );
     });
 
-    it('benzene pathLength matrix', function () {
+    test('benzene pathLength matrix', () => {
         var molecule=OCLE.Molecule.fromSmiles('c1ccccc1');
         var connectivityMatrix=molecule.getConnectivityMatrix({pathLength: true});
         connectivityMatrix.should.be.eql(

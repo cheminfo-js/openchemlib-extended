@@ -4,15 +4,15 @@
 var OCLE = require('../..');
 
 
-describe('getMF test', function () {
-    it('check benzene', function () {
+describe('getMF test', () => {
+    test('check benzene', () => {
         var molecule=OCLE.Molecule.fromSmiles('c1ccccc1');
         var result=molecule.getMF();
         result.mf.should.equal('C6H6');
         result.parts.length.should.equal(1);
         result.parts[0].should.equal('C6H6');
     });
-    it('check glycine', function () {
+    test('check glycine', () => {
         var molecule=OCLE.Molecule.fromSmiles('[NH3+]CC(=O)[O-]');
         var result=molecule.getMF();
         result.mf.should.equal('C2H5NO2');
@@ -20,7 +20,7 @@ describe('getMF test', function () {
         result.parts[0].should.equal('C2H5NO2');
 
     });
-    it('check isotope of pentane', function () {
+    test('check isotope of pentane', () => {
         var molecule=OCLE.Molecule.fromSmiles('CC[13CH2]CC([2H])([2H])([2H])');
         var result=molecule.getMF();
         result.mf.should.equal('C4H9[13C][2H]3');
@@ -28,7 +28,7 @@ describe('getMF test', function () {
         result.parts[0].should.equal('C4H9[13C][2H]3');
 
     });
-    it('check multipart', function () {
+    test('check multipart', () => {
         var molecule=OCLE.Molecule.fromSmiles('OCC(N)CCl.[CH2+][2H]');
         var result=molecule.getMF();
         result.mf.should.equal('C4H10ClNO[2H](+)');
@@ -37,7 +37,7 @@ describe('getMF test', function () {
         result.parts[1].should.equal('CH2[2H](+)');
 
     });
-    it('check multihydrate', function () {
+    test('check multihydrate', () => {
         var molecule=OCLE.Molecule.fromSmiles('[ClH].O.O.O.O');
 
         var result=molecule.getMF();
@@ -47,7 +47,7 @@ describe('getMF test', function () {
         result.parts[1].should.equal('HCl');
     });
 
-    it('check 4 H2O', function () {
+    test('check 4 H2O', () => {
         var molecule=OCLE.Molecule.fromSmiles('O.O.O.O');
 
         var result=molecule.getMF();
@@ -56,7 +56,7 @@ describe('getMF test', function () {
         result.parts[0].should.equal('4H2O');
     });
 
-    it('check Li+ OH-', function () {
+    test('check Li+ OH-', () => {
         var molecule=OCLE.Molecule.fromIDCode('eDJRpCjP@');
         var result=molecule.getMF();
         result.mf.should.equal('HLiO');
@@ -65,7 +65,7 @@ describe('getMF test', function () {
         result.parts[1].should.equal('Li(+)');
     });
 
-    it('check 2 atoms of cobalt', function () {
+    test('check 2 atoms of cobalt', () => {
         // if we have the same molecular formula we group them and count in front
         var molecule=OCLE.Molecule.fromIDCode('eDACXm`@@');
         var result=molecule.getMF();
@@ -74,7 +74,7 @@ describe('getMF test', function () {
         result.parts[0].should.equal('2Co');
     });
     
-    it('check O--', function () {
+    test('check O--', () => {
         var molecule=OCLE.Molecule.fromSmiles('[O--]');
         var result=molecule.getMF();
         result.mf.should.equal('O(-2)');

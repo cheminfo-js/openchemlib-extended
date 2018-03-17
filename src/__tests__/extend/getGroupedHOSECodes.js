@@ -4,8 +4,8 @@
 var OCLE = require('../..');
 
 
-describe('getGroupedHOSECodes test propane', function () {
-    it('should yield the right table without atom filtering', function () {
+describe('getGroupedHOSECodes test propane', () => {
+    test('should yield the right table without atom filtering', () => {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         molecule.addImplicitHydrogens();
         var diaIDs=molecule.getGroupedHOSECodes();
@@ -16,7 +16,7 @@ describe('getGroupedHOSECodes test propane', function () {
         diaIDs[0].hoses.length.should.equal(3);
     });
 
-    it('should yield the right table only C', function () {
+    test('should yield the right table only C', () => {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         molecule.addImplicitHydrogens();
         var diaIDs=molecule.getGroupedHOSECodes({
@@ -29,7 +29,7 @@ describe('getGroupedHOSECodes test propane', function () {
         diaIDs[0].hoses.length.should.equal(3);
     });
 
-    it('should yield the right table only H', function () {
+    test('should yield the right table only H', () => {
         var molecule=OCLE.Molecule.fromSmiles('CCC');
         molecule.addImplicitHydrogens();
         var diaIDs=molecule.getGroupedHOSECodes({

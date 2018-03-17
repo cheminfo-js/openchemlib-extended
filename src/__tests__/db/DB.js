@@ -6,9 +6,9 @@ var fs = require('fs');
 var sdf = fs.readFileSync(__dirname + '/../data/data.sdf', 'ascii');
 var csv = fs.readFileSync(__dirname + '/../data/data.csv', 'ascii');
 
-describe('DB', function () {
-    describe('parseSDF', function () {
-        it('should parse all molecules', function () {
+describe('DB', () => {
+    describe('parseSDF', () => {
+        test('should parse all molecules', () => {
             return DB.parseSDF(sdf).then(function (db) {
                 db.length.should.equal(20);
                 db.data.length.should.equal(20);
@@ -16,7 +16,7 @@ describe('DB', function () {
             });
         });
 
-        it('should call step for each molecule', function () {
+        test('should call step for each molecule', () => {
             var called = 0;
             function onStep(current, total) {
                 current.should.equal(++called);
@@ -27,7 +27,7 @@ describe('DB', function () {
             });
         });
 
-        it('should compute properties', function () {
+        test('should compute properties', () => {
             return DB.parseSDF(sdf, {computeProperties: true}).then(function (db) {
                 db.data[0].should.have.property('properties');
                 db.data[0].properties.should.have.properties(['formula', 'logP', 'polarSurfaceArea']);
@@ -35,14 +35,14 @@ describe('DB', function () {
         });
     });
 
-    describe('parseCSV', function () {
-        it('should parse all molecules', function () {
+    describe('parseCSV', () => {
+        test('should parse all molecules', () => {
             return DB.parseCSV(csv).then(function (db) {
                 db.length.should.equal(5);
             });
         });
 
-        it('should call step for each molecule', function () {
+        test('should call step for each molecule', () => {
             var called = 0;
             function onStep(current, total) {
                 current.should.equal(++called);
@@ -54,15 +54,15 @@ describe('DB', function () {
         });
     });
 
-    describe('search', function () {
+    describe('search', () => {
         var db;
-        before(function () {
+        beforeAll(function () {
             return DB.parseCSV(csv).then(function (database) {
                 db = database;
             });
         });
 
-        it('invalid arguments', function () {
+        test('invalid arguments', () => {
             (function () {
                 db.search(null);
             }).should.throw(/toSearch must be a Molecule or string/);
@@ -71,7 +71,7 @@ describe('DB', function () {
             }).should.throw(/unknown search mode: abc/);
         });
 
-        it('exact with SMILES', function () {
+        test('exact with SMILES', () => {
             var result = db.search('CC', {format: 'smiles', mode: 'exact'});
             result.length.should.equal(1);
             result = db.search('CCC', {format: 'smiles', mode: 'exact'});
@@ -82,7 +82,7 @@ describe('DB', function () {
             result.length.should.equal(0);
         });
 
-        it('subStructure with SMILES', function () {
+        test('subStructure with SMILES', () => {
             var result = db.search('CC', {format: 'smiles', mode: 'substructure'});
             result.length.should.equal(4);
             result.data[0].name.should.equal('Ethane');
@@ -94,7 +94,7 @@ describe('DB', function () {
             result.length.should.equal(0);
         });
 
-        it('similarity with SMILES', function () {
+        test('similarity with SMILES', () => {
             var result = db.search('CC', {format: 'smiles', mode: 'similarity'});
             result.length.should.equal(5);
             result.data[0].name.should.equal('Ethane');
