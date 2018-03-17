@@ -9,11 +9,11 @@ const staticMethods = {
 const moleculePrototypeMethods = {
   getAllPaths: require('./extend/getAllPaths'),
   getFunctions: require('./extend/functions/getFunctions'),
-  getGroupedDiastereotopicAtomIDs: require('./extend/getGroupedDiastereotopicAtomIDs'),
+  getGroupedDiastereotopicAtomIDs: require('./extend/diastereotopic/getGroupedDiastereotopicAtomIDs'),
   getMF: require('./extend/getMF'),
   getCouplings: require('./extend/couplings/getCouplings'),
   getNumberOfAtoms: require('./extend/getNumberOfAtoms'),
-  toDiastereotopicSVG: require('./extend/toDiastereotopicSVG'),
+  toDiastereotopicSVG: require('./extend/diastereotopic/toDiastereotopicSVG'),
   toVisualizerMolfile: require('./extend/toVisualizerMolfile')
 };
 
@@ -22,8 +22,8 @@ const moleculePrototypeMethods = {
 const moleculePrototypeMethodsNeedOCL = {
   getAtomsInfo: require('./extend/getAtomsInfo'),
   getConnectivityMatrix: require('./extend/getConnectivityMatrix'),
-  getDiastereotopicHoseCodes: require('./extend/getDiastereotopicHoseCodes'),
-  getExtendedDiastereotopicAtomIDs: require('./extend/getExtendedDiastereotopicAtomIDs'),
+  getDiastereotopicHoseCodes: require('./extend/diastereotopic/getDiastereotopicHoseCodes'),
+  getExtendedDiastereotopicAtomIDs: require('./extend/diastereotopic/getExtendedDiastereotopicAtomIDs'),
   getFunctionCodes: require('./extend/functions/getFunctionCodes'),
   getGroupedHOSECodes: require('./extend/getGroupedHOSECodes'),
   getHoseCodesForAtom: require('./extend/getHoseCodesForAtom'),
