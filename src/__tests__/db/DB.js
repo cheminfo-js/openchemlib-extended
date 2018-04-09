@@ -4,8 +4,8 @@ const fs = require('fs');
 
 const DB = require('../..').DB;
 
-var sdf = fs.readFileSync(`${__dirname}/../data/data.sdf`, 'ascii');
-var csv = fs.readFileSync(`${__dirname}/../data/data.csv`, 'ascii');
+var sdf = fs.readFileSync(`${__dirname}/../../../data/data.sdf`, 'ascii');
+var csv = fs.readFileSync(`${__dirname}/../../../data/data.csv`, 'ascii');
 
 describe('DB', () => {
   describe('parseSDF', () => {

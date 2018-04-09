@@ -5,7 +5,7 @@ const fs = require('fs');
 const RXN = require('../..').RXN;
 
 describe('RXN', () => {
-  var text = fs.readFileSync(`${__dirname}/../data/reaction.rxn`).toString();
+  var text = fs.readFileSync(`${__dirname}/../../../data/reaction.rxn`).toString();
 
   var rxn = new RXN(text);
 
