@@ -1,6 +1,6 @@
 /**
  * openchemlib-extended - Openchemlib extended
- * @version v3.1.0
+ * @version v3.2.0
  * @link https://github.com/cheminfo-js/openchemlib-extended
  * @license BSD-3-Clause
  */
@@ -4157,6 +4157,7 @@ __webpack_require__(5);
 var OCL = __webpack_require__(15);
 
 __webpack_require__(16)(OCL);
+
 module.exports = OCL;
 
 /***/ }),
@@ -4383,47 +4384,49 @@ var path=["OCL"];var l=path.length-1;var obj=globalEnv;for(var i=0;i<l;i++){obj=
 
 
 var staticMethods = {
-    DB: __webpack_require__(17),
-    RXN: __webpack_require__(22)
+  DB: __webpack_require__(17),
+  RXN: __webpack_require__(22)
 };
 
 // These methods don't need to directly access OCL
 var moleculePrototypeMethods = {
-    getAllPaths: __webpack_require__(24),
-    getFunctions: __webpack_require__(42),
-    getGroupedDiastereotopicAtomIDs: __webpack_require__(44),
-    getMF: __webpack_require__(45),
-    getCouplings: __webpack_require__(46),
-    getNumberOfAtoms: __webpack_require__(49),
-    toDiastereotopicSVG: __webpack_require__(50),
-    toVisualizerMolfile: __webpack_require__(51)
+  getAllPaths: __webpack_require__(24),
+  getFunctions: __webpack_require__(42),
+  getGroupedDiastereotopicAtomIDs: __webpack_require__(44),
+  getMF: __webpack_require__(45),
+  getCouplings: __webpack_require__(46),
+  getNumberOfAtoms: __webpack_require__(49),
+  toDiastereotopicSVG: __webpack_require__(50),
+  toVisualizerMolfile: __webpack_require__(51)
 };
 
 // These methods need a direct access to OCL. The must be exported as a function
 // that receives OCL and returns the method that will use it.
 var moleculePrototypeMethodsNeedOCL = {
-    getAtomsInfo: __webpack_require__(52),
-    getConnectivityMatrix: __webpack_require__(53),
-    getDiastereotopicHoseCodes: __webpack_require__(54),
-    getExtendedDiastereotopicAtomIDs: __webpack_require__(55),
-    getFunctionCodes: __webpack_require__(56),
-    getGroupedHOSECodes: __webpack_require__(57)
+  getAtomsInfo: __webpack_require__(52),
+  getConnectivityMatrix: __webpack_require__(53),
+  getDiastereotopicHoseCodes: __webpack_require__(54),
+  getExtendedDiastereotopicAtomIDs: __webpack_require__(55),
+  getFunctionCodes: __webpack_require__(56),
+  getGroupedHOSECodes: __webpack_require__(57),
+  getHoseCodesForAtom: __webpack_require__(58),
+  cleaveBonds: __webpack_require__(59)
 };
 
 module.exports = function extend(OCL) {
-    var key = void 0;
-    for (key in staticMethods) {
-        OCL[key] = staticMethods[key](OCL);
-    }
+  var key = void 0;
+  for (key in staticMethods) {
+    OCL[key] = staticMethods[key](OCL);
+  }
 
-    var MoleculePrototype = OCL.Molecule.prototype;
-    for (key in moleculePrototypeMethods) {
-        MoleculePrototype[key] = moleculePrototypeMethods[key];
-    }
-    for (key in moleculePrototypeMethodsNeedOCL) {
-        MoleculePrototype[key] = moleculePrototypeMethodsNeedOCL[key](OCL);
-    }
-    return OCL;
+  var MoleculePrototype = OCL.Molecule.prototype;
+  for (key in moleculePrototypeMethods) {
+    MoleculePrototype[key] = moleculePrototypeMethods[key];
+  }
+  for (key in moleculePrototypeMethodsNeedOCL) {
+    MoleculePrototype[key] = moleculePrototypeMethodsNeedOCL[key](OCL);
+  }
+  return OCL;
 };
 
 /***/ }),
@@ -4434,19 +4437,19 @@ module.exports = function extend(OCL) {
 /* WEBPACK VAR INJECTION */(function(setImmediate) {
 
 var _createClass = function () {
-    function defineProperties(target, props) {
-        for (var i = 0; i < props.length; i++) {
-            var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-        }
-    }return function (Constructor, protoProps, staticProps) {
-        if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-    };
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
 }();
 
 function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
 }
 
 var _parseSDF = __webpack_require__(19);
@@ -4455,294 +4458,294 @@ var Papa = __webpack_require__(20);
 var getMoleculeCreators = __webpack_require__(21);
 
 module.exports = function (OCL) {
-    var cHelperRings = OCL.Molecule.cHelperRings;
-    var Molecule = OCL.Molecule;
+  var cHelperRings = OCL.Molecule.cHelperRings;
+  var Molecule = OCL.Molecule;
 
-    var moleculeCreators = getMoleculeCreators(Molecule);
+  var moleculeCreators = getMoleculeCreators(Molecule);
 
-    var defaultDBOptions = {
-        length: 0,
-        computeProperties: false
-    };
+  var defaultDBOptions = {
+    length: 0,
+    computeProperties: false
+  };
 
-    var defaultSDFOptions = {
-        onStep: function onStep() /*current, total*/{
-            // empty function
+  var defaultSDFOptions = {
+    onStep: function onStep() /* current, total*/{
+      // empty function
+    }
+  };
+
+  var defaultCSVOptions = {
+    header: true,
+    dynamicTyping: true,
+    skipEmptyLines: true,
+    onStep: function onStep() /* current, total*/{
+      // empty function
+    }
+  };
+
+  var defaultSearchOptions = {
+    format: 'oclid',
+    mode: 'substructure',
+    limit: 0
+  };
+
+  var MoleculeDB = function () {
+    function MoleculeDB(options) {
+      _classCallCheck(this, MoleculeDB);
+
+      options = Object.assign({}, defaultDBOptions, options);
+      this.data = new Array(options.length);
+      this.molecules = new Array(options.length);
+      this.statistics = null;
+      this.length = 0;
+      this.computeProperties = !!options.computeProperties;
+      this.searcher = null;
+    }
+
+    _createClass(MoleculeDB, [{
+      key: 'push',
+      value: function push(molecule, data) {
+        if (data === undefined) data = {};
+        this.molecules[this.length] = molecule;
+        // ensure helper arrays needed for substructure search
+        molecule.ensureHelperArrays(cHelperRings);
+        var molecularFormula = void 0;
+        if (!molecule.index) {
+          molecule.index = molecule.getIndex();
         }
-    };
-
-    var defaultCSVOptions = {
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        onStep: function onStep() /*current, total*/{
-            // empty function
+        if (!molecule.idcode) {
+          molecule.idcode = molecule.getIDCode();
         }
-    };
+        if (!molecule.mw) {
+          molecularFormula = molecule.getMolecularFormula();
+          molecule.mw = molecularFormula.relativeWeight;
+        }
+        this.data[this.length++] = data;
+        if (this.computeProperties) {
+          if (!molecularFormula) {
+            molecularFormula = molecule.getMolecularFormula();
+          }
+          var properties = new OCL.MoleculeProperties(molecule);
+          data.properties = {
+            absoluteWeight: molecularFormula.absoluteWeight,
+            relativeWeight: molecule.mw,
+            formula: molecularFormula.formula,
+            acceptorCount: properties.acceptorCount,
+            donorCount: properties.donorCount,
+            logP: properties.logP,
+            logS: properties.logS,
+            polarSurfaceArea: properties.polarSurfaceArea,
+            rotatableBondCount: properties.rotatableBondCount,
+            stereoCenterCount: properties.stereoCenterCount
+          };
+        }
+      }
+    }, {
+      key: 'search',
+      value: function search(query, options) {
+        options = Object.assign({}, defaultSearchOptions, options);
 
-    var defaultSearchOptions = {
-        format: 'oclid',
-        mode: 'substructure',
-        limit: 0
-    };
-
-    var MoleculeDB = function () {
-        function MoleculeDB(options) {
-            _classCallCheck(this, MoleculeDB);
-
-            options = Object.assign({}, defaultDBOptions, options);
-            this.data = new Array(options.length);
-            this.molecules = new Array(options.length);
-            this.statistics = null;
-            this.length = 0;
-            this.computeProperties = !!options.computeProperties;
-            this.searcher = null;
+        if (typeof query === 'string') {
+          query = moleculeCreators.get(options.format.toLowerCase())(query);
+        } else if (!(query instanceof Molecule)) {
+          throw new TypeError('toSearch must be a Molecule or string');
         }
 
-        _createClass(MoleculeDB, [{
-            key: 'push',
-            value: function push(molecule, data) {
-                if (data === undefined) data = {};
-                this.molecules[this.length] = molecule;
-                // ensure helper arrays needed for substructure search
-                molecule.ensureHelperArrays(cHelperRings);
-                var molecularFormula = void 0;
-                if (!molecule.index) {
-                    molecule.index = molecule.getIndex();
-                }
-                if (!molecule.idcode) {
-                    molecule.idcode = molecule.getIDCode();
-                }
-                if (!molecule.mw) {
-                    molecularFormula = molecule.getMolecularFormula();
-                    molecule.mw = molecularFormula.relativeWeight;
-                }
-                this.data[this.length++] = data;
-                if (this.computeProperties) {
-                    if (!molecularFormula) {
-                        molecularFormula = molecule.getMolecularFormula();
-                    }
-                    var properties = new OCL.MoleculeProperties(molecule);
-                    data.properties = {
-                        absoluteWeight: molecularFormula.absoluteWeight,
-                        relativeWeight: molecule.mw,
-                        formula: molecularFormula.formula,
-                        acceptorCount: properties.acceptorCount,
-                        donorCount: properties.donorCount,
-                        logP: properties.logP,
-                        logS: properties.logS,
-                        polarSurfaceArea: properties.polarSurfaceArea,
-                        rotatableBondCount: properties.rotatableBondCount,
-                        stereoCenterCount: properties.stereoCenterCount
-                    };
-                }
+        var result = void 0;
+        switch (options.mode.toLowerCase()) {
+          case 'exact':
+            result = this.exactSearch(query, options.limit);
+            break;
+          case 'substructure':
+            result = this.subStructureSearch(query, options.limit);
+            break;
+          case 'similarity':
+            result = this.similaritySearch(query, options.limit);
+            break;
+          default:
+            throw new Error(`unknown search mode: ${options.mode}`);
+        }
+        return result;
+      }
+    }, {
+      key: 'exactSearch',
+      value: function exactSearch(query, limit) {
+        var queryIdcode = query.getIDCode();
+        var result = new MoleculeDB();
+        limit = limit || Number.MAX_SAFE_INTEGER;
+        for (var i = 0; i < this.length; i++) {
+          if (this.molecules[i].idcode === queryIdcode) {
+            result.push(this.molecules[i], this.data[i]);
+            if (result.length >= limit) break;
+          }
+        }
+        return result;
+      }
+    }, {
+      key: 'subStructureSearch',
+      value: function subStructureSearch(query, limit) {
+        var needReset = false;
+
+        if (!query.isFragment()) {
+          needReset = true;
+          query.setFragment(true);
+        }
+
+        var queryMW = getMW(query);
+
+        var queryIndex = query.getIndex();
+        var searcher = this.getSearcher();
+
+        searcher.setFragment(query, queryIndex);
+        var searchResult = [];
+        for (var i = 0; i < this.length; i++) {
+          searcher.setMolecule(this.molecules[i], this.molecules[i].index);
+          if (searcher.isFragmentInMolecule()) {
+            searchResult.push([this.molecules[i], i]);
+          }
+        }
+        searchResult.sort(function (a, b) {
+          return Math.abs(queryMW - a[0].mw) - Math.abs(queryMW - b[0].mw);
+        });
+
+        var length = Math.min(limit || searchResult.length, searchResult.length);
+        var result = new MoleculeDB({ length: length });
+        for (var _i = 0; _i < length; _i++) {
+          result.push(this.molecules[searchResult[_i][1]], this.data[searchResult[_i][1]]);
+        }
+
+        if (needReset) {
+          query.setFragment(false);
+        }
+        return result;
+      }
+    }, {
+      key: 'similaritySearch',
+      value: function similaritySearch(query, limit) {
+        var queryIndex = query.getIndex();
+
+        var queryMW = getMW(query);
+        var queryIDCode = query.getIDCode();
+
+        var searchResult = new Array(this.length);
+        var similarity = void 0;
+        for (var i = 0; i < this.length; i++) {
+          if (this.molecules[i].idcode === queryIDCode) {
+            similarity = 1e10;
+          } else {
+            similarity = OCL.SSSearcherWithIndex.getSimilarityTanimoto(queryIndex, this.molecules[i].index) * 100000 - Math.abs(queryMW - this.molecules[i].mw) / 1000;
+          }
+          searchResult[i] = [similarity, i];
+        }
+        searchResult.sort(function (a, b) {
+          return b[0] - a[0];
+        });
+
+        var length = Math.min(limit || searchResult.length, searchResult.length);
+        var result = new MoleculeDB({ length: length });
+        for (var _i2 = 0; _i2 < length; _i2++) {
+          result.push(this.molecules[searchResult[_i2][1]], this.data[searchResult[_i2][1]]);
+        }
+        return result;
+      }
+    }, {
+      key: 'getSearcher',
+      value: function getSearcher() {
+        return this.searcher || (this.searcher = new OCL.SSSearcherWithIndex());
+      }
+    }], [{
+      key: 'parseSDF',
+      value: function parseSDF(sdf, options) {
+        if (typeof sdf !== 'string') {
+          throw new TypeError('sdf must be a string');
+        }
+        options = Object.assign({}, defaultSDFOptions, options);
+        return new Promise(function (resolve, reject) {
+          var parsed = _parseSDF(sdf);
+          var molecules = parsed.molecules;
+          var db = new MoleculeDB(options);
+          db.statistics = parsed.statistics;
+          var i = 0;
+          var l = molecules.length;
+          parseNext();
+          function parseNext() {
+            if (i === l) {
+              resolve(db);
+              return;
             }
-        }, {
-            key: 'search',
-            value: function search(query, options) {
-                options = Object.assign({}, defaultSearchOptions, options);
-
-                if (typeof query === 'string') {
-                    query = moleculeCreators.get(options.format.toLowerCase())(query);
-                } else if (!(query instanceof Molecule)) {
-                    throw new TypeError('toSearch must be a Molecule or string');
-                }
-
-                var result = void 0;
-                switch (options.mode.toLowerCase()) {
-                    case 'exact':
-                        result = this.exactSearch(query, options.limit);
-                        break;
-                    case 'substructure':
-                        result = this.subStructureSearch(query, options.limit);
-                        break;
-                    case 'similarity':
-                        result = this.similaritySearch(query, options.limit);
-                        break;
-                    default:
-                        throw new Error('unknown search mode: ' + options.mode);
-                }
-                return result;
+            try {
+              db.push(Molecule.fromMolfile(molecules[i].molfile), molecules[i]);
+            } catch (e) {
+              reject(e);
+              return;
             }
-        }, {
-            key: 'exactSearch',
-            value: function exactSearch(query, limit) {
-                var queryIdcode = query.getIDCode();
-                var result = new MoleculeDB();
-                limit = limit || Number.MAX_SAFE_INTEGER;
-                for (var i = 0; i < this.length; i++) {
-                    if (this.molecules[i].idcode === queryIdcode) {
-                        result.push(this.molecules[i], this.data[i]);
-                        if (result.length >= limit) break;
-                    }
-                }
-                return result;
+            options.onStep(++i, l);
+            setImmediate(parseNext);
+          }
+        });
+      }
+    }, {
+      key: 'parseCSV',
+      value: function parseCSV(csv, options) {
+        if (typeof csv !== 'string') {
+          throw new TypeError('csv must be a string');
+        }
+        options = Object.assign({}, defaultCSVOptions, options);
+        return new Promise(function (resolve, reject) {
+          var parsed = Papa.parse(csv, options);
+          var fields = parsed.meta.fields;
+          var stats = new Array(fields.length);
+          var firstElement = parsed.data[0];
+          var datatype = void 0,
+              datafield = void 0;
+          for (var _i3 = 0; _i3 < fields.length; _i3++) {
+            stats[_i3] = {
+              label: fields[_i3],
+              isNumeric: typeof firstElement[fields[_i3]] === 'number'
+            };
+            var lowerField = fields[_i3].toLowerCase();
+            if (moleculeCreators.has(lowerField)) {
+              datatype = moleculeCreators.get(lowerField);
+              datafield = fields[_i3];
             }
-        }, {
-            key: 'subStructureSearch',
-            value: function subStructureSearch(query, limit) {
-                var needReset = false;
+          }
+          if (!datatype) {
+            throw new Error('this document does not contain any molecule field');
+          }
+          var db = new MoleculeDB(options);
+          db.statistics = stats;
 
-                if (!query.isFragment()) {
-                    needReset = true;
-                    query.setFragment(true);
-                }
-
-                var queryMW = getMW(query);
-
-                var queryIndex = query.getIndex();
-                var searcher = this.getSearcher();
-
-                searcher.setFragment(query, queryIndex);
-                var searchResult = [];
-                for (var i = 0; i < this.length; i++) {
-                    searcher.setMolecule(this.molecules[i], this.molecules[i].index);
-                    if (searcher.isFragmentInMolecule()) {
-                        searchResult.push([this.molecules[i], i]);
-                    }
-                }
-                searchResult.sort(function (a, b) {
-                    return Math.abs(queryMW - a[0].mw) - Math.abs(queryMW - b[0].mw);
-                });
-
-                var length = Math.min(limit || searchResult.length, searchResult.length);
-                var result = new MoleculeDB({ length: length });
-                for (var _i = 0; _i < length; _i++) {
-                    result.push(this.molecules[searchResult[_i][1]], this.data[searchResult[_i][1]]);
-                }
-
-                if (needReset) {
-                    query.setFragment(false);
-                }
-                return result;
+          var i = 0;
+          var l = parsed.data.length;
+          parseNext();
+          function parseNext() {
+            if (i === l) {
+              resolve(db);
+              return;
             }
-        }, {
-            key: 'similaritySearch',
-            value: function similaritySearch(query, limit) {
-                var queryIndex = query.getIndex();
-
-                var queryMW = getMW(query);
-                var queryIDCode = query.getIDCode();
-
-                var searchResult = new Array(this.length);
-                var similarity = void 0;
-                for (var i = 0; i < this.length; i++) {
-                    if (this.molecules[i].idcode === queryIDCode) {
-                        similarity = 1e10;
-                    } else {
-                        similarity = OCL.SSSearcherWithIndex.getSimilarityTanimoto(queryIndex, this.molecules[i].index) * 100000 - Math.abs(queryMW - this.molecules[i].mw) / 1000;
-                    }
-                    searchResult[i] = [similarity, i];
-                }
-                searchResult.sort(function (a, b) {
-                    return b[0] - a[0];
-                });
-
-                var length = Math.min(limit || searchResult.length, searchResult.length);
-                var result = new MoleculeDB({ length: length });
-                for (var _i2 = 0; _i2 < length; _i2++) {
-                    result.push(this.molecules[searchResult[_i2][1]], this.data[searchResult[_i2][1]]);
-                }
-                return result;
+            try {
+              db.push(datatype(parsed.data[i][datafield]), parsed.data[i]);
+            } catch (e) {
+              reject(e);
+              return;
             }
-        }, {
-            key: 'getSearcher',
-            value: function getSearcher() {
-                return this.searcher || (this.searcher = new OCL.SSSearcherWithIndex());
-            }
-        }], [{
-            key: 'parseSDF',
-            value: function parseSDF(sdf, options) {
-                if (typeof sdf !== 'string') {
-                    throw new TypeError('sdf must be a string');
-                }
-                options = Object.assign({}, defaultSDFOptions, options);
-                return new Promise(function (resolve, reject) {
-                    var parsed = _parseSDF(sdf);
-                    var molecules = parsed.molecules;
-                    var db = new MoleculeDB(options);
-                    db.statistics = parsed.statistics;
-                    var i = 0;
-                    var l = molecules.length;
-                    parseNext();
-                    function parseNext() {
-                        if (i === l) {
-                            resolve(db);
-                            return;
-                        }
-                        try {
-                            db.push(Molecule.fromMolfile(molecules[i].molfile), molecules[i]);
-                        } catch (e) {
-                            reject(e);
-                            return;
-                        }
-                        options.onStep(++i, l);
-                        setImmediate(parseNext);
-                    }
-                });
-            }
-        }, {
-            key: 'parseCSV',
-            value: function parseCSV(csv, options) {
-                if (typeof csv !== 'string') {
-                    throw new TypeError('csv must be a string');
-                }
-                options = Object.assign({}, defaultCSVOptions, options);
-                return new Promise(function (resolve, reject) {
-                    var parsed = Papa.parse(csv, options);
-                    var fields = parsed.meta.fields;
-                    var stats = new Array(fields.length);
-                    var firstElement = parsed.data[0];
-                    var datatype = void 0,
-                        datafield = void 0;
-                    for (var _i3 = 0; _i3 < fields.length; _i3++) {
-                        stats[_i3] = {
-                            label: fields[_i3],
-                            isNumeric: typeof firstElement[fields[_i3]] === 'number'
-                        };
-                        var lowerField = fields[_i3].toLowerCase();
-                        if (moleculeCreators.has(lowerField)) {
-                            datatype = moleculeCreators.get(lowerField);
-                            datafield = fields[_i3];
-                        }
-                    }
-                    if (!datatype) {
-                        throw new Error('this document does not contain any molecule field');
-                    }
-                    var db = new MoleculeDB(options);
-                    db.statistics = stats;
-
-                    var i = 0;
-                    var l = parsed.data.length;
-                    parseNext();
-                    function parseNext() {
-                        if (i === l) {
-                            resolve(db);
-                            return;
-                        }
-                        try {
-                            db.push(datatype(parsed.data[i][datafield]), parsed.data[i]);
-                        } catch (e) {
-                            reject(e);
-                            return;
-                        }
-                        options.onStep(++i, l);
-                        setImmediate(parseNext);
-                    }
-                });
-            }
-        }]);
-
-        return MoleculeDB;
-    }();
+            options.onStep(++i, l);
+            setImmediate(parseNext);
+          }
+        });
+      }
+    }]);
 
     return MoleculeDB;
+  }();
+
+  return MoleculeDB;
 };
 
 function getMW(query) {
-    var copy = query.getCompactCopy();
-    copy.setFragment(false);
-    return copy.getMolecularFormula().relativeWeight;
+  var copy = query.getCompactCopy();
+  copy.setFragment(false);
+  return copy.getMolecularFormula().relativeWeight;
 }
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18).setImmediate))
 
@@ -4931,7 +4934,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 /*!
 	Papa Parse
-	v4.3.6
+	v4.3.7
 	https://github.com/mholt/PapaParse
 	License: MIT
 */
@@ -5492,7 +5495,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		};
 
 		this._chunkError = function () {
-			this._sendError(reader.error);
+			this._sendError(reader.error.message);
 		};
 	}
 	FileStreamer.prototype = Object.create(ChunkStreamer.prototype);
@@ -5843,7 +5846,12 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		var step = config.step;
 		var preview = config.preview;
 		var fastMode = config.fastMode;
-		var quoteChar = config.quoteChar || '"';
+		/** Allows for no quoteChar by setting quoteChar to undefined in config */
+		if (config.quoteChar === undefined) {
+			var quoteChar = '"';
+		} else {
+			var quoteChar = config.quoteChar;
+		}
 
 		// Delimiter must be valid
 		if (typeof delim !== 'string' || Papa.BAD_DELIMITERS.indexOf(delim) > -1) delim = ',';
@@ -6210,14 +6218,14 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 module.exports = function (Molecule) {
-    var fields = new Map();
+  var fields = new Map();
 
-    fields.set('oclid', Molecule.fromIDCode);
-    fields.set('idcode', Molecule.fromIDCode);
-    fields.set('smiles', Molecule.fromSmiles);
-    fields.set('molfile', Molecule.fromMolfile);
+  fields.set('oclid', Molecule.fromIDCode);
+  fields.set('idcode', Molecule.fromIDCode);
+  fields.set('smiles', Molecule.fromSmiles);
+  fields.set('molfile', Molecule.fromMolfile);
 
-    return fields;
+  return fields;
 };
 
 /***/ }),
@@ -6230,72 +6238,72 @@ module.exports = function (Molecule) {
 var parseRXN = __webpack_require__(23);
 
 module.exports = function (OCL) {
-    function RXN(rxn) {
-        if (!rxn) {
-            this.reagents = [];
-            this.products = [];
-        } else {
-            var parsed = parseRXN(rxn);
-            this.reagents = generateInfo(parsed.reagents);
-            this.products = generateInfo(parsed.products);
-        }
+  function RXN(rxn) {
+    if (!rxn) {
+      this.reagents = [];
+      this.products = [];
+    } else {
+      var parsed = parseRXN(rxn);
+      this.reagents = generateInfo(parsed.reagents);
+      this.products = generateInfo(parsed.products);
     }
+  }
 
-    RXN.prototype.addReagent = function (molfile) {
-        this.reagents.push(getMolfileInfo(molfile));
+  RXN.prototype.addReagent = function (molfile) {
+    this.reagents.push(getMolfileInfo(molfile));
+  };
+
+  RXN.prototype.addProduct = function (molfile) {
+    this.products.push(getMolfileInfo(molfile));
+  };
+
+  RXN.prototype.toRXN = function () {
+    var result = [];
+    result.push('$RXN');
+    result.push('');
+    result.push('');
+    result.push('Openchemlib');
+    result.push(format3(this.reagents.length) + format3(this.products.length));
+    for (var i = 0; i < this.reagents.length; i++) {
+      result.push('$MOL');
+      result.push(getMolfile(this.reagents[i].molfile));
+    }
+    for (var _i = 0; _i < this.products.length; _i++) {
+      result.push('$MOL');
+      result.push(getMolfile(this.products[_i].molfile));
+    }
+    return result.join('\n');
+  };
+
+  function getMolfile(molfile) {
+    var lines = ~molfile.indexOf('\r\n') ? molfile.split('\r\n') : molfile.split(/[\r\n]/);
+    return lines.join('\n');
+  }
+
+  function format3(number) {
+    var length = `${number}`.length;
+    return '   '.substring(0, 3 - length) + number;
+  }
+
+  function generateInfo(molecules) {
+    for (var i = 0; i < molecules.length; i++) {
+      molecules[i] = getMolfileInfo(molecules[i]);
+    }
+    return molecules;
+  }
+
+  function getMolfileInfo(molfile) {
+    var ocl = OCL.Molecule.fromMolfile(molfile);
+    return {
+      molfile: molfile,
+      smiles: ocl.toSmiles(),
+      mf: ocl.getMolecularFormula().formula,
+      mw: ocl.getMolecularFormula().relativeWeight,
+      idCode: ocl.getIDCode
     };
+  }
 
-    RXN.prototype.addProduct = function (molfile) {
-        this.products.push(getMolfileInfo(molfile));
-    };
-
-    RXN.prototype.toRXN = function () {
-        var result = [];
-        result.push('$RXN');
-        result.push('');
-        result.push('');
-        result.push('Openchemlib');
-        result.push(format3(this.reagents.length) + format3(this.products.length));
-        for (var i = 0; i < this.reagents.length; i++) {
-            result.push('$MOL');
-            result.push(getMolfile(this.reagents[i].molfile));
-        }
-        for (var _i = 0; _i < this.products.length; _i++) {
-            result.push('$MOL');
-            result.push(getMolfile(this.products[_i].molfile));
-        }
-        return result.join('\n');
-    };
-
-    function getMolfile(molfile) {
-        var lines = ~molfile.indexOf('\r\n') ? molfile.split('\r\n') : molfile.split(/[\r\n]/);
-        return lines.join('\n');
-    }
-
-    function format3(number) {
-        var length = (number + '').length;
-        return '   '.substring(0, 3 - length) + number;
-    }
-
-    function generateInfo(molecules) {
-        for (var i = 0; i < molecules.length; i++) {
-            molecules[i] = getMolfileInfo(molecules[i]);
-        }
-        return molecules;
-    }
-
-    function getMolfileInfo(molfile) {
-        var ocl = OCL.Molecule.fromMolfile(molfile);
-        return {
-            molfile: molfile,
-            smiles: ocl.toSmiles(),
-            mf: ocl.getMolecularFormula().formula,
-            mw: ocl.getMolecularFormula().relativeWeight,
-            idCode: ocl.getIDCode
-        };
-    }
-
-    return RXN;
+  return RXN;
 };
 
 /***/ }),
@@ -6367,58 +6375,58 @@ var floydWarshall = __webpack_require__(7);
 var Matrix = __webpack_require__(3);
 
 module.exports = function getAllPaths() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-    var fromLabel = options.fromLabel || '';
-    var toLabel = options.toLabel || '';
-    var minLength = options.minLength === undefined ? 1 : options.minLength;
-    var maxLength = options.maxLength === undefined ? 4 : options.maxLength;
+  var fromLabel = options.fromLabel || '';
+  var toLabel = options.toLabel || '';
+  var minLength = options.minLength === undefined ? 1 : options.minLength;
+  var maxLength = options.maxLength === undefined ? 4 : options.maxLength;
 
-    // we need to find all the atoms 'fromLabel' and 'toLabel'
-    var results = {};
-    var diaIDs = this.getDiastereotopicAtomIDs();
+  // we need to find all the atoms 'fromLabel' and 'toLabel'
+  var results = {};
+  var diaIDs = this.getDiastereotopicAtomIDs();
 
-    var connectivityMatrix = this.getConnectivityMatrix();
-    // TODO have a package that allows to convert the connectivityMatrix to a distanceMatrix
-    var pathLengthMatrix = floydWarshall(new Matrix(connectivityMatrix));
+  var connectivityMatrix = this.getConnectivityMatrix();
+  // TODO have a package that allows to convert the connectivityMatrix to a distanceMatrix
+  var pathLengthMatrix = floydWarshall(new Matrix(connectivityMatrix));
 
-    for (var from = 0; from < this.getAllAtoms(); from++) {
-        for (var to = 0; to < this.getAllAtoms(); to++) {
-            if (!fromLabel || this.getAtomLabel(from) === fromLabel) {
-                if (!toLabel || this.getAtomLabel(to) === toLabel) {
-                    var key = diaIDs[from] + '_' + diaIDs[to];
-                    var pathLength = pathLengthMatrix[from][to];
-                    if (pathLength >= minLength && pathLength <= maxLength) {
-                        if (!results[key]) {
-                            results[key] = {
-                                fromDiaID: diaIDs[from],
-                                toDiaID: diaIDs[to],
-                                fromAtoms: [],
-                                toAtoms: [],
-                                fromLabel: this.getAtomLabel(from),
-                                toLabel: this.getAtomLabel(to),
-                                pathLength: pathLength
-                            };
-                        }
-                        if (results[key].fromAtoms.indexOf(from) === -1) results[key].fromAtoms.push(from);
-                        if (results[key].toAtoms.indexOf(to) === -1) results[key].toAtoms.push(to);
-                    }
-                }
+  for (var from = 0; from < this.getAllAtoms(); from++) {
+    for (var to = 0; to < this.getAllAtoms(); to++) {
+      if (!fromLabel || this.getAtomLabel(from) === fromLabel) {
+        if (!toLabel || this.getAtomLabel(to) === toLabel) {
+          var key = `${diaIDs[from]}_${diaIDs[to]}`;
+          var pathLength = pathLengthMatrix[from][to];
+          if (pathLength >= minLength && pathLength <= maxLength) {
+            if (!results[key]) {
+              results[key] = {
+                fromDiaID: diaIDs[from],
+                toDiaID: diaIDs[to],
+                fromAtoms: [],
+                toAtoms: [],
+                fromLabel: this.getAtomLabel(from),
+                toLabel: this.getAtomLabel(to),
+                pathLength: pathLength
+              };
             }
+            if (results[key].fromAtoms.indexOf(from) === -1) results[key].fromAtoms.push(from);
+            if (results[key].toAtoms.indexOf(to) === -1) results[key].toAtoms.push(to);
+          }
         }
+      }
     }
+  }
 
-    var finalResults = [];
-    for (var _key in results) {
-        results[_key].fromAtoms.sort(function (a, b) {
-            return a - b;
-        });
-        results[_key].toAtoms.sort(function (a, b) {
-            return a - b;
-        });
-        finalResults.push(results[_key]);
-    }
-    return finalResults;
+  var finalResults = [];
+  for (var _key in results) {
+    results[_key].fromAtoms.sort(function (a, b) {
+      return a - b;
+    });
+    results[_key].toAtoms.sort(function (a, b) {
+      return a - b;
+    });
+    finalResults.push(results[_key]);
+  }
+  return finalResults;
 };
 
 /***/ }),
@@ -9077,38 +9085,38 @@ module.exports = CholeskyDecomposition;
 var functionIndex = __webpack_require__(43);
 
 module.exports = function getFunctions() {
-    var currentFunctionCodes = this.getFunctionCodes();
-    var currentFunctions = [];
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
+  var currentFunctionCodes = this.getFunctionCodes();
+  var currentFunctions = [];
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
 
-    try {
-        for (var _iterator = currentFunctionCodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var fragment = _step.value;
+  try {
+    for (var _iterator = currentFunctionCodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var fragment = _step.value;
 
-            if (functionIndex[fragment.idCode]) {
-                var currentFunction = JSON.parse(JSON.stringify(functionIndex[fragment.idCode]));
-                currentFunction.atomMap = fragment.atomMap;
-                currentFunctions.push(currentFunction);
-            }
-        }
-    } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-    } finally {
-        try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-                _iterator.return();
-            }
-        } finally {
-            if (_didIteratorError) {
-                throw _iteratorError;
-            }
-        }
+      if (functionIndex[fragment.idCode]) {
+        var currentFunction = JSON.parse(JSON.stringify(functionIndex[fragment.idCode]));
+        currentFunction.atomMap = fragment.atomMap;
+        currentFunctions.push(currentFunction);
+      }
     }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
 
-    return currentFunctions;
+  return currentFunctions;
 };
 
 /***/ }),
@@ -9119,64 +9127,65 @@ module.exports = function getFunctions() {
 /* eslint-disable quote-props */
 
 
+
 module.exports = {
-    'gJQLBEeKNVTfjh@': {
-        name: 'tertiary alcohol'
-    },
-    'eF@HxP': {
-        name: 'alkyne'
-    },
-    'eF@HhP': {
-        name: 'alkene'
-    },
-    'eM`BN`p`': {
-        name: 'secondary amine'
-    },
-    'gC``@deZ@~d\\': {
-        name: 'ester'
-    },
-    'eMHBN``': {
-        name: 'ether'
-    },
-    'gC``Adij@pf}IX': {
-        name: 'hemiacetal'
-    },
-    'gJP`AdizhCzRp': {
-        name: 'acetal'
-    },
-    'gCh@AGj@`': {
-        name: 'tertiary amine'
-    },
-    'gJP`AdizhCzQp': {
-        name: 'cetal'
-    },
-    'gJP`AdizhCzSP': {
-        name: 'acetal'
-    },
-    'gJY@DDefhCzQp': {
-        name: 'tertiary amide'
-    },
-    'eMJDVTfP@': {
-        name: 'aldehyde'
-    },
-    'gCaDLEeKJST`@': {
-        name: 'ketone'
-    },
-    'eF`BLFD@': {
-        name: 'primary amine'
-    },
-    'eFHBLFD@': {
-        name: ''
-    },
-    'eMJDVTf`@': {
-        name: 'primary alcohol'
-    },
-    'gCaDLEeKJSU@@': {
-        name: 'secondary alcohol'
-    },
-    'eMDARVCB_Tx': {
-        name: 'carboxylic acid'
-    }
+  'gJQLBEeKNVTfjh@': {
+    name: 'tertiary alcohol'
+  },
+  'eF@HxP': {
+    name: 'alkyne'
+  },
+  'eF@HhP': {
+    name: 'alkene'
+  },
+  'eM`BN`p`': {
+    name: 'secondary amine'
+  },
+  'gC``@deZ@~d\\': {
+    name: 'ester'
+  },
+  'eMHBN``': {
+    name: 'ether'
+  },
+  'gC``Adij@pf}IX': {
+    name: 'hemiacetal'
+  },
+  'gJP`AdizhCzRp': {
+    name: 'acetal'
+  },
+  'gCh@AGj@`': {
+    name: 'tertiary amine'
+  },
+  'gJP`AdizhCzQp': {
+    name: 'cetal'
+  },
+  'gJP`AdizhCzSP': {
+    name: 'acetal'
+  },
+  'gJY@DDefhCzQp': {
+    name: 'tertiary amide'
+  },
+  'eMJDVTfP@': {
+    name: 'aldehyde'
+  },
+  'gCaDLEeKJST`@': {
+    name: 'ketone'
+  },
+  'eF`BLFD@': {
+    name: 'primary amine'
+  },
+  'eFHBLFD@': {
+    name: ''
+  },
+  'eMJDVTf`@': {
+    name: 'primary alcohol'
+  },
+  'gCaDLEeKJSU@@': {
+    name: 'secondary alcohol'
+  },
+  'eMDARVCB_Tx': {
+    name: 'carboxylic acid'
+  }
 };
 
 /***/ }),
@@ -9187,58 +9196,58 @@ module.exports = {
 
 
 module.exports = function getGroupedDiastereotopicAtomIDs() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-    var label = options.atomLabel;
+  var label = options.atomLabel;
 
-    var diaIDs = this.getDiastereotopicAtomIDs(options);
-    var diaIDsObject = {};
+  var diaIDs = this.getDiastereotopicAtomIDs(options);
+  var diaIDsObject = {};
 
-    for (var i = 0; i < diaIDs.length; i++) {
-        if (!label || this.getAtomLabel(i) === label) {
-            var diaID = diaIDs[i];
-            if (!diaIDsObject[diaID]) {
-                diaIDsObject[diaID] = {
-                    counter: 1,
-                    atoms: [i],
-                    oclID: diaID,
-                    atomLabel: this.getAtomLabel(i),
-                    _highlight: [diaID]
-                };
-            } else {
-                diaIDsObject[diaID].counter++;
-                diaIDsObject[diaID].atoms.push(i);
-            }
-        }
+  for (var i = 0; i < diaIDs.length; i++) {
+    if (!label || this.getAtomLabel(i) === label) {
+      var diaID = diaIDs[i];
+      if (!diaIDsObject[diaID]) {
+        diaIDsObject[diaID] = {
+          counter: 1,
+          atoms: [i],
+          oclID: diaID,
+          atomLabel: this.getAtomLabel(i),
+          _highlight: [diaID]
+        };
+      } else {
+        diaIDsObject[diaID].counter++;
+        diaIDsObject[diaID].atoms.push(i);
+      }
     }
+  }
 
-    var diaIDsTable = [];
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
+  var diaIDsTable = [];
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
 
+  try {
+    for (var _iterator = Object.keys(diaIDsObject)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var key = _step.value;
+
+      diaIDsTable.push(diaIDsObject[key]);
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
     try {
-        for (var _iterator = Object.keys(diaIDsObject)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var key = _step.value;
-
-            diaIDsTable.push(diaIDsObject[key]);
-        }
-    } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
     } finally {
-        try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-                _iterator.return();
-            }
-        } finally {
-            if (_didIteratorError) {
-                throw _iteratorError;
-            }
-        }
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
     }
+  }
 
-    return diaIDsTable;
+  return diaIDsTable;
 };
 
 /***/ }),
@@ -9254,173 +9263,173 @@ module.exports = function getGroupedDiastereotopicAtomIDs() {
  */
 
 module.exports = function getMF() {
-    var entries = this.getFragments();
-    var result = {};
-    var parts = [];
-    var allAtoms = [];
-    entries.forEach(function (entry) {
-        var mf = getFragmentMF(entry);
-        parts.push(mf);
+  var entries = this.getFragments();
+  var result = {};
+  var parts = [];
+  var allAtoms = [];
+  entries.forEach(function (entry) {
+    var mf = getFragmentMF(entry);
+    parts.push(mf);
+  });
+
+  var counts = {};
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = parts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var part = _step.value;
+
+      if (!counts[part]) counts[part] = 0;
+      counts[part]++;
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
+  parts = [];
+  var _iteratorNormalCompletion2 = true;
+  var _didIteratorError2 = false;
+  var _iteratorError2 = undefined;
+
+  try {
+    for (var _iterator2 = Object.keys(counts).sort()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      var key = _step2.value;
+
+      if (counts[key] > 1) {
+        parts.push(counts[key] + key);
+      } else {
+        parts.push(key);
+      }
+    }
+  } catch (err) {
+    _didIteratorError2 = true;
+    _iteratorError2 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion2 && _iterator2.return) {
+        _iterator2.return();
+      }
+    } finally {
+      if (_didIteratorError2) {
+        throw _iteratorError2;
+      }
+    }
+  }
+
+  result.parts = parts;
+  result.mf = getMF(allAtoms);
+  return result;
+
+  function getFragmentMF(molecule) {
+    var atoms = [];
+    for (var i = 0; i < molecule.getAllAtoms(); i++) {
+      var atom = {};
+      atom.charge = molecule.getAtomCharge(i);
+      atom.label = molecule.getAtomLabel(i);
+      atom.mass = molecule.getAtomMass(i);
+      atom.implicitHydrogens = molecule.getImplicitHydrogens(i);
+      atoms.push(atom);
+      allAtoms.push(atom);
+    }
+    return getMF(atoms);
+  }
+
+  function getMF(atoms) {
+    var charge = 0;
+    var mfs = {};
+    var _iteratorNormalCompletion3 = true;
+    var _didIteratorError3 = false;
+    var _iteratorError3 = undefined;
+
+    try {
+      for (var _iterator3 = atoms[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+        var atom = _step3.value;
+
+        var label = atom.label;
+        charge += atom.charge;
+        if (atom.mass) {
+          label = `[${atom.mass}${label}]`;
+        }
+        var mfAtom = mfs[label];
+        if (!mfAtom) {
+          mfs[label] = 0;
+        }
+        mfs[label] += 1;
+        if (atom.implicitHydrogens) {
+          if (!mfs.H) mfs.H = 0;
+          mfs.H += atom.implicitHydrogens;
+        }
+      }
+    } catch (err) {
+      _didIteratorError3 = true;
+      _iteratorError3 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+          _iterator3.return();
+        }
+      } finally {
+        if (_didIteratorError3) {
+          throw _iteratorError3;
+        }
+      }
+    }
+
+    var mf = '';
+    var keys = Object.keys(mfs).sort(function (a, b) {
+      if (a === 'C') return -1;
+      if (b === 'C') return 1;
+      if (a === 'H' && b !== 'C') return -1;
+      if (a !== 'C' && b === 'H') return 1;
+      if (a < b) return -1;
+      return 1;
     });
-
-    var counts = {};
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
+    var _iteratorNormalCompletion4 = true;
+    var _didIteratorError4 = false;
+    var _iteratorError4 = undefined;
 
     try {
-        for (var _iterator = parts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var part = _step.value;
+      for (var _iterator4 = keys[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+        var key = _step4.value;
 
-            if (!counts[part]) counts[part] = 0;
-            counts[part]++;
-        }
+        mf += key;
+        if (mfs[key] > 1) mf += mfs[key];
+      }
     } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
+      _didIteratorError4 = true;
+      _iteratorError4 = err;
     } finally {
-        try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-                _iterator.return();
-            }
-        } finally {
-            if (_didIteratorError) {
-                throw _iteratorError;
-            }
+      try {
+        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+          _iterator4.return();
         }
+      } finally {
+        if (_didIteratorError4) {
+          throw _iteratorError4;
+        }
+      }
     }
 
-    parts = [];
-    var _iteratorNormalCompletion2 = true;
-    var _didIteratorError2 = false;
-    var _iteratorError2 = undefined;
-
-    try {
-        for (var _iterator2 = Object.keys(counts).sort()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var key = _step2.value;
-
-            if (counts[key] > 1) {
-                parts.push(counts[key] + key);
-            } else {
-                parts.push(key);
-            }
-        }
-    } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-    } finally {
-        try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                _iterator2.return();
-            }
-        } finally {
-            if (_didIteratorError2) {
-                throw _iteratorError2;
-            }
-        }
+    if (charge > 0) {
+      mf += `(+${charge > 1 ? charge : ''})`;
+    } else if (charge < 0) {
+      mf += `(${charge < -1 ? charge : '-'})`;
     }
-
-    result.parts = parts;
-    result.mf = getMF(allAtoms);
-    return result;
-
-    function getFragmentMF(molecule) {
-        var atoms = [];
-        for (var i = 0; i < molecule.getAllAtoms(); i++) {
-            var atom = {};
-            atom.charge = molecule.getAtomCharge(i);
-            atom.label = molecule.getAtomLabel(i);
-            atom.mass = molecule.getAtomMass(i);
-            atom.implicitHydrogens = molecule.getImplicitHydrogens(i);
-            atoms.push(atom);
-            allAtoms.push(atom);
-        }
-        return getMF(atoms);
-    }
-
-    function getMF(atoms) {
-        var charge = 0;
-        var mfs = {};
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
-
-        try {
-            for (var _iterator3 = atoms[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                var atom = _step3.value;
-
-                var label = atom.label;
-                charge += atom.charge;
-                if (atom.mass) {
-                    label = '[' + atom.mass + label + ']';
-                }
-                var mfAtom = mfs[label];
-                if (!mfAtom) {
-                    mfs[label] = 0;
-                }
-                mfs[label] += 1;
-                if (atom.implicitHydrogens) {
-                    if (!mfs.H) mfs.H = 0;
-                    mfs.H += atom.implicitHydrogens;
-                }
-            }
-        } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
-        } finally {
-            try {
-                if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                    _iterator3.return();
-                }
-            } finally {
-                if (_didIteratorError3) {
-                    throw _iteratorError3;
-                }
-            }
-        }
-
-        var mf = '';
-        var keys = Object.keys(mfs).sort(function (a, b) {
-            if (a === 'C') return -1;
-            if (b === 'C') return 1;
-            if (a === 'H' && b !== 'C') return -1;
-            if (a !== 'C' && b === 'H') return 1;
-            if (a < b) return -1;
-            return 1;
-        });
-        var _iteratorNormalCompletion4 = true;
-        var _didIteratorError4 = false;
-        var _iteratorError4 = undefined;
-
-        try {
-            for (var _iterator4 = keys[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                var key = _step4.value;
-
-                mf += key;
-                if (mfs[key] > 1) mf += mfs[key];
-            }
-        } catch (err) {
-            _didIteratorError4 = true;
-            _iteratorError4 = err;
-        } finally {
-            try {
-                if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                    _iterator4.return();
-                }
-            } finally {
-                if (_didIteratorError4) {
-                    throw _iteratorError4;
-                }
-            }
-        }
-
-        if (charge > 0) {
-            mf += '(+' + (charge > 1 ? charge : '') + ')';
-        } else if (charge < 0) {
-            mf += '(' + (charge < -1 ? charge : '-') + ')';
-        }
-        return mf;
-    }
+    return mf;
+  }
 };
 
 /***/ }),
@@ -9434,447 +9443,447 @@ var electronegativities = __webpack_require__(47);
 var fragments = __webpack_require__(48);
 
 module.exports = function getAllCouplings() {
-    var molecule = this.getCompactCopy();
-    var diaIDs = molecule.getDiastereotopicAtomIDs();
-    var matchFragments = molecule.getFragments();
-    var fragmentsId = {};
-    var couplings = [];
-    for (var i = 0; i < molecule.getAllAtoms(); i++) {
-        if (molecule.getAtomLabel(i) === 'H') {
-            for (var j = i + 1; j < molecule.getAllAtoms(); j++) {
-                if (molecule.getAtomLabel(j) === 'H') {
-                    if (!isAttachedToHeteroAtom(molecule, i) && !isAttachedToHeteroAtom(molecule, j)) {
-                        if (!(diaIDs[i].toLowerCase() === diaIDs[j].toLowerCase())) {
-                            var atoms = [];
-                            var xyz = []; //TODO
-                            getPath(molecule, i, i, j, 0, atoms, xyz);
-                            if (atoms.length !== 0) {
-                                var fragmentId = -1;
-                                var coupling = {};
-                                coupling.atoms = atoms;
-                                coupling.xyz = xyz;
-                                coupling.fromDiaID = diaIDs[j];
-                                coupling.toDiaID = diaIDs[i];
-                                if (matchFragments !== null) {
-                                    fragmentId = couplingBelongToFragment(atoms, matchFragments);
-                                    coupling.fragmentId = fragmentId;
-                                }
-                                if (calculatedCoupling(molecule, coupling, fragmentsId, matchFragments)) {
-                                    couplings.push(coupling);
-                                }
-                            }
-                        }
-                    }
+  var molecule = this.getCompactCopy();
+  var diaIDs = molecule.getDiastereotopicAtomIDs();
+  var matchFragments = molecule.getFragments();
+  var fragmentsId = {};
+  var couplings = [];
+  for (var i = 0; i < molecule.getAllAtoms(); i++) {
+    if (molecule.getAtomLabel(i) === 'H') {
+      for (var j = i + 1; j < molecule.getAllAtoms(); j++) {
+        if (molecule.getAtomLabel(j) === 'H') {
+          if (!isAttachedToHeteroAtom(molecule, i) && !isAttachedToHeteroAtom(molecule, j)) {
+            if (!(diaIDs[i].toLowerCase() === diaIDs[j].toLowerCase())) {
+              var atoms = [];
+              var xyz = []; // TODO
+              getPath(molecule, i, i, j, 0, atoms, xyz);
+              if (atoms.length !== 0) {
+                var fragmentId = -1;
+                var coupling = {};
+                coupling.atoms = atoms;
+                coupling.xyz = xyz;
+                coupling.fromDiaID = diaIDs[j];
+                coupling.toDiaID = diaIDs[i];
+                if (matchFragments !== null) {
+                  fragmentId = couplingBelongToFragment(atoms, matchFragments);
+                  coupling.fragmentId = fragmentId;
                 }
+                if (calculatedCoupling(molecule, coupling, fragmentsId, matchFragments)) {
+                  couplings.push(coupling);
+                }
+              }
             }
+          }
         }
+      }
     }
-    return couplings;
+  }
+  return couplings;
 };
 
 function getPath(molecule, parent, idInit, idEnd, pathLength, atoms, xyz) {
-    if (pathLength > 3) {
-        return;
-    }
-    var nbConnectedAtoms = molecule.getAllConnAtoms(idInit);
-    for (var i = 0; i < nbConnectedAtoms; i++) {
-        if (molecule.getConnAtom(idInit, i) === idEnd) {
-            var coordinates = new Array(3);
-            coordinates[0] = molecule.getAtomX(idEnd);
-            coordinates[1] = molecule.getAtomY(idEnd);
-            coordinates[2] = molecule.getAtomZ(idEnd);
-            atoms.push(idEnd);
-            xyz.push(coordinates);
+  if (pathLength > 3) {
+    return;
+  }
+  var nbConnectedAtoms = molecule.getAllConnAtoms(idInit);
+  for (var i = 0; i < nbConnectedAtoms; i++) {
+    if (molecule.getConnAtom(idInit, i) === idEnd) {
+      var coordinates = new Array(3);
+      coordinates[0] = molecule.getAtomX(idEnd);
+      coordinates[1] = molecule.getAtomY(idEnd);
+      coordinates[2] = molecule.getAtomZ(idEnd);
+      atoms.push(idEnd);
+      xyz.push(coordinates);
 
-            coordinates = new Array(3);
-            coordinates[0] = molecule.getAtomX(idInit);
-            coordinates[1] = molecule.getAtomY(idInit);
-            coordinates[2] = molecule.getAtomZ(idInit);
-            atoms.push(idInit);
-            xyz.push(coordinates);
-            pathLength++;
-            return;
-        }
+      coordinates = new Array(3);
+      coordinates[0] = molecule.getAtomX(idInit);
+      coordinates[1] = molecule.getAtomY(idInit);
+      coordinates[2] = molecule.getAtomZ(idInit);
+      atoms.push(idInit);
+      xyz.push(coordinates);
+      pathLength++;
+      return;
     }
+  }
 
-    pathLength++;
+  pathLength++;
 
-    for (var _i = 0; _i < nbConnectedAtoms; _i++) {
-        var connectivityAtom = molecule.getConnAtom(idInit, _i);
-        if (connectivityAtom !== parent) {
-            getPath(molecule, idInit, connectivityAtom, idEnd, pathLength, atoms, xyz);
-            if (atoms.length !== 0) {
-                coordinates = new Array(3);
-                coordinates[0] = molecule.getAtomX(idInit);
-                coordinates[1] = molecule.getAtomY(idInit);
-                coordinates[2] = molecule.getAtomZ(idInit);
-                atoms.push(idInit);
-                xyz.push(coordinates);
-                break;
-            }
-        }
+  for (var _i = 0; _i < nbConnectedAtoms; _i++) {
+    var connectivityAtom = molecule.getConnAtom(idInit, _i);
+    if (connectivityAtom !== parent) {
+      getPath(molecule, idInit, connectivityAtom, idEnd, pathLength, atoms, xyz);
+      if (atoms.length !== 0) {
+        coordinates = new Array(3);
+        coordinates[0] = molecule.getAtomX(idInit);
+        coordinates[1] = molecule.getAtomY(idInit);
+        coordinates[2] = molecule.getAtomZ(idInit);
+        atoms.push(idInit);
+        xyz.push(coordinates);
+        break;
+      }
     }
+  }
 }
 
 function couplingBelongToFragment(atoms, matchFragments) {
-    var match;
-    var result = -1;
-    var index = atoms.length - 1;
-    for (var i = 0; i < matchFragments.length; i++) {
-        match = 0;
-        for (var j = 0; j < matchFragments[i].length; j++) {
-            for (var k = 1; k < index; k++) {
-                if (matchFragments[i][j] === atoms[k]) {
-                    match++;
-                }
-            }
+  var match;
+  var result = -1;
+  var index = atoms.length - 1;
+  for (var i = 0; i < matchFragments.length; i++) {
+    match = 0;
+    for (var j = 0; j < matchFragments[i].length; j++) {
+      for (var k = 1; k < index; k++) {
+        if (matchFragments[i][j] === atoms[k]) {
+          match++;
         }
-
-        if (match === atoms.length - 2) {
-            result = i;
-            i = matchFragments.length;
-        }
+      }
     }
-    return result;
+
+    if (match === atoms.length - 2) {
+      result = i;
+      i = matchFragments.length;
+    }
+  }
+  return result;
 }
 
 function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
-    var atoms = coupling.atoms;
-    var bondLength = atoms.length - 1;
-    var fragmentId = coupling.fragmentId;
-    if (fragmentId !== -1) {
-        coupling.type = 0;
-        var C1 = -1;
-        var C2 = -1;
-        var possibleCouplings = fragments[fragmentsId[fragmentId]];
+  var atoms = coupling.atoms;
+  var bondLength = atoms.length - 1;
+  var fragmentId = coupling.fragmentId;
+  if (fragmentId !== -1) {
+    coupling.type = 0;
+    var C1 = -1;
+    var C2 = -1;
+    var possibleCouplings = fragments[fragmentsId[fragmentId]];
 
-        for (var i = 0; i < matchFragments[coupling.getFragmentId()].length; i++) {
-            if (atoms[1] === matchFragments[fragmentId][i]) {
-                C1 = i;
-            }
-            if (atoms[atoms.length - 2] === matchFragments[fragmentId][i]) {
-                C2 = i;
-            }
-        }
-
-        if (C1 > C2) {
-            var _ref = [C2, C1];
-            C1 = _ref[0];
-            C2 = _ref[1];
-        }
-
-        if (possibleCouplings !== null) {
-            coupling.value = possibleCouplings[C1 + '-' + C2];
-        }
-
-        return true;
+    for (var i = 0; i < matchFragments[coupling.getFragmentId()].length; i++) {
+      if (atoms[1] === matchFragments[fragmentId][i]) {
+        C1 = i;
+      }
+      if (atoms[atoms.length - 2] === matchFragments[fragmentId][i]) {
+        C2 = i;
+      }
     }
 
-    switch (bondLength) {
-        case 2:
-            if (molecule.getAllConnAtoms(atoms[1]) < 4) {
-                coupling.type = 1; // geminal coupling of alkene
-                coupling.value = geminalCoupling();
-            } else {
-                coupling.value = 16; // generic coupling between geminal hydrogens
-            }
-            break;
-        case 3:
-            {
-                var angle, xyz, coords;
-                if (isDoubleBond(molecule, atoms[1], atoms[2])) {
-                    // coupling
-                    // through
-                    // double
-                    // bond
-                    // It have to be plain
-                    coupling.type = 2;
-                    coords = new Array(3);
-                    xyz = coupling.xyz;
-                    for (var _i2 = 0; _i2 < xyz.length; _i2++) {
-                        coords[_i2] = new Array(3);
-                        for (var j = 0; j < 3; j++) {
-                            coords[_i2][j] = xyz[_i2][j];
-                        }
-                    }
+    if (C1 > C2) {
+      var _ref = [C2, C1];
+      C1 = _ref[0];
+      C2 = _ref[1];
+    }
 
-                    angle = getDihedralAngle(coords);
-
-                    if (angle > 60) {
-                        coupling.type = 22;
-                        coupling.value = doubleBondCoupling(molecule, 2, atoms);
-                    } else {
-                        coupling.type = 21;
-                        coupling.value = doubleBondCoupling(molecule, 1, atoms);
-                    }
-                } else {
-                    var sumZ = 0;
-                    angle = 0.0;
-                    xyz = coupling.xyz;
-                    coords = new Array(3);
-
-                    for (var _i3 = 0; _i3 < xyz.length; _i3++) {
-                        coords[_i3] = new Array(3);
-                        for (var _j = 0; _j < 3; _j++) {
-                            coords[_i3][_j] = xyz[_i3][_j];
-                        }
-                        sumZ += Math.abs(coords[_i3][2]);
-                    }
-                    if (sumZ === 0 && !isDoubleOrTripleBond(molecule, atoms[1], atoms[2])) {
-                        // If
-                        // it
-                        // is
-                        // single
-                        // and
-                        // no
-                        // Z
-                        // coordinate
-                        angle = 60;
-                    } else {
-                        angle = getDihedralAngle(coords);
-                    }
-                    if (true === checkVynilicCoupling(molecule, atoms)) {
-                        coupling.type = 3;
-                        coupling.value = vinylCoupling(angle);
-                    } else {
-                        coupling.type = 4;
-                        coupling.value = jCouplingVicinal(molecule, angle, 1, atoms);
-                    }
-                }
-                coupling.angle = angle;
-                break;
-            }
-        case 4:
-            {
-                // allylic Coupling
-                coupling.type = 5;
-                if (isDoubleOrTripleBond(molecule, atoms[1], atoms[2]) && isNotAromatic(molecule, atoms[1], atoms[2])) {
-                    coupling.value = 2;
-                } else if (isDoubleOrTripleBond(molecule, atoms[2], atoms[3]) && isNotAromatic(molecule, atoms[2], atoms[3])) {
-                    coupling.value = 2;
-                } else if (isAromatic(molecule, atoms[1], atoms[2]) && isAromatic(molecule, atoms[2], atoms[3])) {
-                    coupling.value = 2;
-                } else {
-                    if (isAromatic(molecule, atoms[1], atoms[1]) && !isAromatic(molecule, atoms[2], atoms[3])) {
-                        if (isOnlyAttachedToHC(molecule, atoms[3])) {
-                            coupling.value = 1.5;
-                            return true;
-                        }
-                    } else {
-                        if (!isAromatic(molecule, atoms[1], atoms[1]) && isAromatic(molecule, atoms[2], atoms[3])) {
-                            if (isOnlyAttachedToHC(molecule, atoms[1])) {
-                                coupling.value = 1.5;
-                                return true;
-                            }
-                        }
-                    }
-                    coupling.value = 0;
-                    return false;
-                }
-                break;
-            }
-        default:
-            coupling.value = 7; // check default value
-            break;
+    if (possibleCouplings !== null) {
+      coupling.value = possibleCouplings[`${C1}-${C2}`];
     }
 
     return true;
+  }
+
+  switch (bondLength) {
+    case 2:
+      if (molecule.getAllConnAtoms(atoms[1]) < 4) {
+        coupling.type = 1; // geminal coupling of alkene
+        coupling.value = geminalCoupling();
+      } else {
+        coupling.value = 16; // generic coupling between geminal hydrogens
+      }
+      break;
+    case 3:
+      {
+        var angle, xyz, coords;
+        if (isDoubleBond(molecule, atoms[1], atoms[2])) {
+          // coupling
+          // through
+          // double
+          // bond
+          // It have to be plain
+          coupling.type = 2;
+          coords = new Array(3);
+          xyz = coupling.xyz;
+          for (var _i2 = 0; _i2 < xyz.length; _i2++) {
+            coords[_i2] = new Array(3);
+            for (var j = 0; j < 3; j++) {
+              coords[_i2][j] = xyz[_i2][j];
+            }
+          }
+
+          angle = getDihedralAngle(coords);
+
+          if (angle > 60) {
+            coupling.type = 22;
+            coupling.value = doubleBondCoupling(molecule, 2, atoms);
+          } else {
+            coupling.type = 21;
+            coupling.value = doubleBondCoupling(molecule, 1, atoms);
+          }
+        } else {
+          var sumZ = 0;
+          angle = 0.0;
+          xyz = coupling.xyz;
+          coords = new Array(3);
+
+          for (var _i3 = 0; _i3 < xyz.length; _i3++) {
+            coords[_i3] = new Array(3);
+            for (var _j = 0; _j < 3; _j++) {
+              coords[_i3][_j] = xyz[_i3][_j];
+            }
+            sumZ += Math.abs(coords[_i3][2]);
+          }
+          if (sumZ === 0 && !isDoubleOrTripleBond(molecule, atoms[1], atoms[2])) {
+            // If
+            // it
+            // is
+            // single
+            // and
+            // no
+            // Z
+            // coordinate
+            angle = 60;
+          } else {
+            angle = getDihedralAngle(coords);
+          }
+          if (checkVynilicCoupling(molecule, atoms) === true) {
+            coupling.type = 3;
+            coupling.value = vinylCoupling(angle);
+          } else {
+            coupling.type = 4;
+            coupling.value = jCouplingVicinal(molecule, angle, 1, atoms);
+          }
+        }
+        coupling.angle = angle;
+        break;
+      }
+    case 4:
+      {
+        // allylic Coupling
+        coupling.type = 5;
+        if (isDoubleOrTripleBond(molecule, atoms[1], atoms[2]) && isNotAromatic(molecule, atoms[1], atoms[2])) {
+          coupling.value = 2;
+        } else if (isDoubleOrTripleBond(molecule, atoms[2], atoms[3]) && isNotAromatic(molecule, atoms[2], atoms[3])) {
+          coupling.value = 2;
+        } else if (isAromatic(molecule, atoms[1], atoms[2]) && isAromatic(molecule, atoms[2], atoms[3])) {
+          coupling.value = 2;
+        } else {
+          if (isAromatic(molecule, atoms[1], atoms[1]) && !isAromatic(molecule, atoms[2], atoms[3])) {
+            if (isOnlyAttachedToHC(molecule, atoms[3])) {
+              coupling.value = 1.5;
+              return true;
+            }
+          } else {
+            if (!isAromatic(molecule, atoms[1], atoms[1]) && isAromatic(molecule, atoms[2], atoms[3])) {
+              if (isOnlyAttachedToHC(molecule, atoms[1])) {
+                coupling.value = 1.5;
+                return true;
+              }
+            }
+          }
+          coupling.value = 0;
+          return false;
+        }
+        break;
+      }
+    default:
+      coupling.value = 7; // check default value
+      break;
+  }
+
+  return true;
 }
 
 function getDihedralAngle(xyz) {
-    /*
+  /*
      * double sum=0; //Check if we have the Z coordinate for (int
      * i=0;i<xyz.length;i++) sum+=Math.abs(xyz[i][2]); if(sum==0) return 60;
      */
-    var cosAng, P, Q;
-    var distances = new Array(6);
-    var Sdistances = new Array(6);
-    var k = 0;
+  var cosAng, P, Q;
+  var distances = new Array(6);
+  var Sdistances = new Array(6);
+  var k = 0;
 
-    for (var i = 0; i < xyz.length; i++) {
-        for (var j = i + 1; j < xyz.length; j++) {
-            Sdistances[k] = (xyz[i][0] - xyz[j][0]) * (xyz[i][0] - xyz[j][0]) + (xyz[i][1] - xyz[j][1]) * (xyz[i][1] - xyz[j][1]) + (xyz[i][2] - xyz[j][2]) * (xyz[i][2] - xyz[j][2]);
-            distances[k] = Math.sqrt(Sdistances[k]);
-            k++;
-        }
+  for (var i = 0; i < xyz.length; i++) {
+    for (var j = i + 1; j < xyz.length; j++) {
+      Sdistances[k] = (xyz[i][0] - xyz[j][0]) * (xyz[i][0] - xyz[j][0]) + (xyz[i][1] - xyz[j][1]) * (xyz[i][1] - xyz[j][1]) + (xyz[i][2] - xyz[j][2]) * (xyz[i][2] - xyz[j][2]);
+      distances[k] = Math.sqrt(Sdistances[k]);
+      k++;
     }
+  }
 
-    P = Sdistances[0] * (Sdistances[3] + Sdistances[5] - Sdistances[4]) + Sdistances[3] * (-Sdistances[3] + Sdistances[5] + Sdistances[4]) + Sdistances[1] * (Sdistances[3] - Sdistances[5] + Sdistances[4]) - 2 * Sdistances[3] * Sdistances[2];
+  P = Sdistances[0] * (Sdistances[3] + Sdistances[5] - Sdistances[4]) + Sdistances[3] * (-Sdistances[3] + Sdistances[5] + Sdistances[4]) + Sdistances[1] * (Sdistances[3] - Sdistances[5] + Sdistances[4]) - 2 * Sdistances[3] * Sdistances[2];
 
-    Q = (distances[0] + distances[3] + distances[1]) * (distances[0] + distances[3] - distances[1]) * (distances[0] - distances[3] + distances[1]) * (-distances[0] + distances[3] + distances[1]) * (distances[3] + distances[5] + distances[4]) * (distances[3] + distances[5] - distances[4]) * (distances[3] - distances[5] + distances[4]) * (-distances[3] + distances[5] + distances[4]);
+  Q = (distances[0] + distances[3] + distances[1]) * (distances[0] + distances[3] - distances[1]) * (distances[0] - distances[3] + distances[1]) * (-distances[0] + distances[3] + distances[1]) * (distances[3] + distances[5] + distances[4]) * (distances[3] + distances[5] - distances[4]) * (distances[3] - distances[5] + distances[4]) * (-distances[3] + distances[5] + distances[4]);
 
-    cosAng = P / Math.sqrt(Q);
+  cosAng = P / Math.sqrt(Q);
 
-    if (cosAng > 1 || cosAng < -1) {
-        cosAng = 1;
-    }
+  if (cosAng > 1 || cosAng < -1) {
+    cosAng = 1;
+  }
 
-    return Math.acos(cosAng) * 180 / Math.PI;
+  return Math.acos(cosAng) * 180 / Math.PI;
 }
 
 function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
-    var J = 0.0;
-    var delta;
-    var nbConnectedAtoms;
-    var electH = electronegativities.H;
-    var direction = [1, -1, 1, -1];
-    var p = [];
-    switch (model) {
-        case 1:
-            // type = "karplus";
+  var J = 0.0;
+  var delta;
+  var nbConnectedAtoms;
+  var electH = electronegativities.H;
+  var direction = [1, -1, 1, -1];
+  var p = [];
+  switch (model) {
+    case 1:
+      // type = "karplus";
 
-            p = [7.76, -1.10, 1.40];
-            J = p[0] * Math.cos(dihedralAngle) * Math.cos(dihedralAngle) + p[1] * Math.cos(dihedralAngle) + p[2];
-            break;
+      p = [7.76, -1.10, 1.40];
+      J = p[0] * Math.cos(dihedralAngle) * Math.cos(dihedralAngle) + p[1] * Math.cos(dihedralAngle) + p[2];
+      break;
 
-        case 2:
+    case 2:
 
-            // type = "Karplus-altona";
+      // type = "Karplus-altona";
 
-            // p = [13.88, -0.81, 0, 0.56, -2.32, 17.9];
-            p = [13.7, -0.73, 0, 0.56, -2.47, 16.9];
-            for (var j = 1; j < atoms.length - 1; j++) {
-                nbConnectedAtoms = molecule.getAllConnAtoms(j);
-                for (var i = 0; i < nbConnectedAtoms; i++) {
-                    delta = electronegativities[molecule.getAtomLabel(molecule.getConnAtom(j, i))] - electH;
-                    J += delta * (p[3] + p[4] * Math.cos(direction[j] * dihedralAngle + p[5] * Math.abs(delta)) * Math.cos(direction[j] * dihedralAngle + p[5] * Math.abs(delta)));
-                }
-            }
-            J += p[0] * Math.cos(dihedralAngle) * Math.cos(dihedralAngle) + p[1] * Math.cos(dihedralAngle) + p[2];
-            break;
+      // p = [13.88, -0.81, 0, 0.56, -2.32, 17.9];
+      p = [13.7, -0.73, 0, 0.56, -2.47, 16.9];
+      for (var j = 1; j < atoms.length - 1; j++) {
+        nbConnectedAtoms = molecule.getAllConnAtoms(j);
+        for (var i = 0; i < nbConnectedAtoms; i++) {
+          delta = electronegativities[molecule.getAtomLabel(molecule.getConnAtom(j, i))] - electH;
+          J += delta * (p[3] + p[4] * Math.cos(direction[j] * dihedralAngle + p[5] * Math.abs(delta)) * Math.cos(direction[j] * dihedralAngle + p[5] * Math.abs(delta)));
+        }
+      }
+      J += p[0] * Math.cos(dihedralAngle) * Math.cos(dihedralAngle) + p[1] * Math.cos(dihedralAngle) + p[2];
+      break;
 
-        case 3:
+    case 3:
 
-            // type = "Karplus-altona beta effect";
-            p = [13.7, -0.73, 0, 0.56, -2.47, 16.9, -0.14];
-            var I;
-            var atom2;
-            var nbConnectedAtoms2;
+      // type = "Karplus-altona beta effect";
+      p = [13.7, -0.73, 0, 0.56, -2.47, 16.9, -0.14];
+      var I;
+      var atom2;
+      var nbConnectedAtoms2;
 
-            for (var _j2 = 1; _j2 < atoms.length - 1; _j2++) {
-                nbConnectedAtoms = molecule.getAllConnAtoms(_j2);
-                I = 0;
-                for (var _i4 = 0; _i4 < nbConnectedAtoms; _i4++) {
-                    atom2 = molecule.getConnAtom(_j2, _i4);
-                    delta = electronegativities[molecule.getAtomLabel(atom2)] - electH;
-                    atom2 = molecule.getConnAtom(_j2, _i4);
-                    nbConnectedAtoms2 = molecule.getAllConnAtoms(atom2);
-                    for (var k = 0; k < nbConnectedAtoms2; k++) {
-                        // i = (Ca -CH) + p7 S ( Cb -CH)
-                        I += electronegativities[molecule.getAtomLabel(molecule.getConnAtom(atom2, k))] - electH;
-                    }
-                    I = delta + p[6] * I;
-                }
+      for (var _j2 = 1; _j2 < atoms.length - 1; _j2++) {
+        nbConnectedAtoms = molecule.getAllConnAtoms(_j2);
+        I = 0;
+        for (var _i4 = 0; _i4 < nbConnectedAtoms; _i4++) {
+          atom2 = molecule.getConnAtom(_j2, _i4);
+          delta = electronegativities[molecule.getAtomLabel(atom2)] - electH;
+          atom2 = molecule.getConnAtom(_j2, _i4);
+          nbConnectedAtoms2 = molecule.getAllConnAtoms(atom2);
+          for (var k = 0; k < nbConnectedAtoms2; k++) {
+            // i = (Ca -CH) + p7 S ( Cb -CH)
+            I += electronegativities[molecule.getAtomLabel(molecule.getConnAtom(atom2, k))] - electH;
+          }
+          I = delta + p[6] * I;
+        }
 
-                J += I * (p[3] + p[4] * (Math.cos(direction[_j2] * dihedralAngle + p[5] * Math.abs(I)) * Math.cos(direction[_j2] * dihedralAngle + p[5] * Math.abs(I))));
-            }
-            J += p[0] * Math.cos(dihedralAngle) * Math.cos(dihedralAngle) + p[1] * Math.cos(dihedralAngle) + p[2];
-            break;
-        default:
-            J = 0.0;
-    }
-    return J;
+        J += I * (p[3] + p[4] * (Math.cos(direction[_j2] * dihedralAngle + p[5] * Math.abs(I)) * Math.cos(direction[_j2] * dihedralAngle + p[5] * Math.abs(I))));
+      }
+      J += p[0] * Math.cos(dihedralAngle) * Math.cos(dihedralAngle) + p[1] * Math.cos(dihedralAngle) + p[2];
+      break;
+    default:
+      J = 0.0;
+  }
+  return J;
 }
 
 function vinylCoupling(phi) {
-    var J = 0.0;
-    if (phi <= 90) {
-        J = 6.6 * Math.cos(phi) * Math.cos(phi) + 2.6 * Math.sin(phi) * Math.sin(phi);
-    } else {
-        J = 11.6 * Math.cos(phi) * Math.cos(phi) + 2.6 * Math.sin(phi) * Math.sin(phi);
-    }
-    return J;
+  var J = 0.0;
+  if (phi <= 90) {
+    J = 6.6 * Math.cos(phi) * Math.cos(phi) + 2.6 * Math.sin(phi) * Math.sin(phi);
+  } else {
+    J = 11.6 * Math.cos(phi) * Math.cos(phi) + 2.6 * Math.sin(phi) * Math.sin(phi);
+  }
+  return J;
 }
 
 function geminalCoupling() {
-    return 1.6; // average over a sample of experimental spectra
+  return 1.6; // average over a sample of experimental spectra
 }
 
 function doubleBondCoupling(molecule, type, atoms) {
-    var x = 0;
-    var nbConnectedAtoms;
-    for (var j = 1; j < atoms.length - 1; j++) {
-        nbConnectedAtoms = molecule.getAllConnAtoms(j);
-        for (var i = 0; i < nbConnectedAtoms; i++) {
-            x += electronegativities[molecule.getAtomLabel(molecule.getConnAtom(j, i))] - electronegativities.H;
-        }
+  var x = 0;
+  var nbConnectedAtoms;
+  for (var j = 1; j < atoms.length - 1; j++) {
+    nbConnectedAtoms = molecule.getAllConnAtoms(j);
+    for (var i = 0; i < nbConnectedAtoms; i++) {
+      x += electronegativities[molecule.getAtomLabel(molecule.getConnAtom(j, i))] - electronegativities.H;
     }
+  }
 
-    var result;
-    switch (type) {
-        case 1:
-            // cis, empirical formula from a sample of experimental spectra
-            result = -4.724 * x + 13.949;
-            break;
-        case 2:
-            // trans, empirical formula from a sample of experimental
-            // spectra
-            result = -3.063 * x + 17.519;
-            break;
-        default:
-            result = 0;
-    }
+  var result;
+  switch (type) {
+    case 1:
+      // cis, empirical formula from a sample of experimental spectra
+      result = -4.724 * x + 13.949;
+      break;
+    case 2:
+      // trans, empirical formula from a sample of experimental
+      // spectra
+      result = -3.063 * x + 17.519;
+      break;
+    default:
+      result = 0;
+  }
 
-    return result;
+  return result;
 }
 
 function checkVynilicCoupling(molecule, atoms) {
-    var nbConnectedAtoms;
-    var result = false;
-    for (var j = 1, l = atoms.length - 1; j < l; j++) {
-        nbConnectedAtoms = molecule.getAllConnAtoms(atoms[j]);
-        if (nbConnectedAtoms < 4) {
-            result = true;
-            j = l;
-        }
+  var nbConnectedAtoms;
+  var result = false;
+  for (var j = 1, l = atoms.length - 1; j < l; j++) {
+    nbConnectedAtoms = molecule.getAllConnAtoms(atoms[j]);
+    if (nbConnectedAtoms < 4) {
+      result = true;
+      j = l;
     }
-    return result;
+  }
+  return result;
 }
 
 function isDoubleBond(molecule, atom1, atom2) {
-    var bond = molecule.getBond(atom1, atom2);
-    var bondType = molecule.getBondType(bond);
-    return bondType === 2;
+  var bond = molecule.getBond(atom1, atom2);
+  var bondType = molecule.getBondType(bond);
+  return bondType === 2;
 }
 
 function isDoubleOrTripleBond(molecule, atom1, atom2) {
-    var bond = molecule.getBond(atom1, atom2);
-    var bondType = molecule.getBondType(bond);
-    return bondType === 2 || bondType === 4;
+  var bond = molecule.getBond(atom1, atom2);
+  var bondType = molecule.getBondType(bond);
+  return bondType === 2 || bondType === 4;
 }
 
 function isNotAromatic(molecule, atom1, atom2) {
-    var bond = molecule.getBond(atom1, atom2);
-    return !molecule.isAromaticBond(bond);
+  var bond = molecule.getBond(atom1, atom2);
+  return !molecule.isAromaticBond(bond);
 }
 
 function isAromatic(molecule, atom1, atom2) {
-    var bond = molecule.getBond(atom1, atom2);
-    return molecule.isAromaticBond(bond);
+  var bond = molecule.getBond(atom1, atom2);
+  return molecule.isAromaticBond(bond);
 }
 
 function isAttachedToHeteroAtom(molecule, atom) {
-    var result = false;
-    var nbConnectedAtoms = molecule.getAllConnAtoms(atom);
-    for (var j = 0; j < nbConnectedAtoms; j++) {
-        var connAtom = molecule.getConnAtom(atom, j);
-        if (!(molecule.getAtomLabel(connAtom) === 'C')) {
-            result = true;
-            j = nbConnectedAtoms;
-        }
+  var result = false;
+  var nbConnectedAtoms = molecule.getAllConnAtoms(atom);
+  for (var j = 0; j < nbConnectedAtoms; j++) {
+    var connAtom = molecule.getConnAtom(atom, j);
+    if (!(molecule.getAtomLabel(connAtom) === 'C')) {
+      result = true;
+      j = nbConnectedAtoms;
     }
-    return result;
+  }
+  return result;
 }
 
 function isOnlyAttachedToHC(molecule, atom) {
-    var nbConnectedAtoms = molecule.getAllConnAtoms(atom);
-    for (var j = 0; j < nbConnectedAtoms; j++) {
-        var connAtom = molecule.getConnAtom(atom, j);
-        if (!(molecule.getAtomLabel(connAtom) === 'C' || molecule.getAtomLabel(connAtom) === 'H')) {
-            return false;
-        }
+  var nbConnectedAtoms = molecule.getAllConnAtoms(atom);
+  for (var j = 0; j < nbConnectedAtoms; j++) {
+    var connAtom = molecule.getConnAtom(atom, j);
+    if (!(molecule.getAtomLabel(connAtom) === 'C' || molecule.getAtomLabel(connAtom) === 'H')) {
+      return false;
     }
-    return true;
+  }
+  return true;
 }
 
 /***/ }),
@@ -9885,100 +9894,100 @@ function isOnlyAttachedToHC(molecule, atom) {
 
 
 module.exports = {
-    H: 2.20,
-    Li: 0.98,
-    Be: 1.57,
-    B: 2.04,
-    C: 2.55,
-    N: 3.04,
-    O: 3.44,
-    F: 3.98,
-    Na: 0.93,
-    Mg: 1.31,
-    Al: 1.61,
-    Si: 1.90,
-    P: 2.19,
-    S: 2.58,
-    Cl: 3.16,
-    K: 0.82,
-    Ca: 1.00,
-    Sc: 1.36,
-    Ti: 1.54,
-    V: 1.63,
-    Cr: 1.66,
-    Mn: 1.55,
-    Fe: 1.83,
-    Co: 1.88,
-    Ni: 1.91,
-    Cu: 1.90,
-    Zn: 1.65,
-    Ga: 1.81,
-    Ge: 2.01,
-    As: 2.18,
-    Se: 2.55,
-    Br: 2.96,
-    Kr: 3.00,
-    Rb: 0.82,
-    Sr: 0.95,
-    Y: 1.22,
-    Zr: 1.33,
-    Nb: 1.6,
-    Mo: 2.16,
-    Tc: 1.9,
-    Ru: 2.2,
-    Rh: 2.28,
-    Pd: 2.20,
-    Ag: 1.93,
-    Cd: 1.69,
-    In: 1.78,
-    Sn: 1.96,
-    Sb: 2.05,
-    Te: 2.1,
-    I: 2.66,
-    Xe: 2.6,
-    Cs: 0.79,
-    Ba: 0.89,
-    La: 1.10,
-    Ce: 1.12,
-    Pr: 1.13,
-    Nd: 1.14,
-    Sm: 1.17,
-    Gd: 1.20,
-    Dy: 1.22,
-    Ho: 1.23,
-    Er: 1.24,
-    Tm: 1.25,
-    Lu: 1.27,
-    Hf: 1.3,
-    Ta: 1.5,
-    W: 2.36,
-    Re: 1.9,
-    Os: 2.2,
-    Ir: 2.20,
-    Pt: 2.28,
-    Au: 2.54,
-    Hg: 2.00,
-    Tl: 1.62,
-    Pb: 2.33,
-    Bi: 2.02,
-    Po: 2.0,
-    At: 2.2,
-    Fr: 0.7,
-    Ra: 0.9,
-    Ac: 1.1,
-    Th: 1.3,
-    Pa: 1.5,
-    U: 1.38,
-    Np: 1.36,
-    Pu: 1.28,
-    Am: 1.3,
-    Cm: 1.3,
-    Bk: 1.3,
-    Cf: 1.3,
-    Es: 1.3,
-    Fm: 1.3,
-    Md: 1.3,
-    No: 1.3
+  H: 2.20,
+  Li: 0.98,
+  Be: 1.57,
+  B: 2.04,
+  C: 2.55,
+  N: 3.04,
+  O: 3.44,
+  F: 3.98,
+  Na: 0.93,
+  Mg: 1.31,
+  Al: 1.61,
+  Si: 1.90,
+  P: 2.19,
+  S: 2.58,
+  Cl: 3.16,
+  K: 0.82,
+  Ca: 1.00,
+  Sc: 1.36,
+  Ti: 1.54,
+  V: 1.63,
+  Cr: 1.66,
+  Mn: 1.55,
+  Fe: 1.83,
+  Co: 1.88,
+  Ni: 1.91,
+  Cu: 1.90,
+  Zn: 1.65,
+  Ga: 1.81,
+  Ge: 2.01,
+  As: 2.18,
+  Se: 2.55,
+  Br: 2.96,
+  Kr: 3.00,
+  Rb: 0.82,
+  Sr: 0.95,
+  Y: 1.22,
+  Zr: 1.33,
+  Nb: 1.6,
+  Mo: 2.16,
+  Tc: 1.9,
+  Ru: 2.2,
+  Rh: 2.28,
+  Pd: 2.20,
+  Ag: 1.93,
+  Cd: 1.69,
+  In: 1.78,
+  Sn: 1.96,
+  Sb: 2.05,
+  Te: 2.1,
+  I: 2.66,
+  Xe: 2.6,
+  Cs: 0.79,
+  Ba: 0.89,
+  La: 1.10,
+  Ce: 1.12,
+  Pr: 1.13,
+  Nd: 1.14,
+  Sm: 1.17,
+  Gd: 1.20,
+  Dy: 1.22,
+  Ho: 1.23,
+  Er: 1.24,
+  Tm: 1.25,
+  Lu: 1.27,
+  Hf: 1.3,
+  Ta: 1.5,
+  W: 2.36,
+  Re: 1.9,
+  Os: 2.2,
+  Ir: 2.20,
+  Pt: 2.28,
+  Au: 2.54,
+  Hg: 2.00,
+  Tl: 1.62,
+  Pb: 2.33,
+  Bi: 2.02,
+  Po: 2.0,
+  At: 2.2,
+  Fr: 0.7,
+  Ra: 0.9,
+  Ac: 1.1,
+  Th: 1.3,
+  Pa: 1.5,
+  U: 1.38,
+  Np: 1.36,
+  Pu: 1.28,
+  Am: 1.3,
+  Cm: 1.3,
+  Bk: 1.3,
+  Cf: 1.3,
+  Es: 1.3,
+  Fm: 1.3,
+  Md: 1.3,
+  No: 1.3
 };
 
 /***/ }),
@@ -9989,20 +9998,20 @@ module.exports = {
 
 
 module.exports = {
-    'gFp@DiTt@@B !Bg~wK_}mvw@`': { '0-1': 8, '0-2': 8, '1-3': 8, '3-5': 8, '4-5': 8, '2-4': 8, '0-3': 2.5, '0-4': 2.5, '3-4': 2.5, '1-2': 2.5, '1-5': 2.5, '2-5': 2.5, '2-3': 1, '1-4': 1, '0-5': 1 },
-    'gKQ@@eKcRpD !BcLbLypAe@Bh': { '1-3': 1.8, '2-4': 1.8, '1-4': 0.5, '2-3': 0.5, '1-2': 1.55, '3-4': 3.5 },
-    'gKX@@eKcRpD !BcLbLipBe@Lh': { '1-3': 2.2, '2-4': 2.2, '1-4': 1.25, '2-3': 1.25, '1-2': 2.05, '3-4': 3.4 },
-    'gKPH@DIRxtlA@ !BcLbLqp@e@Dh': { '1-3': 5.2, '2-4': 5.2, '1-4': 1.25, '2-3': 1.25, '1-2': 2.7, '3-4': 3.6 },
-    'gFx@@eJf`@@P !BbOsWGx@_`CW@': { '1-3': 5.3, '2-4': 5.3, '1-4': 0.9, '2-3': 0.9, '1-2': 0.35, '3-4': 1.65, '1-5': 1.8, '2-5': 1.8, '3-5': 7.85, '4-5': 7.85 },
-    'gKT@Adi\\Vf@` !Bo`@oIR}jXq`': { '2-4': 1.5, '1-4': 1.5, '1-2': 0.75 },
-    'gKT@ADi\\Yi@` !BKrk~_qLgKtT': { '2-4': 1.5, '3-4': 2.5, '2-3': 0.75 },
-    'gKY@LDi\\ZV@` !BXNTSIwysA\\\\': { '1-2': 0.5, '2-4': 0.8 },
-    'gKXHL@aJWFe`H !BXNTSIwysA\\\\': { '1-2': 1.9, '2-4': 3.2 },
-    'gKXHL@aJWFe`H !BHFTSI{ycA\\\\': { '2-4': 4.7, '3-4': 1.7 },
-    'gFxA@IReSP@@H !BlCvwO[yog~wOP': { '1-3': 6, '2-4': 6, '2-5': 1.5, '1-5': 2.5, '2-3': 0.8, '1-4': 0.8, '1-2': 1, '3-5': 8, '4-5': 8, '3-4': 1.4 },
-    'gFt@ADiTt@@B !Bmsr~_{_}mv~_p': { '2-4': 4.9, '3-5': 4.9, '2-5': 2, '3-4': 2, '2-3': 3.5, '4-5': 8.4 },
-    'gFt@AdiTt@@B !Bo`BWoY_|epJWoP': { '4-5': 5, '2-5': 2.5, '1-5': 1.5, '1-4': 0 },
-    'gFt@ATiTt@@B !Br@KgCx@O`Cg@': { '1-3': 1.8, '2-4': 1.8, '1-4': 1.8, '2-3': 1.8, '1-2': 0.5, '3-4': 0.5 }
+  'gFp@DiTt@@B !Bg~wK_}mvw@`': { '0-1': 8, '0-2': 8, '1-3': 8, '3-5': 8, '4-5': 8, '2-4': 8, '0-3': 2.5, '0-4': 2.5, '3-4': 2.5, '1-2': 2.5, '1-5': 2.5, '2-5': 2.5, '2-3': 1, '1-4': 1, '0-5': 1 },
+  'gKQ@@eKcRpD !BcLbLypAe@Bh': { '1-3': 1.8, '2-4': 1.8, '1-4': 0.5, '2-3': 0.5, '1-2': 1.55, '3-4': 3.5 },
+  'gKX@@eKcRpD !BcLbLipBe@Lh': { '1-3': 2.2, '2-4': 2.2, '1-4': 1.25, '2-3': 1.25, '1-2': 2.05, '3-4': 3.4 },
+  'gKPH@DIRxtlA@ !BcLbLqp@e@Dh': { '1-3': 5.2, '2-4': 5.2, '1-4': 1.25, '2-3': 1.25, '1-2': 2.7, '3-4': 3.6 },
+  'gFx@@eJf`@@P !BbOsWGx@_`CW@': { '1-3': 5.3, '2-4': 5.3, '1-4': 0.9, '2-3': 0.9, '1-2': 0.35, '3-4': 1.65, '1-5': 1.8, '2-5': 1.8, '3-5': 7.85, '4-5': 7.85 },
+  'gKT@Adi\\Vf@` !Bo`@oIR}jXq`': { '2-4': 1.5, '1-4': 1.5, '1-2': 0.75 },
+  'gKT@ADi\\Yi@` !BKrk~_qLgKtT': { '2-4': 1.5, '3-4': 2.5, '2-3': 0.75 },
+  'gKY@LDi\\ZV@` !BXNTSIwysA\\\\': { '1-2': 0.5, '2-4': 0.8 },
+  'gKXHL@aJWFe`H !BXNTSIwysA\\\\': { '1-2': 1.9, '2-4': 3.2 },
+  'gKXHL@aJWFe`H !BHFTSI{ycA\\\\': { '2-4': 4.7, '3-4': 1.7 },
+  'gFxA@IReSP@@H !BlCvwO[yog~wOP': { '1-3': 6, '2-4': 6, '2-5': 1.5, '1-5': 2.5, '2-3': 0.8, '1-4': 0.8, '1-2': 1, '3-5': 8, '4-5': 8, '3-4': 1.4 },
+  'gFt@ADiTt@@B !Bmsr~_{_}mv~_p': { '2-4': 4.9, '3-5': 4.9, '2-5': 2, '3-4': 2, '2-3': 3.5, '4-5': 8.4 },
+  'gFt@AdiTt@@B !Bo`BWoY_|epJWoP': { '4-5': 5, '2-5': 2.5, '1-5': 1.5, '1-4': 0 },
+  'gFt@ATiTt@@B !Br@KgCx@O`Cg@': { '1-3': 1.8, '2-4': 1.8, '1-4': 1.8, '2-3': 1.8, '1-2': 0.5, '3-4': 0.5 }
 };
 
 /***/ }),
@@ -10013,40 +10022,40 @@ module.exports = {
 
 
 module.exports = function getNumberOfAtoms() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-    var label = options.atomLabel;
-    var mf = this.getMolecularFormula().formula;
-    var parts = mf.split(/(?=[A-Z])/);
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
+  var label = options.atomLabel;
+  var mf = this.getMolecularFormula().formula;
+  var parts = mf.split(/(?=[A-Z])/);
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
 
-    try {
-        for (var _iterator = parts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var part = _step.value;
+  try {
+    for (var _iterator = parts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var part = _step.value;
 
-            var atom = part.replace(/[0-9]/g, '');
-            if (atom === label) {
-                return part.replace(/[^0-9]/g, '') * 1 || 1;
-            }
-        }
-    } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-    } finally {
-        try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-                _iterator.return();
-            }
-        } finally {
-            if (_didIteratorError) {
-                throw _iteratorError;
-            }
-        }
+      var atom = part.replace(/[0-9]/g, '');
+      if (atom === label) {
+        return part.replace(/[^0-9]/g, '') * 1 || 1;
+      }
     }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
 
-    return 0;
+  return 0;
 };
 
 /***/ }),
@@ -10057,52 +10066,52 @@ module.exports = function getNumberOfAtoms() {
 
 
 module.exports = function toDiastereotopicSVG() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var _options$width = options.width,
-        width = _options$width === undefined ? 300 : _options$width,
-        _options$height = options.height,
-        height = _options$height === undefined ? 200 : _options$height,
-        _options$prefix = options.prefix,
-        prefix = _options$prefix === undefined ? 'ocl' : _options$prefix,
-        _options$heavyAtomHyd = options.heavyAtomHydrogen,
-        heavyAtomHydrogen = _options$heavyAtomHyd === undefined ? false : _options$heavyAtomHyd;
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var _options$width = options.width,
+      width = _options$width === undefined ? 300 : _options$width,
+      _options$height = options.height,
+      height = _options$height === undefined ? 200 : _options$height,
+      _options$prefix = options.prefix,
+      prefix = _options$prefix === undefined ? 'ocl' : _options$prefix,
+      _options$heavyAtomHyd = options.heavyAtomHydrogen,
+      heavyAtomHydrogen = _options$heavyAtomHyd === undefined ? false : _options$heavyAtomHyd;
 
-    var svg = options.svg;
-    var diaIDs = [];
+  var svg = options.svg;
+  var diaIDs = [];
 
-    var hydrogenInfo = {};
-    this.getExtendedDiastereotopicAtomIDs().forEach(function (line) {
-        hydrogenInfo[line.oclID] = line;
-    });
+  var hydrogenInfo = {};
+  this.getExtendedDiastereotopicAtomIDs().forEach(function (line) {
+    hydrogenInfo[line.oclID] = line;
+  });
 
-    if (heavyAtomHydrogen) {
-        for (var i = 0; i < this.getAtoms(); i++) {
-            diaIDs.push([]);
-        }
-        var groupedDiaIDs = this.getGroupedDiastereotopicAtomIDs();
-        groupedDiaIDs.forEach(function (diaID) {
-            if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens > 0) {
-                diaID.atoms.forEach(function (atom) {
-                    hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach(function (id) {
-                        if (!diaIDs[atom * 1].includes(id)) diaIDs[atom].push(id);
-                    });
-                });
-            }
-        });
-    } else {
-        diaIDs = this.getDiastereotopicAtomIDs().map(function (a) {
-            return [a];
-        });
+  if (heavyAtomHydrogen) {
+    for (var i = 0; i < this.getAtoms(); i++) {
+      diaIDs.push([]);
     }
-
-    if (!svg) svg = this.toSVG(width, height, prefix);
-
-    svg = svg.replace(/Atom:[0-9]+\"/g, function (value) {
-        var atom = value.replace(/[^0-9]/g, '');
-        return value + ' data-atomid="' + diaIDs[atom].join(',') + '"';
+    var groupedDiaIDs = this.getGroupedDiastereotopicAtomIDs();
+    groupedDiaIDs.forEach(function (diaID) {
+      if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens > 0) {
+        diaID.atoms.forEach(function (atom) {
+          hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach(function (id) {
+            if (!diaIDs[atom * 1].includes(id)) diaIDs[atom].push(id);
+          });
+        });
+      }
     });
+  } else {
+    diaIDs = this.getDiastereotopicAtomIDs().map(function (a) {
+      return [a];
+    });
+  }
 
-    return svg;
+  if (!svg) svg = this.toSVG(width, height, prefix);
+
+  svg = svg.replace(/Atom:[0-9]+"/g, function (value) {
+    var atom = value.replace(/[^0-9]/g, '');
+    return `${value} data-atomid="${diaIDs[atom].join(',')}"`;
+  });
+
+  return svg;
 };
 
 /***/ }),
@@ -10113,50 +10122,50 @@ module.exports = function toDiastereotopicSVG() {
 
 
 module.exports = function toVisualizerMolfile() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-    var diastereotopic = options.diastereotopic;
+  var diastereotopic = options.diastereotopic;
 
-    var highlight = [];
-    var atoms = {};
-    if (diastereotopic) {
-        var heavyAtomHydrogen = options.heavyAtomHydrogen;
-        var hydrogenInfo = {};
-        this.getExtendedDiastereotopicAtomIDs().forEach(function (line) {
-            hydrogenInfo[line.oclID] = line;
-        });
+  var highlight = [];
+  var atoms = {};
+  if (diastereotopic) {
+    var heavyAtomHydrogen = options.heavyAtomHydrogen;
+    var hydrogenInfo = {};
+    this.getExtendedDiastereotopicAtomIDs().forEach(function (line) {
+      hydrogenInfo[line.oclID] = line;
+    });
 
-        var diaIDs = this.getGroupedDiastereotopicAtomIDs();
-        diaIDs.forEach(function (diaID) {
-            atoms[diaID.oclID] = diaID.atoms;
-            highlight.push(diaID.oclID);
-            if (heavyAtomHydrogen) {
-                if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens > 0) {
-                    hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach(function (id) {
-                        highlight.push(id);
-                        atoms[id] = diaID.atoms;
-                    });
-                }
-            }
-        });
-    } else {
-        var size = this.getAllAtoms();
-        highlight = new Array(size).fill(0).map(function (a, index) {
-            return index;
-        });
-        atoms = highlight.map(function (a) {
-            return [a];
-        });
-    }
+    var diaIDs = this.getGroupedDiastereotopicAtomIDs();
+    diaIDs.forEach(function (diaID) {
+      atoms[diaID.oclID] = diaID.atoms;
+      highlight.push(diaID.oclID);
+      if (heavyAtomHydrogen) {
+        if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens > 0) {
+          hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach(function (id) {
+            highlight.push(id);
+            atoms[id] = diaID.atoms;
+          });
+        }
+      }
+    });
+  } else {
+    var size = this.getAllAtoms();
+    highlight = new Array(size).fill(0).map(function (a, index) {
+      return index;
+    });
+    atoms = highlight.map(function (a) {
+      return [a];
+    });
+  }
 
-    var molfile = {
-        type: 'mol2d',
-        value: this.toMolfile(),
-        _highlight: highlight,
-        _atoms: atoms
-    };
+  var molfile = {
+    type: 'mol2d',
+    value: this.toMolfile(),
+    _highlight: highlight,
+    _atoms: atoms
+  };
 
-    return molfile;
+  return molfile;
 };
 
 /***/ }),
@@ -10167,97 +10176,96 @@ module.exports = function toVisualizerMolfile() {
 
 
 module.exports = function (OCL) {
-    return function getAtomsInfo() {
+  return function getAtomsInfo() {
+    this.ensureHelperArrays(OCL.Molecule.cHelperRings);
 
-        this.ensureHelperArrays(OCL.Molecule.cHelperRings);
+    var diaIDs = this.getDiastereotopicAtomIDs();
 
-        var diaIDs = this.getDiastereotopicAtomIDs();
-
-        var results = [];
-        for (var i = 0; i < diaIDs.length; i++) {
-            var result = {
-                oclID: diaIDs[i],
-                extra: {
-                    singleBonds: 0,
-                    doubleBonds: 0,
-                    tripleBonds: 0,
-                    aromaticBonds: 0,
-                    cnoHybridation: 0 // should be 1 (sp), 2 (sp2) or 3 (sp3)
-                }
-            };
-            var extra = result.extra;
-            results.push(result);
-            result.abnormalValence = this.getAtomAbnormalValence(i); // -1 is normal otherwise specified
-            result.charge = this.getAtomCharge(i);
-            result.cipParity = this.getAtomCIPParity(i);
-            result.color = this.getAtomColor(i);
-            result.customLabel = this.getAtomCustomLabel(i);
-            //        result.esrGroup=this.getAtomESRGroup(i);
-            //        result.esrType=this.getAtomESRType(i);
-            result.atomicNo = this.getAtomicNo(i);
-            result.label = this.getAtomLabel(i);
-            //        result.list=this.getAtomList(i);
-            //        result.listString=this.getAtomListString(i);
-            //        result.mapNo=this.getAtomMapNo(i);
-            result.mass = this.getAtomMass(i);
-            //        result.parity=this.getAtomParity(i);
-            //        result.pi=this.getAtomPi(i);
-            //        result.preferredStereoBond=this.getAtomPreferredStereoBond(i);
-            //        result.queryFeatures=this.getAtomQueryFeatures(i);
-            result.radical = this.getAtomRadical(i);
-            result.ringBondCount = this.getAtomRingBondCount(i);
-            //        result.ringCount=this.getAtomRingCount(i);
-            result.ringSize = this.getAtomRingSize(i);
-            result.x = this.getAtomX(i);
-            result.y = this.getAtomY(i);
-            result.z = this.getAtomZ(i);
-            result.allHydrogens = this.getAllHydrogens(i);
-            result.connAtoms = this.getConnAtoms(i);
-            result.allConnAtoms = this.getAllConnAtoms(i);
-
-            result.implicitHydrogens = result.allHydrogens + result.connAtoms - result.allConnAtoms;
-
-            result.isAromatic = this.isAromaticAtom(i);
-            result.isAllylic = this.isAllylicAtom(i);
-            result.isStereoCenter = this.isAtomStereoCenter(i);
-            result.isRing = this.isRingAtom(i);
-            result.isSmallRing = this.isSmallRingAtom(i);
-            result.isStabilized = this.isStabilizedAtom(i);
-
-            // todo HACK to circumvent bug in OCL that consider than an hydrogen is connected to itself
-            result.extra.singleBonds = result.atomicNo === 1 ? 0 : result.implicitHydrogens;
-            for (var j = 0; j < this.getAllConnAtoms(i); j++) {
-                var bond = this.getConnBond(i, j);
-                var bondOrder = this.getBondOrder(bond);
-                if (this.isAromaticBond(bond)) {
-                    extra.aromaticBonds++;
-                } else if (bondOrder === 1) {
-                    // not an hydrogen
-                    extra.singleBonds++;
-                } else if (bondOrder === 2) {
-                    extra.doubleBonds++;
-                } else if (bondOrder === 3) {
-                    extra.tripleBonds++;
-                }
-            }
-            result.extra.totalBonds = result.extra.singleBonds + result.extra.doubleBonds + result.extra.tripleBonds + result.extra.aromaticBonds;
-
-            if (result.atomicNo === 6) {
-                result.extra.cnoHybridation = result.extra.totalBonds - 1;
-            } else if (result.atomicNo === 7) {
-                result.extra.cnoHybridation = result.extra.totalBonds;
-            } else if (result.atomicNo === 8) {
-                result.extra.cnoHybridation = result.extra.totalBonds + 1;
-            } else if (result.atomicNo === 1) {
-                var connectedAtom = this.getAllConnAtoms(i) === 0 ? 0 : this.getAtomicNo(this.getConnAtom(i, 0));
-                result.extra.hydrogenOnAtomicNo = connectedAtom;
-                if (connectedAtom === 7 || connectedAtom === 8) {
-                    result.extra.labileHydrogen = true;
-                }
-            }
+    var results = [];
+    for (var i = 0; i < diaIDs.length; i++) {
+      var result = {
+        oclID: diaIDs[i],
+        extra: {
+          singleBonds: 0,
+          doubleBonds: 0,
+          tripleBonds: 0,
+          aromaticBonds: 0,
+          cnoHybridation: 0 // should be 1 (sp), 2 (sp2) or 3 (sp3)
         }
-        return results;
-    };
+      };
+      var extra = result.extra;
+      results.push(result);
+      result.abnormalValence = this.getAtomAbnormalValence(i); // -1 is normal otherwise specified
+      result.charge = this.getAtomCharge(i);
+      result.cipParity = this.getAtomCIPParity(i);
+      result.color = this.getAtomColor(i);
+      result.customLabel = this.getAtomCustomLabel(i);
+      //        result.esrGroup=this.getAtomESRGroup(i);
+      //        result.esrType=this.getAtomESRType(i);
+      result.atomicNo = this.getAtomicNo(i);
+      result.label = this.getAtomLabel(i);
+      //        result.list=this.getAtomList(i);
+      //        result.listString=this.getAtomListString(i);
+      //        result.mapNo=this.getAtomMapNo(i);
+      result.mass = this.getAtomMass(i);
+      //        result.parity=this.getAtomParity(i);
+      //        result.pi=this.getAtomPi(i);
+      //        result.preferredStereoBond=this.getAtomPreferredStereoBond(i);
+      //        result.queryFeatures=this.getAtomQueryFeatures(i);
+      result.radical = this.getAtomRadical(i);
+      result.ringBondCount = this.getAtomRingBondCount(i);
+      //        result.ringCount=this.getAtomRingCount(i);
+      result.ringSize = this.getAtomRingSize(i);
+      result.x = this.getAtomX(i);
+      result.y = this.getAtomY(i);
+      result.z = this.getAtomZ(i);
+      result.allHydrogens = this.getAllHydrogens(i);
+      result.connAtoms = this.getConnAtoms(i);
+      result.allConnAtoms = this.getAllConnAtoms(i);
+
+      result.implicitHydrogens = result.allHydrogens + result.connAtoms - result.allConnAtoms;
+
+      result.isAromatic = this.isAromaticAtom(i);
+      result.isAllylic = this.isAllylicAtom(i);
+      result.isStereoCenter = this.isAtomStereoCenter(i);
+      result.isRing = this.isRingAtom(i);
+      result.isSmallRing = this.isSmallRingAtom(i);
+      result.isStabilized = this.isStabilizedAtom(i);
+
+      // todo HACK to circumvent bug in OCL that consider than an hydrogen is connected to itself
+      result.extra.singleBonds = result.atomicNo === 1 ? 0 : result.implicitHydrogens;
+      for (var j = 0; j < this.getAllConnAtoms(i); j++) {
+        var bond = this.getConnBond(i, j);
+        var bondOrder = this.getBondOrder(bond);
+        if (this.isAromaticBond(bond)) {
+          extra.aromaticBonds++;
+        } else if (bondOrder === 1) {
+          // not an hydrogen
+          extra.singleBonds++;
+        } else if (bondOrder === 2) {
+          extra.doubleBonds++;
+        } else if (bondOrder === 3) {
+          extra.tripleBonds++;
+        }
+      }
+      result.extra.totalBonds = result.extra.singleBonds + result.extra.doubleBonds + result.extra.tripleBonds + result.extra.aromaticBonds;
+
+      if (result.atomicNo === 6) {
+        result.extra.cnoHybridation = result.extra.totalBonds - 1;
+      } else if (result.atomicNo === 7) {
+        result.extra.cnoHybridation = result.extra.totalBonds;
+      } else if (result.atomicNo === 8) {
+        result.extra.cnoHybridation = result.extra.totalBonds + 1;
+      } else if (result.atomicNo === 1) {
+        var connectedAtom = this.getAllConnAtoms(i) === 0 ? 0 : this.getAtomicNo(this.getConnAtom(i, 0));
+        result.extra.hydrogenOnAtomicNo = connectedAtom;
+        if (connectedAtom === 7 || connectedAtom === 8) {
+          result.extra.labileHydrogen = true;
+        }
+      }
+    }
+    return results;
+  };
 };
 
 /***/ }),
@@ -10271,55 +10279,55 @@ var floydWarshall = __webpack_require__(7);
 var Matrix = __webpack_require__(3);
 
 module.exports = function (OCL) {
-    return function getConnectivityMatrix() {
-        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  return function getConnectivityMatrix() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        this.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
-        var nbAtoms = this.getAllAtoms();
-        var i, j, l;
-        var result = new Array(nbAtoms).fill();
-        result = result.map(function () {
-            return new Array(nbAtoms).fill(0);
-        });
+    this.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
+    var nbAtoms = this.getAllAtoms();
+    var i, j, l;
+    var result = new Array(nbAtoms).fill();
+    result = result.map(function () {
+      return new Array(nbAtoms).fill(0);
+    });
 
-        if (!options.pathLength) {
-            if (options.atomicNo) {
-                for (i = 0; i < nbAtoms; i++) {
-                    result[i][i] = this.getAtomicNo(i);
-                }
-            } else if (options.mass) {
-                for (i = 0; i < nbAtoms; i++) {
-                    result[i][i] = OCL.Molecule.cRoundedMass[this.getAtomicNo(i)];
-                }
-            } else {
-                for (i = 0; i < nbAtoms; i++) {
-                    result[i][i] = 1;
-                }
-            }
+    if (!options.pathLength) {
+      if (options.atomicNo) {
+        for (i = 0; i < nbAtoms; i++) {
+          result[i][i] = this.getAtomicNo(i);
         }
-
-        if (options.sdt) {
-            for (i = 0; i < nbAtoms; i++) {
-                l = this.getAllConnAtoms(i);
-                for (j = 0; j < l; j++) {
-                    result[i][this.getConnAtom(i, j)] = this.getConnBondOrder(i, j);
-                }
-            }
-        } else {
-            for (i = 0; i < nbAtoms; i++) {
-                l = this.getAllConnAtoms(i);
-                for (j = 0; j < l; j++) {
-                    result[i][this.getConnAtom(i, j)] = 1;
-                }
-            }
+      } else if (options.mass) {
+        for (i = 0; i < nbAtoms; i++) {
+          result[i][i] = OCL.Molecule.cRoundedMass[this.getAtomicNo(i)];
         }
-
-        if (options.pathLength) {
-            result = floydWarshall(new Matrix(result)).to2DArray();
+      } else {
+        for (i = 0; i < nbAtoms; i++) {
+          result[i][i] = 1;
         }
+      }
+    }
 
-        return result;
-    };
+    if (options.sdt) {
+      for (i = 0; i < nbAtoms; i++) {
+        l = this.getAllConnAtoms(i);
+        for (j = 0; j < l; j++) {
+          result[i][this.getConnAtom(i, j)] = this.getConnBondOrder(i, j);
+        }
+      }
+    } else {
+      for (i = 0; i < nbAtoms; i++) {
+        l = this.getAllConnAtoms(i);
+        for (j = 0; j < l; j++) {
+          result[i][this.getConnAtom(i, j)] = 1;
+        }
+      }
+    }
+
+    if (options.pathLength) {
+      result = floydWarshall(new Matrix(result)).to2DArray();
+    }
+
+    return result;
+  };
 };
 
 /***/ }),
@@ -10330,47 +10338,47 @@ module.exports = function (OCL) {
 
 
 module.exports = function (OCL) {
-    var Util = OCL.Util;
-    return function getDiastereotopicHoseCodes() {
-        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var Util = OCL.Util;
+  return function getDiastereotopicHoseCodes() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        var diaIDs = this.getDiastereotopicAtomIDs(options).map(function (a) {
-            return { oclID: a };
-        });
-        diaIDs.forEach(function (diaID) {
-            var hoses = Util.getHoseCodesFromDiastereotopicID(diaID.oclID, options);
-            diaID.hoses = [];
-            var level = 1;
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+    var diaIDs = this.getDiastereotopicAtomIDs(options).map(function (a) {
+      return { oclID: a };
+    });
+    diaIDs.forEach(function (diaID) {
+      var hoses = Util.getHoseCodesFromDiastereotopicID(diaID.oclID, options);
+      diaID.hoses = [];
+      var level = 1;
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-            try {
-                for (var _iterator = hoses[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var hose = _step.value;
+      try {
+        for (var _iterator = hoses[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var hose = _step.value;
 
-                    diaID.hoses.push({
-                        level: level++,
-                        oclID: hose
-                    });
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-        });
-        return diaIDs;
-    };
+          diaID.hoses.push({
+            level: level++,
+            oclID: hose
+          });
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    });
+    return diaIDs;
+  };
 };
 
 /***/ }),
@@ -10381,37 +10389,37 @@ module.exports = function (OCL) {
 
 
 module.exports = function (OCL) {
-    return function getExtendedDiastereotopicAtomIDs() {
-        var molecule = this.getCompactCopy();
-        molecule.addImplicitHydrogens();
-        // TODO Temporary code ???
-        molecule.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
+  return function getExtendedDiastereotopicAtomIDs() {
+    var molecule = this.getCompactCopy();
+    molecule.addImplicitHydrogens();
+    // TODO Temporary code ???
+    molecule.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
 
-        var diaIDs = molecule.getDiastereotopicAtomIDs();
-        var newDiaIDs = [];
+    var diaIDs = molecule.getDiastereotopicAtomIDs();
+    var newDiaIDs = [];
 
-        for (var i = 0; i < diaIDs.length; i++) {
-            var diaID = diaIDs[i];
-            var newDiaID = {
-                oclID: diaID,
-                hydrogenOCLIDs: [],
-                nbHydrogens: 0
-            };
-            for (var j = 0; j < molecule.getAllConnAtoms(i); j++) {
-                var atom = molecule.getConnAtom(i, j);
-                if (molecule.getAtomicNo(atom) === 1) {
-                    newDiaID.nbHydrogens++;
-                    if (newDiaID.hydrogenOCLIDs.indexOf(diaIDs[atom]) === -1) {
-                        newDiaID.hydrogenOCLIDs.push(diaIDs[atom]);
-                    }
-                }
-            }
-
-            newDiaIDs.push(newDiaID);
+    for (var i = 0; i < diaIDs.length; i++) {
+      var diaID = diaIDs[i];
+      var newDiaID = {
+        oclID: diaID,
+        hydrogenOCLIDs: [],
+        nbHydrogens: 0
+      };
+      for (var j = 0; j < molecule.getAllConnAtoms(i); j++) {
+        var atom = molecule.getConnAtom(i, j);
+        if (molecule.getAtomicNo(atom) === 1) {
+          newDiaID.nbHydrogens++;
+          if (newDiaID.hydrogenOCLIDs.indexOf(diaIDs[atom]) === -1) {
+            newDiaID.hydrogenOCLIDs.push(diaIDs[atom]);
+          }
         }
+      }
 
-        return newDiaIDs;
-    };
+      newDiaIDs.push(newDiaID);
+    }
+
+    return newDiaIDs;
+  };
 };
 
 /***/ }),
@@ -10422,172 +10430,171 @@ module.exports = function (OCL) {
 
 
 module.exports = function (OCL) {
-    return function getFunctionCodes() {
-        var molecule = this.getCompactCopy();
-        var atoms = molecule.getAtomsInfo();
-        for (var i = 0; i < molecule.getAllAtoms(); i++) {
-            var atom = atoms[i];
-            atom.i = i;
-            atom.mapNo = molecule.getAtomMapNo(i);
-            atom.links = []; // we will store connected atoms of broken bonds
+  return function getFunctionCodes() {
+    var molecule = this.getCompactCopy();
+    var atoms = molecule.getAtomsInfo();
+    for (var i = 0; i < molecule.getAllAtoms(); i++) {
+      var atom = atoms[i];
+      atom.i = i;
+      atom.mapNo = molecule.getAtomMapNo(i);
+      atom.links = []; // we will store connected atoms of broken bonds
+    }
+
+    var bonds = [];
+    for (var _i = 0; _i < molecule.getAllBonds(); _i++) {
+      var bond = {};
+      bonds.push(bond);
+      bond.i = _i;
+      bond.order = molecule.getBondOrder(_i);
+      bond.atom1 = molecule.getBondAtom(0, _i);
+      bond.atom2 = molecule.getBondAtom(1, _i);
+      bond.type = molecule.getBondType(_i);
+      bond.isAromatic = molecule.isAromaticBond(_i);
+
+      if (!bond.isAromatic && molecule.getBondTypeSimple(_i) === 1 && molecule.getAtomicNo(bond.atom1) === 6 && molecule.getAtomicNo(bond.atom2) === 6 && (atoms[bond.atom1].extra.cnoHybridation === 3 || atoms[bond.atom2].extra.cnoHybridation === 3)) {
+        bond.selected = true;
+        atoms[bond.atom1].links.push(bond.atom2);
+        atoms[bond.atom2].links.push(bond.atom1);
+      }
+    }
+
+    var brokenMolecule = molecule.getCompactCopy();
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = bonds[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var _bond = _step.value;
+
+        if (_bond.selected) {
+          brokenMolecule.markBondForDeletion(_bond.i);
         }
-
-        var bonds = [];
-        for (var _i = 0; _i < molecule.getAllBonds(); _i++) {
-            var bond = {};
-            bonds.push(bond);
-            bond.i = _i;
-            bond.order = molecule.getBondOrder(_i);
-            bond.atom1 = molecule.getBondAtom(0, _i);
-            bond.atom2 = molecule.getBondAtom(1, _i);
-            bond.type = molecule.getBondType(_i);
-            bond.isAromatic = molecule.isAromaticBond(_i);
-
-            if (!bond.isAromatic && molecule.getBondTypeSimple(_i) === 1 && molecule.getAtomicNo(bond.atom1) === 6 && molecule.getAtomicNo(bond.atom2) === 6 && (atoms[bond.atom1].extra.cnoHybridation === 3 || atoms[bond.atom2].extra.cnoHybridation === 3)) {
-
-                bond.selected = true;
-                atoms[bond.atom1].links.push(bond.atom2);
-                atoms[bond.atom2].links.push(bond.atom1);
-            }
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
         }
-
-        var brokenMolecule = molecule.getCompactCopy();
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-            for (var _iterator = bonds[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                var _bond = _step.value;
-
-                if (_bond.selected) {
-                    brokenMolecule.markBondForDeletion(_bond.i);
-                }
-            }
-        } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-        } finally {
-            try {
-                if (!_iteratorNormalCompletion && _iterator.return) {
-                    _iterator.return();
-                }
-            } finally {
-                if (_didIteratorError) {
-                    throw _iteratorError;
-                }
-            }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
         }
+      }
+    }
 
-        brokenMolecule.deleteMarkedAtomsAndBonds();
-        var fragmentMap = [];
-        var nbFragments = brokenMolecule.getFragmentNumbers(fragmentMap);
+    brokenMolecule.deleteMarkedAtomsAndBonds();
+    var fragmentMap = [];
+    var nbFragments = brokenMolecule.getFragmentNumbers(fragmentMap);
 
-        var results = {};
+    var results = {};
 
-        var _loop = function _loop(_i2) {
-            result = {};
+    var _loop = function _loop(_i2) {
+      result = {};
 
-            result.atomMap = [];
-            includeAtom = fragmentMap.map(function (id) {
-                return id === _i2;
-            });
-            fragment = new OCL.Molecule();
-            atomMap = [];
+      result.atomMap = [];
+      includeAtom = fragmentMap.map(function (id) {
+        return id === _i2;
+      });
+      fragment = new OCL.Molecule();
+      atomMap = [];
 
-            brokenMolecule.copyMoleculeByAtoms(fragment, includeAtom, false, atomMap);
-            parent = fragment.getCompactCopy();
+      brokenMolecule.copyMoleculeByAtoms(fragment, includeAtom, false, atomMap);
+      parent = fragment.getCompactCopy();
 
-            parent.setFragment(true);
-            // we will remove the hydrogens of the broken carbon
-            for (var j = 0; j < atomMap.length; j++) {
-                if (atomMap[j] > -1) {
-                    //                var numberDeletedHydrogens = 0;
-                    if (atoms[j].links.length > 0) {
-                        for (var k = 0; k < atoms[j].links.length; k++) {
-                            if (parent.getAtomicNo(atoms[j].links[k]) === 1) {
-                                //                           numberDeletedHydrogens++;
-                                fragment.deleteAtom(atoms[j].links[k]);
-                            }
-                        }
-                    }
-                    fragment.ensureHelperArrays(OCL.Molecule.cHelperBitNeighbours);
-                    // we will allow any substitution on sp3 hydrogens
-                    // that is at an extremety (only one connection)
-
-                    if (atoms[j].atomicNo === 6 && fragment.getConnAtoms(atomMap[j]) > 1) {
-                        if (atoms[j].allHydrogens !== 0) parent.setAtomQueryFeature(atomMap[j], OCL.Molecule.cAtomQFNot0Hydrogen, true);
-                        if (atoms[j].allHydrogens !== 1) parent.setAtomQueryFeature(atomMap[j], OCL.Molecule.cAtomQFNot1Hydrogen, true);
-                        if (atoms[j].allHydrogens !== 2) parent.setAtomQueryFeature(atomMap[j], OCL.Molecule.cAtomQFNot2Hydrogen, true);
-                        if (atoms[j].allHydrogens !== 3) parent.setAtomQueryFeature(atomMap[j], OCL.Molecule.cAtomQFNot3Hydrogen, true);
-                    }
-                    if (atoms[j].atomicNo !== 6) {
-                        parent.setAtomQueryFeature(atomMap[j], OCL.Molecule.cAtomQFNoMoreNeighbours, true);
-                    }
-                }
+      parent.setFragment(true);
+      // we will remove the hydrogens of the broken carbon
+      for (var j = 0; j < atomMap.length; j++) {
+        if (atomMap[j] > -1) {
+          //                var numberDeletedHydrogens = 0;
+          if (atoms[j].links.length > 0) {
+            for (var k = 0; k < atoms[j].links.length; k++) {
+              if (parent.getAtomicNo(atoms[j].links[k]) === 1) {
+                //                           numberDeletedHydrogens++;
+                fragment.deleteAtom(atoms[j].links[k]);
+              }
             }
+          }
+          fragment.ensureHelperArrays(OCL.Molecule.cHelperBitNeighbours);
+          // we will allow any substitution on sp3 hydrogens
+          // that is at an extremety (only one connection)
 
-            result.parent = parent.getIDCode();
-            fragment.setFragment(false); // required for small molecules like methanol
+          if (atoms[j].atomicNo === 6 && fragment.getConnAtoms(atomMap[j]) > 1) {
+            if (atoms[j].allHydrogens !== 0) parent.setAtomQueryFeature(atomMap[j], OCL.Molecule.cAtomQFNot0Hydrogen, true);
+            if (atoms[j].allHydrogens !== 1) parent.setAtomQueryFeature(atomMap[j], OCL.Molecule.cAtomQFNot1Hydrogen, true);
+            if (atoms[j].allHydrogens !== 2) parent.setAtomQueryFeature(atomMap[j], OCL.Molecule.cAtomQFNot2Hydrogen, true);
+            if (atoms[j].allHydrogens !== 3) parent.setAtomQueryFeature(atomMap[j], OCL.Molecule.cAtomQFNot3Hydrogen, true);
+          }
+          if (atoms[j].atomicNo !== 6) {
+            parent.setAtomQueryFeature(atomMap[j], OCL.Molecule.cAtomQFNoMoreNeighbours, true);
+          }
+        }
+      }
 
-            // we will add some R groups at the level of the broken bonds
-            for (var _j = 0; _j < atomMap.length; _j++) {
-                if (atomMap[_j] > -1) {
-                    result.atomMap.push(_j);
-                    if (atoms[_j].links.length > 0) {
-                        for (var _k = 0; _k < atoms[_j].links.length; _k++) {
-                            rGroup = fragment.addAtom(154);
-                            x = molecule.getAtomX(atoms[_j].links[_k]);
-                            y = molecule.getAtomY(atoms[_j].links[_k]);
+      result.parent = parent.getIDCode();
+      fragment.setFragment(false); // required for small molecules like methanol
 
-                            fragment.setAtomX(rGroup, x);
-                            fragment.setAtomY(rGroup, y);
-                            fragment.addBond(atomMap[_j], rGroup, 1);
-                        }
-                    }
-                }
+      // we will add some R groups at the level of the broken bonds
+      for (var _j = 0; _j < atomMap.length; _j++) {
+        if (atomMap[_j] > -1) {
+          result.atomMap.push(_j);
+          if (atoms[_j].links.length > 0) {
+            for (var _k = 0; _k < atoms[_j].links.length; _k++) {
+              rGroup = fragment.addAtom(154);
+              x = molecule.getAtomX(atoms[_j].links[_k]);
+              y = molecule.getAtomY(atoms[_j].links[_k]);
+
+              fragment.setAtomX(rGroup, x);
+              fragment.setAtomY(rGroup, y);
+              fragment.addBond(atomMap[_j], rGroup, 1);
             }
-            result.idCode = fragment.getIDCode();
+          }
+        }
+      }
+      result.idCode = fragment.getIDCode();
 
-            if (results[result.idCode]) {
-                results[result.idCode].atomMap = results[result.idCode].atomMap.concat(result.atomMap);
-            } else {
-                results[result.idCode] = {
-                    atomMap: result.atomMap,
-                    idCode: result.idCode
-                };
-            }
-
-            if (results[result.parent]) {
-                results[result.parent].atomMap = results[result.parent].atomMap.concat(result.atomMap);
-            } else {
-                results[result.parent] = {
-                    atomMap: result.atomMap,
-                    idCode: result.parent
-                };
-            }
+      if (results[result.idCode]) {
+        results[result.idCode].atomMap = results[result.idCode].atomMap.concat(result.atomMap);
+      } else {
+        results[result.idCode] = {
+          atomMap: result.atomMap,
+          idCode: result.idCode
         };
+      }
 
-        for (var _i2 = 0; _i2 < nbFragments; _i2++) {
-            var result;
-            var includeAtom;
-            var fragment;
-            var atomMap;
-            var parent;
-            var rGroup;
-            var x;
-            var y;
-
-            _loop(_i2);
-        }
-
-        // fragments should be unique
-        var fragments = [];
-        Object.keys(results).forEach(function (key) {
-            fragments.push(results[key]);
-        });
-        return fragments;
+      if (results[result.parent]) {
+        results[result.parent].atomMap = results[result.parent].atomMap.concat(result.atomMap);
+      } else {
+        results[result.parent] = {
+          atomMap: result.atomMap,
+          idCode: result.parent
+        };
+      }
     };
+
+    for (var _i2 = 0; _i2 < nbFragments; _i2++) {
+      var result;
+      var includeAtom;
+      var fragment;
+      var atomMap;
+      var parent;
+      var rGroup;
+      var x;
+      var y;
+
+      _loop(_i2);
+    }
+
+    // fragments should be unique
+    var fragments = [];
+    Object.keys(results).forEach(function (key) {
+      fragments.push(results[key]);
+    });
+    return fragments;
+  };
 };
 
 /***/ }),
@@ -10598,47 +10605,246 @@ module.exports = function (OCL) {
 
 
 module.exports = function (OCL) {
-    var Util = OCL.Util;
-    return function getGroupedHOSECodes() {
-        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var Util = OCL.Util;
+  return function getGroupedHOSECodes() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        var diaIDs = this.getGroupedDiastereotopicAtomIDs(options);
-        diaIDs.forEach(function (diaID) {
-            var hoses = Util.getHoseCodesFromDiastereotopicID(diaID.oclID, options);
+    var diaIDs = this.getGroupedDiastereotopicAtomIDs(options);
+    diaIDs.forEach(function (diaID) {
+      var hoses = Util.getHoseCodesFromDiastereotopicID(diaID.oclID, options);
 
-            diaID.hoses = [];
-            var level = 1;
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+      diaID.hoses = [];
+      var level = 1;
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-            try {
-                for (var _iterator = hoses[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var hose = _step.value;
+      try {
+        for (var _iterator = hoses[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var hose = _step.value;
 
-                    diaID.hoses.push({
-                        level: level++,
-                        oclID: hose
-                    });
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
+          diaID.hoses.push({
+            level: level++,
+            oclID: hose
+          });
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    });
+
+    return diaIDs;
+  };
+};
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// This is a javascript COPY of the java class !!!!
+
+
+module.exports = function (OCL) {
+  return function getHoseCodesForAtom(rootAtom) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    var FULL_HOSE_CODE = 1;
+    var HOSE_CODE_CUT_C_SP3_SP3 = 2;
+    var _options$minSphereSiz = options.minSphereSize,
+        minSphereSize = _options$minSphereSiz === undefined ? 0 : _options$minSphereSiz,
+        _options$maxSphereSiz = options.maxSphereSize,
+        maxSphereSize = _options$maxSphereSiz === undefined ? 4 : _options$maxSphereSiz,
+        _options$kind = options.kind,
+        kind = _options$kind === undefined ? FULL_HOSE_CODE : _options$kind;
+
+    var molecule = this.getCompactCopy();
+
+    molecule.setAtomCustomLabel(rootAtom, `${molecule.getAtomLabel(rootAtom)}*`);
+    molecule.setAtomicNo(rootAtom, OCL.Molecule.getAtomicNoFromLabel('X'));
+
+    var fragment = new OCL.Molecule();
+    var results = [];
+    var min = 0;
+    var max = 0;
+    var atomMask = new Array(molecule.getAllAtoms());
+    var atomList = new Array(molecule.getAllAtoms());
+
+    for (var sphere = 0; sphere <= maxSphereSize; sphere++) {
+      if (max === 0) {
+        atomList[0] = rootAtom;
+        atomMask[rootAtom] = true;
+        max = 1;
+      } else {
+        var newMax = max;
+        for (var i = min; i < max; i++) {
+          var atom = atomList[i];
+          for (var j = 0; j < molecule.getConnAtoms(atom); j++) {
+            var connAtom = molecule.getConnAtom(atom, j);
+            if (!atomMask[connAtom]) {
+              switch (kind) {
+                case FULL_HOSE_CODE:
+                  atomMask[connAtom] = true;
+                  atomList[newMax++] = connAtom;
+                  break;
+                case HOSE_CODE_CUT_C_SP3_SP3:
+                  if (!(isCsp3(molecule, atom) && isCsp3(molecule, connAtom))) {
+                    atomMask[connAtom] = true;
+                    atomList[newMax++] = connAtom;
+                  }
+                  break;
+                default:
+                  throw new Error('getHoseCoesForAtom unknown kind');
+              }
             }
-        });
+          }
+        }
+        min = max;
+        max = newMax;
+      }
+      molecule.copyMoleculeByAtoms(fragment, atomMask, true, null);
+      if (sphere >= minSphereSize) {
+        results.push(fragment.getCanonizedIDCode(OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS));
+      }
+    }
+    return results;
+  };
 
-        return diaIDs;
-    };
+  function isCsp3(molecule, atomID) {
+    if (molecule.getAtomicNo(atomID) !== 6) return false;
+    if (molecule.getAtomCharge(atomID) !== 0) return false;
+    if (molecule.getImplicitHydrogens(atomID) + molecule.getConnAtoms(atomID) !== 4) return false;
+    return true;
+  }
+};
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * @returns [array] array of extended bond bonds
+ */
+
+module.exports = function (OCL) {
+  return function cleaveBonds() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var _options$filter = options.filter,
+        filter = _options$filter === undefined ? function (bond) {
+      return !bond.isAromatic && bond.kind === 1 && bond.ringSize === 0;
+    } : _options$filter,
+        _options$hose = options.hose,
+        hose = _options$hose === undefined ? {
+      minSphereSize: 1,
+      maxSphereSize: 3
+    } : _options$hose;
+
+    var atoms = [];
+    for (var i = 0; i < this.getAllAtoms(); i++) {
+      var atom = {};
+      atoms.push(atom);
+      atom.i = i;
+      atom.mapNo = this.getAtomMapNo(i);
+      atom.links = []; // we will store connected atoms of broken bonds
+    }
+
+    var bonds = [];
+    for (var _i = 0; _i < this.getAllBonds(); _i++) {
+      var _bond = {};
+      _bond.i = _i;
+      _bond.order = this.getBondOrder(_i);
+      _bond.atom1 = this.getBondAtom(0, _i);
+      _bond.atom2 = this.getBondAtom(1, _i);
+      _bond.kind = this.getBondType(_i);
+      _bond.isAromatic = this.isAromaticBond(_i);
+      _bond.ringSize = this.getBondRingSize(_i);
+      if (filter(_bond)) {
+        _bond.selected = true;
+        atoms[_bond.atom1].links.push(_bond.atom2);
+        atoms[_bond.atom2].links.push(_bond.atom1);
+        bonds.push(_bond);
+      }
+    }
+
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = bonds[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var bond = _step.value;
+
+        bond.fragments = breakMolecule(this, atoms, bond, hose);
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+
+    return bonds;
+  };
+
+  function breakMolecule(molecule, atoms, bond, hoseOptions) {
+    var brokenMolecule = molecule.getCompactCopy();
+    brokenMolecule.markBondForDeletion(bond.i);
+    brokenMolecule.deleteMarkedAtomsAndBonds();
+    var fragmentMap = [];
+    var nbFragments = brokenMolecule.getFragmentNumbers(fragmentMap);
+    var results = [];
+    for (var i = 0; i < nbFragments; i++) {
+      var result = {};
+      result.atomMap = [];
+      var includeAtom = fragmentMap.map(function (id) {
+        return id === i;
+      }); // eslint-disable-line no-loop-func
+      var fragment = new OCL.Molecule();
+      var atomMap = [];
+      brokenMolecule.copyMoleculeByAtoms(fragment, includeAtom, false, atomMap);
+      // we will add some R groups at the level of the broken bonds
+      fragment.setFragment(false);
+      if (atomMap[bond.atom1] > -1) {
+        fragment.addBond(atomMap[bond.atom1], fragment.addAtom(154), 1);
+        bond.hoses1 = fragment.getHoseCodesForAtom(atomMap[bond.atom1], hoseOptions).map(function (f, i) {
+          return { f, i };
+        });
+      }
+      if (atomMap[bond.atom2] > -1) {
+        fragment.addBond(atomMap[bond.atom2], fragment.addAtom(154), 1);
+        bond.hoses2 = fragment.getHoseCodesForAtom(atomMap[bond.atom2], hoseOptions).map(function (f, i) {
+          return { f, i };
+        });
+      }
+      result.idCode = fragment.getIDCode();
+      result.mf = fragment.getMF().mf.replace(/R([1-9]|(?=[A-Z(])|$)/, '');
+      results.push(result);
+    }
+    return results;
+  }
 };
 
 /***/ })
