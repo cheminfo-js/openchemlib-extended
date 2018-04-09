@@ -5,7 +5,6 @@
  */
 
 module.exports = function (OCL) {
-
   return function cleaveBonds(options = {}) {
     const {
       filter = (bond) => !bond.isAromatic && bond.kind === 1 && bond.ringSize === 0,
@@ -79,5 +78,4 @@ module.exports = function (OCL) {
     }
     return results;
   }
-
 };

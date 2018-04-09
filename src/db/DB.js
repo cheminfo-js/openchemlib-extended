@@ -17,7 +17,7 @@ module.exports = function (OCL) {
   };
 
   const defaultSDFOptions = {
-    onStep: function (/*current, total*/) {
+    onStep: function (/* current, total*/) {
       // empty function
     }
   };
@@ -26,7 +26,7 @@ module.exports = function (OCL) {
     header: true,
     dynamicTyping: true,
     skipEmptyLines: true,
-    onStep: function (/*current, total*/) {
+    onStep: function (/* current, total*/) {
       // empty function
     }
   };

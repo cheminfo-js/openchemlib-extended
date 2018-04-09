@@ -11,7 +11,6 @@ describe('cleaveBonds test propane', () => {
 
     });
     expect(results).toMatchSnapshot();
-
   });
 
   test('charged', () => {
@@ -21,5 +20,4 @@ describe('cleaveBonds test propane', () => {
     });
     expect(results[0].fragments[1].mf).toMatch('C2H4(+)');
   });
-
 });

@@ -89,5 +89,4 @@ module.exports = function getMF() {
     }
     return mf;
   }
-
 };

@@ -31,7 +31,6 @@ module.exports = function (OCL) {
                     || atoms[bond.atom2].extra.cnoHybridation === 3
                 )
       ) {
-
         bond.selected = true;
         atoms[bond.atom1].links.push(bond.atom2);
         atoms[bond.atom2].links.push(bond.atom1);

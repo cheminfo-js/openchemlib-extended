@@ -5,8 +5,6 @@
 
 module.exports = function (OCL) {
   return function getHoseCodesForAtom(rootAtom, options = {}) {
-
-
     let FULL_HOSE_CODE = 1;
     let HOSE_CODE_CUT_C_SP3_SP3 = 2;
     const {
@@ -63,7 +61,6 @@ module.exports = function (OCL) {
       if (sphere >= minSphereSize) {
         results.push(fragment.getCanonizedIDCode(OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS));
       }
-
     }
     return results;
   };
@@ -74,5 +71,4 @@ module.exports = function (OCL) {
     if ((molecule.getImplicitHydrogens(atomID) + molecule.getConnAtoms(atomID)) !== 4) return false;
     return true;
   }
-
 };

@@ -16,7 +16,7 @@ module.exports = function getAllCouplings() {
           if (!isAttachedToHeteroAtom(molecule, i) && !isAttachedToHeteroAtom(molecule, j)) {
             if (!(diaIDs[i].toLowerCase() === diaIDs[j].toLowerCase())) {
               var atoms = [];
-              var xyz = []; //TODO
+              var xyz = []; // TODO
               getPath(molecule, i, i, j, 0, atoms, xyz);
               if (atoms.length !== 0) {
                 var fragmentId = -1;
@@ -187,7 +187,7 @@ function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
           }
           sumZ += Math.abs(coords[i][2]);
         }
-        if (sumZ === 0 && !isDoubleOrTripleBond(molecule, atoms[1], atoms[2])) {// If
+        if (sumZ === 0 && !isDoubleOrTripleBond(molecule, atoms[1], atoms[2])) { // If
           // it
           // is
           // single
@@ -210,7 +210,7 @@ function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
       coupling.angle = angle;
       break;
     }
-    case 4: {// allylic Coupling
+    case 4: { // allylic Coupling
       coupling.type = 5;
       if (isDoubleOrTripleBond(molecule, atoms[1], atoms[2])
                 && isNotAromatic(molecule, atoms[1], atoms[2])) {
@@ -248,7 +248,6 @@ function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
   }
 
   return true;
-
 }
 
 function getDihedralAngle(xyz) {

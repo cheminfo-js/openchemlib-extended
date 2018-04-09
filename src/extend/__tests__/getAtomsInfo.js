@@ -5,7 +5,6 @@ const OCLE = require('../..');
 
 
 describe('getAtomsInfo test propane', () => {
-
   test('should yield the right table - methanol', () => {
     var molecule = OCLE.Molecule.fromSmiles('CO');
     molecule.addImplicitHydrogens();
@@ -120,5 +119,4 @@ describe('getAtomsInfo test propane', () => {
 
     // console.log(atoms);
   });
-
 });

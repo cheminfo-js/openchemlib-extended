@@ -23,5 +23,4 @@ describe('getHosesCodeForAtom test propane', () => {
     });
     expect(results).toHaveLength(2);
   });
-
 });

@@ -44,7 +44,8 @@ describe('getAllPaths test propane', () => {
         toAtoms: [6, 7],
         fromLabel: 'C',
         toLabel: 'H',
-        pathLength: 1 }]);
+        pathLength: 1 }
+    ]);
   });
 
   test('min:2, max:2', () => {

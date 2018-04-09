@@ -22,7 +22,6 @@ module.exports = function toVisualizerMolfile(options = {}) {
             highlight.push(id);
             atoms[id] = diaID.atoms;
           });
-
         }
       }
     });

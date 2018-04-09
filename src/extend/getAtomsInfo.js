@@ -2,7 +2,6 @@
 
 module.exports = function (OCL) {
   return function getAtomsInfo() {
-
     this.ensureHelperArrays(OCL.Molecule.cHelperRings);
 
     var diaIDs = this.getDiastereotopicAtomIDs();

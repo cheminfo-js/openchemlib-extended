@@ -16,7 +16,6 @@ describe('getMF test', () => {
     expect(result.mf).toBe('C2H5NO2');
     expect(result.parts).toHaveLength(1);
     expect(result.parts[0]).toBe('C2H5NO2');
-
   });
   test('check isotope of pentane', () => {
     var molecule = OCLE.Molecule.fromSmiles('CC[13CH2]CC([2H])([2H])([2H])');
@@ -24,7 +23,6 @@ describe('getMF test', () => {
     expect(result.mf).toBe('C4H9[13C][2H]3');
     expect(result.parts).toHaveLength(1);
     expect(result.parts[0]).toBe('C4H9[13C][2H]3');
-
   });
   test('check multipart', () => {
     var molecule = OCLE.Molecule.fromSmiles('OCC(N)CCl.[CH2+][2H]');
@@ -33,7 +31,6 @@ describe('getMF test', () => {
     expect(result.parts).toHaveLength(2);
     expect(result.parts[0]).toBe('C3H8ClNO');
     expect(result.parts[1]).toBe('CH2[2H](+)');
-
   });
   test('check multihydrate', () => {
     var molecule = OCLE.Molecule.fromSmiles('[ClH].O.O.O.O');
@@ -79,6 +76,4 @@ describe('getMF test', () => {
     expect(result.parts).toHaveLength(1);
     expect(result.parts[0]).toBe('O(-2)');
   });
-
-
 });
