@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`cleaveBonds test propane default 1`] = `
+Array [
+  Object {
+    "atom1": 1,
+    "atom2": 0,
+    "fragments": Array [
+      Object {
+        "atomMap": Array [],
+        "idCode": "eFBAYc@@",
+        "mf": "CH3",
+      },
+      Object {
+        "atomMap": Array [],
+        "idCode": "eMBAYRZ@",
+        "mf": "C2H5",
+      },
+    ],
+    "hoses1": Array [
+      Object {
+        "f": "eMAAYieIhGzRSaU@",
+        "i": 0,
+      },
+      Object {
+        "f": "eMAAYieIhGzRSaU@",
+        "i": 1,
+      },
+      Object {
+        "f": "eMAAYieIhGzRSaU@",
+        "i": 2,
+      },
+    ],
+    "hoses2": Array [
+      Object {
+        "f": "eFAAYifLC}IIpj\`",
+        "i": 0,
+      },
+      Object {
+        "f": "eFAAYifLC}IIpj\`",
+        "i": 1,
+      },
+      Object {
+        "f": "eFAAYifLC}IIpj\`",
+        "i": 2,
+      },
+    ],
+    "i": 0,
+    "isAromatic": false,
+    "kind": 1,
+    "order": 1,
+    "ringSize": 0,
+    "selected": true,
+  },
+  Object {
+    "atom1": 2,
+    "atom2": 1,
+    "fragments": Array [
+      Object {
+        "atomMap": Array [],
+        "idCode": "eMBAYRZ@",
+        "mf": "C2H5",
+      },
+      Object {
+        "atomMap": Array [],
+        "idCode": "eFBAYc@@",
+        "mf": "CH3",
+      },
+    ],
+    "hoses1": Array [
+      Object {
+        "f": "eFAAYifLC}IIpj\`",
+        "i": 0,
+      },
+      Object {
+        "f": "eFAAYifLC}IIpj\`",
+        "i": 1,
+      },
+      Object {
+        "f": "eFAAYifLC}IIpj\`",
+        "i": 2,
+      },
+    ],
+    "hoses2": Array [
+      Object {
+        "f": "eMAAYieIhGzRSaU@",
+        "i": 0,
+      },
+      Object {
+        "f": "eMAAYieIhGzRSaU@",
+        "i": 1,
+      },
+      Object {
+        "f": "eMAAYieIhGzRSaU@",
+        "i": 2,
+      },
+    ],
+    "i": 1,
+    "isAromatic": false,
+    "kind": 1,
+    "order": 1,
+    "ringSize": 0,
+    "selected": true,
+  },
+]
+`;

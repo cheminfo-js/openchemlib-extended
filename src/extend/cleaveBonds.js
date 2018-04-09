@@ -15,9 +15,6 @@ module.exports = function (OCL) {
       }
     } = options;
 
-
-    console.log('HOSE', hose);
-
     var atoms = [];
     for (var i = 0; i < this.getAllAtoms(); i++) {
       var atom = {};
@@ -62,7 +59,7 @@ module.exports = function (OCL) {
     for (var i = 0; i < nbFragments; i++) {
       var result = {};
       result.atomMap = [];
-      var includeAtom = fragmentMap.map((id) => id === i);
+      var includeAtom = fragmentMap.map((id) => id === i); // eslint-disable-line no-loop-func
       var fragment = new OCL.Molecule();
       var atomMap = [];
       brokenMolecule.copyMoleculeByAtoms(fragment, includeAtom, false, atomMap);
@@ -77,7 +74,7 @@ module.exports = function (OCL) {
         bond.hoses2 = fragment.getHoseCodesForAtom(atomMap[bond.atom2], hoseOptions).map((f, i) => ({ f, i }));
       }
       result.idCode = fragment.getIDCode();
-      result.mf = fragment.getMolecularFormula().formula.replace(/R([1-9]|(?=[A-Z])|$)/, '');
+      result.mf = fragment.getMF().mf.replace(/R([1-9]|(?=[A-Z(])|$)/, '');
       results.push(result);
     }
     return results;
