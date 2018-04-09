@@ -27,6 +27,7 @@ const moleculePrototypeMethodsNeedOCL = {
   getFunctionCodes: require('./extend/functions/getFunctionCodes'),
   getGroupedHOSECodes: require('./extend/getGroupedHOSECodes'),
   getHoseCodesForAtom: require('./extend/getHoseCodesForAtom'),
+  cleaveBonds: require('./extend/cleaveBonds'),
 };
 
 module.exports = function extend(OCL) {

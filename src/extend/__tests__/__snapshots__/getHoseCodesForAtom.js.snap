@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getHosesCodeForAtom test propane minSphereSize:0, maxSphereSize:3 1`] = `
+Array [
+  "fHdrARapj\`",
+  "eFBBYcARP\\\\Jh",
+  "eMBBYRZA~d\`xUP",
+  "eMBBYRZA~d\`xUP",
+]
+`;
