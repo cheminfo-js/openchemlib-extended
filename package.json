@@ -24,11 +24,12 @@
   "scripts": {
     "test": "run-s testonly eslint",
     "testonly": "jest",
-    "build": "npm run compile && npm run build-dist",
+    "build": "npm run build-clean && npm run compile && npm run build-dist",
+    "build-clean": "rimraf ./lib/",
     "build-dist": "cheminfo build -u --babel",
     "eslint": "eslint src",
     "eslint-fix": "npm run eslint -- --fix",
-    "compile": "babel src --out-dir lib --quiet",
+    "compile": "babel src --out-dir lib --quiet --ignore __tests__",
     "prepublish": "npm run compile"
   },
   "devDependencies": {
@@ -43,6 +44,7 @@
     "eslint-plugin-no-only-tests": "^1.1.0",
     "jest": "^22.4.2",
     "npm-run-all": "^4.1.2",
+    "rimraf": "^2.6.2",
     "should": "^11.2.1"
   },
   "dependencies": {
