@@ -22,7 +22,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "run-s testonly eslint",
+    "test": "npm run testonly && npm run eslint",
     "testonly": "jest",
     "build": "npm run build-clean && npm run compile && npm run build-dist",
     "build-clean": "rimraf ./lib/",
@@ -50,7 +50,7 @@
   "dependencies": {
     "ml-floyd-warshall": "^1.0.0",
     "ml-matrix": "^2.3.0",
-    "openchemlib": "^5.5.0",
+    "openchemlib": "^5.5.2",
     "papaparse": "^4.3.7",
     "rxn-parser": "0.0.2",
     "sdf-parser": "^1.0.0",
