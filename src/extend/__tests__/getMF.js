@@ -1,5 +1,8 @@
 'use strict';
 
+const fs = require('fs');
+const join = require('path').join;
+
 const OCLE = require('../..');
 
 describe('getMF test', () => {
@@ -75,5 +78,12 @@ describe('getMF test', () => {
     expect(result.mf).toBe('O(-2)');
     expect(result.parts).toHaveLength(1);
     expect(result.parts[0]).toBe('O(-2)');
+  });
+
+  test('multipart molfile', () => {
+    let molfile = fs.readFileSync(join(__dirname, 'ru.mol'), 'utf8');
+    let molecule = OCLE.Molecule.fromMolfile(molfile);
+    let mf = molecule.getMF();
+    expect(mf).toEqual({ parts: ['2C8H16', '2HORu'], mf: 'C16H34O2Ru2' });
   });
 });
