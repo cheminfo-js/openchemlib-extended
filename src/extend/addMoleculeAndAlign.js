@@ -7,7 +7,6 @@
 
 module.exports = function () {
   return function addMoleculeAndAlign(molecule, options = {}) {
-    console.log('START')
     const {
       space = 2
     } = options;
