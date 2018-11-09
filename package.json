@@ -26,7 +26,7 @@
     "testonly": "jest",
     "build": "npm run build-clean && npm run compile && npm run build-dist",
     "build-clean": "rimraf ./lib/",
-    "build-dist": "cheminfo build -u --babel",
+    "build-dist": "cheminfo build -u",
     "eslint": "eslint src",
     "eslint-fix": "npm run eslint -- --fix",
     "compile": "babel src --out-dir lib --quiet --ignore __tests__",
