@@ -14,7 +14,7 @@ const moleculePrototypeMethods = {
   getCouplings: require('./extend/couplings/getCouplings'),
   getNumberOfAtoms: require('./extend/getNumberOfAtoms'),
   toDiastereotopicSVG: require('./extend/diastereotopic/toDiastereotopicSVG'),
-  toVisualizerMolfile: require('./extend/toVisualizerMolfile')
+  toVisualizerMolfile: require('./extend/toVisualizerMolfile'),
 };
 
 // These methods need a direct access to OCL. The must be exported as a function
@@ -27,8 +27,9 @@ const moleculePrototypeMethodsNeedOCL = {
   getFunctionCodes: require('./extend/functions/getFunctionCodes'),
   getGroupedHOSECodes: require('./extend/getGroupedHOSECodes'),
   getHoseCodesForAtom: require('./extend/getHoseCodesForAtom'),
-  getBoundary: require('./extend/getBoundary'),
   cleaveBonds: require('./extend/cleaveBonds'),
+  getBoundary: require('./extend/getBoundary'),
+  addMoleculeAndAlign: require('./extend/addMoleculeAndAlign'),
 };
 
 module.exports = function extend(OCL) {

@@ -56,7 +56,7 @@ module.exports = function (OCL) {
       var includeAtom = fragmentMap.map(function (id) {
         return id === i;
       });
-      var fragment = new OCL.Molecule(0,0);
+      var fragment = new OCL.Molecule(0, 0);
       var atomMap = [];
       brokenMolecule.copyMoleculeByAtoms(fragment, includeAtom, false, atomMap);
       var parent = fragment.getCompactCopy();

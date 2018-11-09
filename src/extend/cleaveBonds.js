@@ -59,7 +59,7 @@ module.exports = function (OCL) {
       var result = {};
       result.atomMap = [];
       var includeAtom = fragmentMap.map((id) => id === i); // eslint-disable-line no-loop-func
-      var fragment = new OCL.Molecule(0,0);
+      var fragment = new OCL.Molecule(0, 0);
       var atomMap = [];
       brokenMolecule.copyMoleculeByAtoms(fragment, includeAtom, false, atomMap);
       // we will add some R groups at the level of the broken bonds
