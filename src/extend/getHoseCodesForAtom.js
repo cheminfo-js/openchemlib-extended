@@ -18,7 +18,7 @@ module.exports = function (OCL) {
     molecule.setAtomCustomLabel(rootAtom, `${molecule.getAtomLabel(rootAtom)}*`);
     molecule.setAtomicNo(rootAtom, OCL.Molecule.getAtomicNoFromLabel('X'));
 
-    let fragment = new OCL.Molecule();
+    let fragment = new OCL.Molecule(0,0);
     let results = [];
     let min = 0;
     let max = 0;

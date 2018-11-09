@@ -3,8 +3,8 @@
 exports[`cleaveBonds test propane default 1`] = `
 Array [
   Object {
-    "atom1": 1,
-    "atom2": 0,
+    "atom1": 0,
+    "atom2": 1,
     "fragments": Array [
       Object {
         "atomMap": Array [],
@@ -19,29 +19,29 @@ Array [
     ],
     "hoses1": Array [
       Object {
-        "f": "eMAAYieIhGzRSaU@",
+        "f": "eFAAYifLC}IIpj\`",
         "i": 0,
       },
       Object {
-        "f": "eMAAYieIhGzRSaU@",
+        "f": "eFAAYifLC}IIpj\`",
         "i": 1,
       },
       Object {
-        "f": "eMAAYieIhGzRSaU@",
+        "f": "eFAAYifLC}IIpj\`",
         "i": 2,
       },
     ],
     "hoses2": Array [
       Object {
-        "f": "eFAAYifLC}IIpj\`",
+        "f": "eMAAYieIhGzRSaU@",
         "i": 0,
       },
       Object {
-        "f": "eFAAYifLC}IIpj\`",
+        "f": "eMAAYieIhGzRSaU@",
         "i": 1,
       },
       Object {
-        "f": "eFAAYifLC}IIpj\`",
+        "f": "eMAAYieIhGzRSaU@",
         "i": 2,
       },
     ],
@@ -53,8 +53,8 @@ Array [
     "selected": true,
   },
   Object {
-    "atom1": 2,
-    "atom2": 1,
+    "atom1": 1,
+    "atom2": 2,
     "fragments": Array [
       Object {
         "atomMap": Array [],
@@ -69,29 +69,29 @@ Array [
     ],
     "hoses1": Array [
       Object {
-        "f": "eFAAYifLC}IIpj\`",
+        "f": "eMAAYieIhGzRSaU@",
         "i": 0,
       },
       Object {
-        "f": "eFAAYifLC}IIpj\`",
+        "f": "eMAAYieIhGzRSaU@",
         "i": 1,
       },
       Object {
-        "f": "eFAAYifLC}IIpj\`",
+        "f": "eMAAYieIhGzRSaU@",
         "i": 2,
       },
     ],
     "hoses2": Array [
       Object {
-        "f": "eMAAYieIhGzRSaU@",
+        "f": "eFAAYifLC}IIpj\`",
         "i": 0,
       },
       Object {
-        "f": "eMAAYieIhGzRSaU@",
+        "f": "eFAAYifLC}IIpj\`",
         "i": 1,
       },
       Object {
-        "f": "eMAAYieIhGzRSaU@",
+        "f": "eFAAYifLC}IIpj\`",
         "i": 2,
       },
     ],

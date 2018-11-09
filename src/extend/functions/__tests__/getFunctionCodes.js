@@ -9,6 +9,6 @@ describe('getFunctionCodes test acetone', () => {
 
     expect(functionCodes).toHaveLength(4);
     expect(functionCodes[2].idCode).toBe('gCaDLEeKJST`@');
-    expect(functionCodes[3].idCode).toBe('eFHBJD');
+    expect(functionCodes[3].idCode).toBe('eFHBJFD@');
   });
 });
