@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * @returns {object} : minX, maxX, minY, maxY, minZ, maxZ, width, height, depth
+ * Add a molecule and align it horizontally
+ * @returns {molecule}
  */
 
 module.exports = function () {
