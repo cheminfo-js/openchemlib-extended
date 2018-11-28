@@ -101,7 +101,8 @@ describe('DB', () => {
       var result = db.search('CC', { format: 'smiles', mode: 'similarity' });
       expect(result).toHaveLength(5);
       expect(result.data[0].name).toBe('Ethane');
-      result = db.search('CC', { format: 'smiles', mode: 'similarity', limit: 2 });
+      result =
+          db.search('CC', { format: 'smiles', mode: 'similarity', limit: 2 });
       expect(result).toHaveLength(2);
     });
   });
