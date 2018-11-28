@@ -17,12 +17,12 @@ function pushMoleculeInfo(moleculeInfo, data = {}) {
     molecule = Molecule.fromMolfile(moleculeInfo.molfile);
   }
   if (moleculeInfo.smiles) molecule = Molecule.fromSmiles(moleculeInfo.smiles);
-  if (moleculeInfo.value) molecule = Molecule.fromMolfile(moleculeInfo.value);
+  if (moleculeInfo.value) molecule = Molecule.fromIDCode(moleculeInfo.value);
   if (moleculeInfo.idCode) {
-    molecule = Molecule.fromMolfile(moleculeInfo.idCode);
+    molecule = Molecule.fromIDCode(moleculeInfo.idCode);
   }
   if (moleculeInfo.oclCode) {
-    molecule = Molecule.fromMolfile(moleculeInfo.oclCode);
+    molecule = Molecule.fromIDCode(moleculeInfo.oclCode);
   }
   if (molecule) this.moleculeDB.pushEntry(molecule, data, moleculeInfo);
 }
