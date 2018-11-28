@@ -1,6 +1,6 @@
 /**
  * openchemlib-extended - Openchemlib extended
- * @version v4.0.0
+ * @version v4.0.1
  * @link https://github.com/cheminfo-js/openchemlib-extended
  * @license BSD-3-Clause
  */
@@ -9764,8 +9764,9 @@ module.exports = function (OCL) {
 
 function pushEntry(molecule) {
   var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var moleculeInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  var moleculeIDCode = molecule.getIDCode();
+  var moleculeInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {}; // the following lin could be the source of problems if the idCode version changes
+
+  var moleculeIDCode = moleculeInfo.idCode ? moleculeInfo.idCode : molecule.getIDCode();
   var entry = this.moleculeDB.db[moleculeIDCode];
 
   if (!entry) {
@@ -9782,6 +9783,8 @@ function pushEntry(molecule) {
 
     if (!moleculeInfo.index) {
       entry.index = molecule.getIndex();
+    } else {
+      entry.index = moleculeInfo.index;
     }
 
     var molecularFormula = void 0;
@@ -9789,6 +9792,8 @@ function pushEntry(molecule) {
     if (!moleculeInfo.mw) {
       molecularFormula = molecule.getMolecularFormula();
       entry.properties.mw = molecularFormula.relativeWeight;
+    } else {
+      entry.properties.mw = moleculeInfo.mw;
     }
 
     if (this.moleculeDB.computeProperties) {
@@ -9822,7 +9827,7 @@ module.exports = pushEntry;
 
 /**
  * Add an netry in the database
- * @param {object} moleculeInfo - a molecule as a JSON that may contain the following properties: molfile, smiles, idCode, value (=idCode), mf, index
+ * @param {object} moleculeInfo - a molecule as a JSON that may contain the following properties: molfile, smiles, idCode, mf, index
  * @param {object} [data={}]
  * @param {object} [moleculeInfo={}] may contain precalculated index and mw
  */
@@ -9842,14 +9847,9 @@ function pushMoleculeInfo(moleculeInfo) {
   }
 
   if (moleculeInfo.smiles) molecule = Molecule.fromSmiles(moleculeInfo.smiles);
-  if (moleculeInfo.value) molecule = Molecule.fromMolfile(moleculeInfo.value);
 
   if (moleculeInfo.idCode) {
-    molecule = Molecule.fromMolfile(moleculeInfo.idCode);
-  }
-
-  if (moleculeInfo.oclCode) {
-    molecule = Molecule.fromMolfile(moleculeInfo.oclCode);
+    molecule = Molecule.fromIDCode(moleculeInfo.idCode, moleculeInfo.coordinates || false);
   }
 
   if (molecule) this.moleculeDB.pushEntry(molecule, data, moleculeInfo);
