@@ -19,12 +19,16 @@ function pushEntry(molecule, data = {}, moleculeInfo = {}) {
     molecule.ensureHelperArrays(this.OCL.Molecule.cHelperRings);
     if (!moleculeInfo.index) {
       entry.index = molecule.getIndex();
+    } else {
+      entry.index = moleculeInfo.index;
     }
 
     let molecularFormula;
     if (!moleculeInfo.mw) {
       molecularFormula = molecule.getMolecularFormula();
       entry.properties.mw = molecularFormula.relativeWeight;
+    } else {
+      entry.properties.mw = moleculeInfo.mw;
     }
 
     if (this.moleculeDB.computeProperties) {
