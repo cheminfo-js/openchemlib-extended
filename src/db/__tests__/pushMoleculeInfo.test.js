@@ -24,7 +24,7 @@ describe('DB', () => {
         flattenResult: false,
         keepMolecule: false
       });
-      console.log(result);
+      expect(result).toHaveLength(2);
     });
   });
 });
