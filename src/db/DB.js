@@ -2,12 +2,10 @@
 
 const getMoleculeCreators = require('./moleculeCreators');
 
-
-module.exports = function (OCL) {
+module.exports = function(OCL) {
   const Molecule = OCL.Molecule;
 
-
-  const defaultDBOptions = { length: 0, computeProperties: false };
+  const defaultDBOptions = {length: 0, computeProperties: false};
 
   const defaultSearchOptions = {
     format: 'oclid',
@@ -34,7 +32,7 @@ module.exports = function (OCL) {
     }
   }
 
-  MoleculeDB.prototype.parseCSV = function (csv, options) {
+  MoleculeDB.parseCSV = function(csv, options) {
     const parseCSV = require('./parseCSV');
     return parseCSV.call(this, csv, options);
   };

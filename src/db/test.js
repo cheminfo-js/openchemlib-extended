@@ -1,7 +1,10 @@
 'use strict';
 const fs = require('fs');
 
-const DB = require('./DB');
+var OCL = require('openchemlib');
+const DB = require('./DB')(OCL);
+
+console.log(DB.parseCSV);
 
 let csv = fs.readFileSync(`${__dirname}/../../data/data.csv`, 'ascii');
 
