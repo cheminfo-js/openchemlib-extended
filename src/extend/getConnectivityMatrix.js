@@ -1,7 +1,7 @@
 'use strict';
 
 var floydWarshall = require('ml-floyd-warshall');
-var Matrix = require('ml-matrix');
+var Matrix = require('ml-matrix').Matrix;
 
 module.exports = function (OCL) {
   return function getConnectivityMatrix(options = {}) {

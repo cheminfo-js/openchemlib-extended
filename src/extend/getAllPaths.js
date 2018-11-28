@@ -1,14 +1,13 @@
 'use strict';
 
 var floydWarshall = require('ml-floyd-warshall');
-var Matrix = require('ml-matrix');
+var Matrix = require('ml-matrix').Matrix;
 
 module.exports = function getAllPaths(options = {}) {
   var fromLabel = options.fromLabel || '';
   var toLabel = options.toLabel || '';
-  var minLength = (options.minLength === undefined) ? 1 : options.minLength;
-  var maxLength = (options.maxLength === undefined) ? 4 : options.maxLength;
-
+  var minLength = options.minLength === undefined ? 1 : options.minLength;
+  var maxLength = options.maxLength === undefined ? 4 : options.maxLength;
 
   // we need to find all the atoms 'fromLabel' and 'toLabel'
   var results = {};
@@ -36,8 +35,12 @@ module.exports = function getAllPaths(options = {}) {
                 pathLength: pathLength
               };
             }
-            if (results[key].fromAtoms.indexOf(from) === -1) results[key].fromAtoms.push(from);
-            if (results[key].toAtoms.indexOf(to) === -1) results[key].toAtoms.push(to);
+            if (results[key].fromAtoms.indexOf(from) === -1) {
+              results[key].fromAtoms.push(from);
+            }
+            if (results[key].toAtoms.indexOf(to) === -1) {
+              results[key].toAtoms.push(to);
+            }
           }
         }
       }
