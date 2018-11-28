@@ -1,7 +1,5 @@
 'use strict';
 
-const moleculeCreators = getMoleculeCreators(Molecule);
-
 const Papa = require('papaparse');
 
 const defaultCSVOptions = {
@@ -14,10 +12,15 @@ const defaultCSVOptions = {
 };
 
 function parseCSV(csv, options = {}) {
+  const getMoleculeCreators = require('./moleculeCreators');
+  const moleculeCreators = getMoleculeCreators(this.OCL.Molecule);
+
   if (typeof csv !== 'string') {
     throw new TypeError('csv must be a string');
   }
   options = Object.assign({}, defaultCSVOptions, options);
+
+  let db = new this.MoleculeDB(options);
   return new Promise(function (resolve, reject) {
     const parsed = Papa.parse(csv, options);
     const fields = parsed.meta.fields;
@@ -38,7 +41,6 @@ function parseCSV(csv, options = {}) {
     if (!moleculeCreator) {
       throw new Error('this document does not contain any molecule field');
     }
-    let db = new this.MoleculeDB(options);
     db.statistics = stats;
 
     let i = 0;
@@ -51,7 +53,9 @@ function parseCSV(csv, options = {}) {
       }
       try {
         db.pushEntry(
-          moleculeCreator(parsed.data[i][moleculeField]), parsed.data[i]);
+          moleculeCreator(parsed.data[i][moleculeField]),
+          parsed.data[i]
+        );
       } catch (e) {
         reject(e);
         return;

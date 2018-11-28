@@ -1,9 +1,9 @@
 'use strict';
 
-const parseSDF = require('sdf-parser');
+const sdfParser = require('sdf-parser');
 
 const defaultSDFOptions = {
-  onStep: function(/* current, total*/) {
+  onStep: function (/* current, total*/) {
     // empty function
   }
 };
@@ -12,11 +12,12 @@ function parseSDF(sdf, options = {}) {
   if (typeof sdf !== 'string') {
     throw new TypeError('sdf must be a string');
   }
+  let Molecule = this.OCL.Molecule;
   options = Object.assign({}, defaultSDFOptions, options);
-  return new Promise(function(resolve, reject) {
-    const parsed = parseSDF(sdf);
+  let db = new this.MoleculeDB(options);
+  return new Promise(function (resolve, reject) {
+    const parsed = sdfParser(sdf);
     const molecules = parsed.molecules;
-    const db = new MoleculeDB(options);
     db.statistics = parsed.statistics;
     let i = 0;
     const l = molecules.length;
@@ -27,7 +28,7 @@ function parseSDF(sdf, options = {}) {
         return;
       }
       try {
-        db.push(Molecule.fromMolfile(molecules[i].molfile), molecules[i]);
+        db.pushEntry(Molecule.fromMolfile(molecules[i].molfile), molecules[i]);
       } catch (e) {
         reject(e);
         return;

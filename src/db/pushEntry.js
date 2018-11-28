@@ -9,11 +9,11 @@
 
 function pushEntry(molecule, data = {}, moleculeInfo = {}) {
   let moleculeIDCode = molecule.getIDCode();
-  let entry = this.db[moleculeIDCode];
+  let entry = this.moleculeDB.db[moleculeIDCode];
   if (!entry) {
     // a new molecule
-    entry = { molecule, properties: {} };
-    this.db[moleculeIDCode] = this.db[moleculeIDCode];
+    entry = { molecule, properties: {}, data: [], idCode: moleculeIDCode };
+    this.moleculeDB.db[moleculeIDCode] = entry;
 
     // ensure helper arrays needed for substructure search
     molecule.ensureHelperArrays(this.OCL.Molecule.cHelperRings);
@@ -24,9 +24,10 @@ function pushEntry(molecule, data = {}, moleculeInfo = {}) {
     let molecularFormula;
     if (!moleculeInfo.mw) {
       molecularFormula = molecule.getMolecularFormula();
-      molecule.properties.mw = molecularFormula.relativeWeight;
+      entry.properties.mw = molecularFormula.relativeWeight;
     }
-    if (this.computeProperties) {
+
+    if (this.moleculeDB.computeProperties) {
       if (!molecularFormula) {
         molecularFormula = molecule.getMolecularFormula();
       }

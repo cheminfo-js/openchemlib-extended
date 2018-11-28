@@ -2,19 +2,19 @@
 
 const fs = require('fs');
 
-const DB = require('../..').DB;
+const MoleculeDB = require('../..').DB;
 
 var sdf = fs.readFileSync(`${__dirname}/../../../data/data.sdf`, 'ascii');
 var csv = fs.readFileSync(`${__dirname}/../../../data/data.csv`, 'ascii');
 
-describe('DB', () => {
+describe.only('DB', () => {
   describe('parseSDF', () => {
-    test('should parse all molecules', () => {
-      return DB.parseSDF(sdf).then(function (db) {
-        expect(db).toHaveLength(20);
-        expect(db.data).toHaveLength(20);
-        expect(db.molecules).toHaveLength(20);
-      });
+    test('should parse all molecules', async () => {
+      let moleculeDB = await MoleculeDB.parseSDF(sdf);
+      expect(Object.keys(moleculeDB.db)).toHaveLength(10);
+      let db = moleculeDB.getDB();
+      expect(db).toHaveLength(10);
+      expect(db.filter((entry) => entry.properties)).toHaveLength(10);
     });
 
     test('should call step for each molecule', () => {
@@ -23,26 +23,27 @@ describe('DB', () => {
         expect(current).toBe(++called);
         expect(total).toBe(20);
       }
-      return DB.parseSDF(sdf, { onStep: onStep }).then(function () {
+      return MoleculeDB.parseSDF(sdf, { onStep: onStep }).then(function () {
         expect(called).toBe(20);
       });
     });
 
-    test('should compute properties', () => {
-      return DB.parseSDF(sdf, { computeProperties: true }).then(function (db) {
-        expect(db.data[0]).toHaveProperty('properties');
-        expect(db.data[0].properties.formula).toBeDefined();
-        expect(db.data[0].properties.logP).toBeDefined();
-        expect(db.data[0].properties.polarSurfaceArea).toBeDefined();
+    test('should compute properties', async () => {
+      let moleculeDB = await MoleculeDB.parseSDF(sdf, {
+        computeProperties: true
       });
+      let firstEntry = moleculeDB.getDB()[0];
+      expect(firstEntry).toHaveProperty('properties');
+      expect(firstEntry.properties.mf).toBeDefined();
+      expect(firstEntry.properties.logP).toBeDefined();
+      expect(firstEntry.properties.polarSurfaceArea).toBeDefined();
     });
   });
 
   describe('parseCSV', () => {
-    test('should parse all molecules', () => {
-      return DB.parseCSV(csv).then(function (db) {
-        expect(db).toHaveLength(5);
-      });
+    test('should parse all molecules', async () => {
+      let moleculeDB = await MoleculeDB.parseCSV(csv);
+      expect(moleculeDB.getDB()).toHaveLength(4);
     });
 
     test('should call step for each molecule', () => {
@@ -51,7 +52,7 @@ describe('DB', () => {
         expect(current).toBe(++called);
         expect(total).toBe(5);
       }
-      return DB.parseCSV(csv, { onStep: onStep }).then(function () {
+      return MoleculeDB.parseCSV(csv, { onStep: onStep }).then(function () {
         expect(called).toBe(5);
       });
     });
@@ -60,7 +61,7 @@ describe('DB', () => {
   describe('search', () => {
     var db;
     beforeAll(function () {
-      return DB.parseCSV(csv).then(function (database) {
+      return MoleculeDB.parseCSV(csv).then(function (database) {
         db = database;
       });
     });
@@ -88,7 +89,7 @@ describe('DB', () => {
     test('subStructure with SMILES', () => {
       var result = db.search('CC', { format: 'smiles', mode: 'substructure' });
       expect(result).toHaveLength(4);
-      expect(result.data[0].name).toBe('Ethane');
+      expect(result[0].data.name).toBe('Ethane');
       result = db.search('CCC', { format: 'smiles' });
       expect(result).toHaveLength(3);
       result = db.search('CCC', { format: 'smiles', limit: 1 });
@@ -100,9 +101,12 @@ describe('DB', () => {
     test('similarity with SMILES', () => {
       var result = db.search('CC', { format: 'smiles', mode: 'similarity' });
       expect(result).toHaveLength(5);
-      expect(result.data[0].name).toBe('Ethane');
-      result =
-          db.search('CC', { format: 'smiles', mode: 'similarity', limit: 2 });
+      expect(result[0].data.name).toBe('Ethane');
+      result = db.search('CC', {
+        format: 'smiles',
+        mode: 'similarity',
+        limit: 2
+      });
       expect(result).toHaveLength(2);
     });
   });

@@ -1,119 +1,141 @@
 'use strict';
 
-const moleculeCreators = getMoleculeCreators(Molecule);
-
-
-search(query, options = {}) {
-  options = Object.assign({}, defaultSearchOptions, options);
+function search(query, options = {}) {
+  const {
+    format = 'oclid',
+    mode = 'substructure',
+    flattenResult = true,
+    keepMolecule = false,
+    limit = Number.MAX_SAFE_INTEGER
+  } = options;
 
   if (typeof query === 'string') {
-    query = moleculeCreators.get(options.format.toLowerCase())(query);
-  } else if (!(query instanceof Molecule)) {
+    const getMoleculeCreators = require('./moleculeCreators');
+    const moleculeCreators = getMoleculeCreators(this.OCL.Molecule);
+    query = moleculeCreators.get(format.toLowerCase())(query);
+  } else if (!(query instanceof this.OCL.Molecule)) {
     throw new TypeError('toSearch must be a Molecule or string');
   }
 
   let result;
-  switch (options.mode.toLowerCase()) {
+  switch (mode.toLowerCase()) {
     case 'exact':
-      result = this.exactSearch(query, options.limit);
+      result = exactSearch(this.moleculeDB.db, query, limit);
       break;
     case 'substructure':
-      result = this.subStructureSearch(query, options.limit);
+      result = subStructureSearch(this.moleculeDB, query, limit);
       break;
     case 'similarity':
-      result = this.similaritySearch(query, options.limit);
+      result = similaritySearch(this.moleculeDB, this.OCL, query, limit);
       break;
     default:
       throw new Error(`unknown search mode: ${options.mode}`);
   }
-  return result;
+  return processResult(result, { flattenResult, keepMolecule, limit });
 }
 
-exactSearch(query, limit) {
-  const queryIdcode = query.getIDCode();
-  const result = new MoleculeDB();
-  limit = limit || Number.MAX_SAFE_INTEGER;
-  for (let i = 0; i < this.length; i++) {
-    if (this.molecules[i].idcode === queryIdcode) {
-      result.push(this.molecules[i], this.data[i]);
-      if (result.length >= limit) break;
-    }
-  }
-  return result;
+function exactSearch(db, query) {
+  const queryIDCode = query.getIDCode();
+  let searchResult = db[queryIDCode] ? [db[queryIDCode]] : [];
+  return searchResult;
 }
 
-subStructureSearch(query, limit) {
-  let needReset = false;
-
+function subStructureSearch(moleculeDB, query) {
+  let resetFragment = false;
   if (!query.isFragment()) {
-    needReset = true;
+    resetFragment = true;
     query.setFragment(true);
   }
 
   const queryMW = getMW(query);
-
   const queryIndex = query.getIndex();
-  const searcher = this.getSearcher();
+  const searcher = moleculeDB.searcher;
 
   searcher.setFragment(query, queryIndex);
   const searchResult = [];
-  for (let i = 0; i < this.length; i++) {
-    searcher.setMolecule(this.molecules[i], this.molecules[i].index);
+  for (let idCode in moleculeDB.db) {
+    let entry = moleculeDB.db[idCode];
+    searcher.setMolecule(entry.molecule, entry.index);
     if (searcher.isFragmentInMolecule()) {
-      searchResult.push([this.molecules[i], i]);
+      searchResult.push(entry);
     }
   }
-  searchResult.sort(function(a, b) {
-    return Math.abs(queryMW - a[0].mw) - Math.abs(queryMW - b[0].mw);
+
+  searchResult.sort(function (a, b) {
+    return (
+      Math.abs(queryMW - a.properties.mw) - Math.abs(queryMW - b.properties.mw)
+    );
   });
 
-  const length = Math.min(limit || searchResult.length, searchResult.length);
-  const result = new MoleculeDB({length: length});
-  for (let i = 0; i < length; i++) {
-    result.push(
-        this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
-  }
-
-  if (needReset) {
+  if (resetFragment) {
     query.setFragment(false);
   }
-  return result;
+
+  return searchResult;
 }
 
-similaritySearch(query, limit) {
+function similaritySearch(moleculeDB, OCL, query) {
   const queryIndex = query.getIndex();
-
   const queryMW = getMW(query);
-  const queryIDCode = query.getIDCode();
+  const queryIdCode = query.getIDCode();
 
-  const searchResult = new Array(this.length);
+  const searchResult = [];
   let similarity;
-  for (let i = 0; i < this.length; i++) {
-    if (this.molecules[i].idcode === queryIDCode) {
-      similarity = 1e10;
+  for (let idCode in moleculeDB.db) {
+    let entry = moleculeDB.db[idCode];
+    if (entry.idCode === queryIdCode) {
+      similarity = Number.MAX_SAFE_INTEGER;
     } else {
-      similarity = OCL.SSSearcherWithIndex.getSimilarityTanimoto(
-                       queryIndex, this.molecules[i].index) *
-              100000 -
-          Math.abs(queryMW - this.molecules[i].mw) / 1000;
+      similarity =
+        OCL.SSSearcherWithIndex.getSimilarityTanimoto(queryIndex, entry.index) *
+          1000000 -
+        Math.abs(queryMW - entry.properties.mw) / 10000;
     }
-    searchResult[i] = [similarity, i];
+    searchResult.push({ similarity, entry });
   }
-  searchResult.sort(function(a, b) {
-    return b[0] - a[0];
+  searchResult.sort(function (a, b) {
+    return b.similarity - a.similarity;
   });
-
-  const length = Math.min(limit || searchResult.length, searchResult.length);
-  const result = new MoleculeDB({length: length});
-  for (let i = 0; i < length; i++) {
-    result.push(
-        this.molecules[searchResult[i][1]], this.data[searchResult[i][1]]);
-  }
-  return result;
+  return searchResult.map((entry) => entry.entry);
 }
 
-getSearcher() {
-  return this.searcher || (this.searcher = new OCL.SSSearcherWithIndex());
+function getMW(query) {
+  let copy = query.getCompactCopy();
+  copy.setFragment(false);
+  return copy.getMolecularFormula().relativeWeight;
+}
+
+function processResult(entries, options = {}) {
+  const {
+    flattenResult = true,
+    keepMolecule = false,
+    limit = Number.MAX_SAFE_INTEGER
+  } = options;
+  let results = [];
+
+  if (flattenResult) {
+    for (let entry of entries) {
+      for (let data of entry.data) {
+        results.push({
+          data,
+          idCode: entry.idCode,
+          properties: entry.properties,
+          molecule: keepMolecule ? entry.molecule : undefined
+        });
+      }
+    }
+  } else {
+    for (let entry of entries) {
+      results.push({
+        data: entry.data,
+        idCode: entry.idCode,
+        properties: entry.properties,
+        molecule: keepMolecule ? entry.molecule : undefined
+      });
+    }
+  }
+  if (limit < results.length) results.length = limit;
+  return results;
 }
 
 module.exports = search;

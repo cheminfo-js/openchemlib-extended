@@ -1,7 +1,7 @@
 'use strict';
 
 const staticMethods = {
-  DB: require('./db/DB'),
+  DB: require('./db/MoleculeDB'),
   RXN: require('./rxn/RXN')
 };
 
@@ -14,7 +14,7 @@ const moleculePrototypeMethods = {
   getCouplings: require('./extend/couplings/getCouplings'),
   getNumberOfAtoms: require('./extend/getNumberOfAtoms'),
   toDiastereotopicSVG: require('./extend/diastereotopic/toDiastereotopicSVG'),
-  toVisualizerMolfile: require('./extend/toVisualizerMolfile'),
+  toVisualizerMolfile: require('./extend/toVisualizerMolfile')
 };
 
 // These methods need a direct access to OCL. The must be exported as a function
@@ -29,7 +29,7 @@ const moleculePrototypeMethodsNeedOCL = {
   getHoseCodesForAtom: require('./extend/getHoseCodesForAtom'),
   cleaveBonds: require('./extend/cleaveBonds'),
   getBoundary: require('./extend/getBoundary'),
-  addMoleculeAndAlign: require('./extend/addMoleculeAndAlign'),
+  addMoleculeAndAlign: require('./extend/addMoleculeAndAlign')
 };
 
 module.exports = function extend(OCL) {
