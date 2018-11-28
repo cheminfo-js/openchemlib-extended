@@ -7,7 +7,7 @@ const MoleculeDB = require('../..').DB;
 var sdf = fs.readFileSync(`${__dirname}/../../../data/data.sdf`, 'ascii');
 var csv = fs.readFileSync(`${__dirname}/../../../data/data.csv`, 'ascii');
 
-describe.only('DB', () => {
+describe('DB', () => {
   describe('parseSDF', () => {
     test('should parse all molecules', async () => {
       let moleculeDB = await MoleculeDB.parseSDF(sdf);

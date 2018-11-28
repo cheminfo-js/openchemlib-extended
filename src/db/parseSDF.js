@@ -8,6 +8,15 @@ const defaultSDFOptions = {
   }
 };
 
+/**
+ * Create a new DB from a CSV file
+ * @memberof DB
+ * @param {text} sdf - text file containing the sdf
+ * @param {object} [options={}]
+ * @param {function} [options.onStep=()=>{}] call back to execute after each molecule
+ * @returns {DB}
+ */
+
 function parseSDF(sdf, options = {}) {
   if (typeof sdf !== 'string') {
     throw new TypeError('sdf must be a string');

@@ -11,6 +11,18 @@ const defaultCSVOptions = {
   }
 };
 
+/**
+ * Create a new DB from a CSV file
+ * @memberof DB
+ * @param {text} csv - text file containing the comma separated value file
+ * @param {object} [options={}]
+ * @param {boolean} [options.header=true]
+ * @param {boolean} [options.dynamicTyping=true]
+ * @param {boolean} [options.skipEmptyLines=true]
+ * @param {function} [options.onStep=()=>{}] call back to execute after each molecule
+ * @returns {DB}
+ */
+
 function parseCSV(csv, options = {}) {
   const getMoleculeCreators = require('./moleculeCreators');
   const moleculeCreators = getMoleculeCreators(this.OCL.Molecule);
