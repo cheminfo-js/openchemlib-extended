@@ -29,6 +29,15 @@ module.exports = function (OCL) {
       );
     }
 
+    pushMoleculeInfo(moleculeInfo, data) {
+      const pushMoleculeInfo = require('./pushMoleculeInfo');
+      return pushMoleculeInfo.call(
+        { moleculeDB: this, OCL },
+        moleculeInfo,
+        data
+      );
+    }
+
     search(query, options) {
       const search = require('./search');
       return search.call(

@@ -13,6 +13,7 @@ const defaultSDFOptions = {
  * @memberof DB
  * @param {text} sdf - text file containing the sdf
  * @param {object} [options={}]
+ * @param {boolean} [computeProperties=false]
  * @param {function} [options.onStep=()=>{}] call back to execute after each molecule
  * @returns {DB}
  */

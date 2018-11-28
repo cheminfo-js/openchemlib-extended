@@ -19,6 +19,7 @@ const defaultCSVOptions = {
  * @param {boolean} [options.header=true]
  * @param {boolean} [options.dynamicTyping=true]
  * @param {boolean} [options.skipEmptyLines=true]
+ * @param {boolean} [computeProperties=false]
  * @param {function} [options.onStep=()=>{}] call back to execute after each molecule
  * @returns {DB}
  */
