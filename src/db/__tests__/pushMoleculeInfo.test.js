@@ -4,7 +4,7 @@ const MoleculeDB = require('../..').DB;
 
 describe('DB', () => {
   describe('pushMoleculeInfo', () => {
-    test.only('should add idCode molecule manually', async () => {
+    test('should add idCode molecule manually', async () => {
       let moleculeDB = new MoleculeDB();
       moleculeDB.pushMoleculeInfo({ idCode: 'gC`@Dij@@' });
       moleculeDB.pushMoleculeInfo({ idCode: 'gC`@Dij@@' });

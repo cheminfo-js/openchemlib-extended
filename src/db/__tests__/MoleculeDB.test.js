@@ -96,6 +96,8 @@ describe('DB', () => {
       expect(result).toHaveLength(1);
       result = db.search('CCCO', { format: 'smiles' });
       expect(result).toHaveLength(0);
+      result = db.search('', { format: 'smiles' });
+      expect(result).toHaveLength(5);
     });
 
     test('similarity with SMILES', () => {

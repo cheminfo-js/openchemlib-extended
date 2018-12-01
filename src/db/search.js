@@ -7,7 +7,7 @@
  * @instance
  * @param {string|OCL.Molecule} [query] smiles, molfile, oclCode or instance of Molecule to look for
  * @param {object} [options={}]
- * @param {string} [options.format='oclid'] - query is in the format 'smiles', 'oclid' or 'molfile'
+ * @param {string} [options.format='idCode'] - query is in the format 'smiles', 'oclid' or 'molfile'
  * @param {string} [options.mode='substructure'] - search by 'substructure', 'exact' or 'similarity'
  * @param {boolean} [options.flattenResult=true] - The database group the data for the same product. This allows to flatten the result
  * @param {boolean} [options.keepMolecule=false] - keep the OCL.Molecule object in the result
@@ -16,7 +16,7 @@
  */
 function search(query, options = {}) {
   const {
-    format = 'oclid',
+    format = 'idCode',
     mode = 'substructure',
     flattenResult = true,
     keepMolecule = false,
@@ -62,23 +62,30 @@ function subStructureSearch(moleculeDB, query) {
   }
 
   const queryMW = getMW(query);
-  const queryIndex = query.getIndex();
-  const searcher = moleculeDB.searcher;
-
-  searcher.setFragment(query, queryIndex);
   const searchResult = [];
-  for (let idCode in moleculeDB.db) {
-    let entry = moleculeDB.db[idCode];
-    searcher.setMolecule(entry.molecule, entry.index);
-    if (searcher.isFragmentInMolecule()) {
-      searchResult.push(entry);
+  if (query.getAllAtoms() === 0) {
+    for (let idCode in moleculeDB.db) {
+      searchResult.push(moleculeDB.db[idCode]);
+    }
+  } else {
+    const queryIndex = query.getIndex();
+    const searcher = moleculeDB.searcher;
+
+    searcher.setFragment(query, queryIndex);
+    for (let idCode in moleculeDB.db) {
+      let entry = moleculeDB.db[idCode];
+      searcher.setMolecule(entry.molecule, entry.index);
+      if (searcher.isFragmentInMolecule()) {
+        searchResult.push(entry);
+      }
     }
   }
 
+
   searchResult.sort(function (a, b) {
     return (
-      Math.abs(queryMW - a.properties.mw) - Math.abs(queryMW - b.properties.mw)
-    );
+      Math.abs(queryMW - a.properties.mw) -
+        Math.abs(queryMW - b.properties.mw));
   });
 
   if (resetFragment) {
@@ -100,10 +107,10 @@ function similaritySearch(moleculeDB, OCL, query) {
     if (entry.idCode === queryIdCode) {
       similarity = Number.MAX_SAFE_INTEGER;
     } else {
-      similarity =
-        OCL.SSSearcherWithIndex.getSimilarityTanimoto(queryIndex, entry.index) *
-          1000000 -
-        Math.abs(queryMW - entry.properties.mw) / 10000;
+      similarity = OCL.SSSearcherWithIndex.getSimilarityTanimoto(
+        queryIndex, entry.index) *
+              1000000 -
+          Math.abs(queryMW - entry.properties.mw) / 10000;
     }
     searchResult.push({ similarity, entry });
   }
