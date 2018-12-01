@@ -1,6 +1,6 @@
 /**
  * openchemlib-extended - Openchemlib extended
- * @version v4.0.1
+ * @version v4.1.0
  * @link https://github.com/cheminfo-js/openchemlib-extended
  * @license BSD-3-Clause
  */
@@ -9764,7 +9764,8 @@ module.exports = function (OCL) {
 
 function pushEntry(molecule) {
   var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var moleculeInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {}; // the following lin could be the source of problems if the idCode version changes
+  var moleculeInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {}; // the following lin could be the source of problems if the idCode version
+  // changes
 
   var moleculeIDCode = moleculeInfo.idCode ? moleculeInfo.idCode : molecule.getIDCode();
   var entry = this.moleculeDB.db[moleculeIDCode];
@@ -9849,10 +9850,16 @@ function pushMoleculeInfo(moleculeInfo) {
   if (moleculeInfo.smiles) molecule = Molecule.fromSmiles(moleculeInfo.smiles);
 
   if (moleculeInfo.idCode) {
-    molecule = Molecule.fromIDCode(moleculeInfo.idCode, moleculeInfo.coordinates || false);
+    if (this.moleculeDB.db[moleculeInfo.idCode]) {
+      molecule = this.moleculeDB.db[moleculeInfo.idCode].molecule;
+    } else {
+      molecule = Molecule.fromIDCode(moleculeInfo.idCode, moleculeInfo.coordinates || false);
+    }
   }
 
-  if (molecule) this.moleculeDB.pushEntry(molecule, data, moleculeInfo);
+  if (molecule) {
+    this.moleculeDB.pushEntry(molecule, data, moleculeInfo);
+  }
 }
 
 module.exports = pushMoleculeInfo;
@@ -9870,7 +9877,7 @@ module.exports = pushMoleculeInfo;
  * @instance
  * @param {string|OCL.Molecule} [query] smiles, molfile, oclCode or instance of Molecule to look for
  * @param {object} [options={}]
- * @param {string} [options.format='oclid'] - query is in the format 'smiles', 'oclid' or 'molfile'
+ * @param {string} [options.format='idCode'] - query is in the format 'smiles', 'oclid' or 'molfile'
  * @param {string} [options.mode='substructure'] - search by 'substructure', 'exact' or 'similarity'
  * @param {boolean} [options.flattenResult=true] - The database group the data for the same product. This allows to flatten the result
  * @param {boolean} [options.keepMolecule=false] - keep the OCL.Molecule object in the result
@@ -9881,7 +9888,7 @@ module.exports = pushMoleculeInfo;
 function search(query) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var _options$format = options.format,
-      format = _options$format === undefined ? 'oclid' : _options$format,
+      format = _options$format === undefined ? 'idCode' : _options$format,
       _options$mode = options.mode,
       mode = _options$mode === undefined ? 'substructure' : _options$mode,
       _options$flattenResul = options.flattenResult,
@@ -9941,17 +9948,24 @@ function subStructureSearch(moleculeDB, query) {
   }
 
   var queryMW = getMW(query);
-  var queryIndex = query.getIndex();
-  var searcher = moleculeDB.searcher;
-  searcher.setFragment(query, queryIndex);
   var searchResult = [];
 
-  for (var idCode in moleculeDB.db) {
-    var entry = moleculeDB.db[idCode];
-    searcher.setMolecule(entry.molecule, entry.index);
+  if (query.getAllAtoms() === 0) {
+    for (var idCode in moleculeDB.db) {
+      searchResult.push(moleculeDB.db[idCode]);
+    }
+  } else {
+    var queryIndex = query.getIndex();
+    var searcher = moleculeDB.searcher;
+    searcher.setFragment(query, queryIndex);
 
-    if (searcher.isFragmentInMolecule()) {
-      searchResult.push(entry);
+    for (var _idCode in moleculeDB.db) {
+      var entry = moleculeDB.db[_idCode];
+      searcher.setMolecule(entry.molecule, entry.index);
+
+      if (searcher.isFragmentInMolecule()) {
+        searchResult.push(entry);
+      }
     }
   }
 
