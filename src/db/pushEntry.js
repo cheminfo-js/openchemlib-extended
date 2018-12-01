@@ -8,10 +8,11 @@
  */
 
 function pushEntry(molecule, data = {}, moleculeInfo = {}) {
-  // the following lin could be the source of problems if the idCode version changes
-  let moleculeIDCode = moleculeInfo.idCode
-    ? moleculeInfo.idCode
-    : molecule.getIDCode();
+  // the following lin could be the source of problems if the idCode version
+  // changes
+
+  let moleculeIDCode =
+      moleculeInfo.idCode ? moleculeInfo.idCode : molecule.getIDCode();
   let entry = this.moleculeDB.db[moleculeIDCode];
   if (!entry) {
     // a new molecule

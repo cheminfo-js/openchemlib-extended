@@ -63,7 +63,7 @@ MoleculeDB.parseCSV(csv, { computeProperties: true });
 
 `moleculeInfo` is an object that may contain the following properties:
 
-- oclCode (or idCode or value): the OCL unique code
+- idCode: the OCL unique code
 - smiles
 - molfile
 - index (OCL substructure search index, if not present will be calculated)

@@ -4,17 +4,19 @@ const MoleculeDB = require('../..').DB;
 
 describe('DB', () => {
   describe('pushMoleculeInfo', () => {
-    test('should add molecule manually', async () => {
+    test.only('should add idCode molecule manually', async () => {
       let moleculeDB = new MoleculeDB();
-      moleculeDB.pushMoleculeInfo({
-        smiles: 'CCCC'
-      });
-      moleculeDB.pushMoleculeInfo({
-        smiles: 'CCCC'
-      });
-      moleculeDB.pushMoleculeInfo({
-        smiles: 'CCCCC'
-      });
+      moleculeDB.pushMoleculeInfo({ idCode: 'gC`@Dij@@' });
+      moleculeDB.pushMoleculeInfo({ idCode: 'gC`@Dij@@' });
+      let db = moleculeDB.getDB();
+      expect(db).toHaveLength(1);
+    });
+
+    test('should add smiles molecule manually', async () => {
+      let moleculeDB = new MoleculeDB();
+      moleculeDB.pushMoleculeInfo({ smiles: 'CCCC' });
+      moleculeDB.pushMoleculeInfo({ smiles: 'CCCC' });
+      moleculeDB.pushMoleculeInfo({ smiles: 'CCCCC' });
       let db = moleculeDB.getDB();
       expect(db).toHaveLength(2);
       expect(db.filter((entry) => entry.properties)).toHaveLength(2);
@@ -25,6 +27,7 @@ describe('DB', () => {
         keepMolecule: false
       });
       expect(result).toHaveLength(2);
+      expect(result).toMatchSnapshot();
     });
   });
 });
