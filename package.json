@@ -18,8 +18,12 @@
   "license": "BSD-3-Clause",
   "main": "./lib/index.js",
   "directories": {
-    "lib": "src",
-    "test": "test"
+    "lib": "src"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ]
   },
   "scripts": {
     "test": "npm run testonly && npm run eslint",
