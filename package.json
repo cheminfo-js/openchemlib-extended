@@ -54,7 +54,7 @@
   "dependencies": {
     "ml-floyd-warshall": "^1.0.0",
     "ml-matrix": "^5.2.0",
-    "openchemlib": "^5.6.1",
+    "openchemlib": "^5.9.0",
     "papaparse": "^4.6.2",
     "rxn-parser": "0.1.0",
     "sdf-parser": "^3.1.0",
