@@ -9,7 +9,7 @@ var csv = fs.readFileSync(`${__dirname}/../../../data/data.csv`, 'ascii');
 
 describe('DB', () => {
   describe('parseSDF', () => {
-    test('should parse all molecules', async () => {
+    it('should parse all molecules', async () => {
       let moleculeDB = await MoleculeDB.parseSDF(sdf);
       expect(Object.keys(moleculeDB.db)).toHaveLength(10);
       let db = moleculeDB.getDB();
@@ -17,18 +17,19 @@ describe('DB', () => {
       expect(db.filter((entry) => entry.properties)).toHaveLength(10);
     });
 
-    test('should call step for each molecule', () => {
+    it('should call step for each molecule', () => {
       var called = 0;
       function onStep(current, total) {
         expect(current).toBe(++called);
         expect(total).toBe(20);
       }
+      // eslint-disable-next-line jest/no-test-return-statement
       return MoleculeDB.parseSDF(sdf, { onStep: onStep }).then(function () {
         expect(called).toBe(20);
       });
     });
 
-    test('should compute properties', async () => {
+    it('should compute properties', async () => {
       let moleculeDB = await MoleculeDB.parseSDF(sdf, {
         computeProperties: true
       });
@@ -41,17 +42,18 @@ describe('DB', () => {
   });
 
   describe('parseCSV', () => {
-    test('should parse all molecules', async () => {
+    it('should parse all molecules', async () => {
       let moleculeDB = await MoleculeDB.parseCSV(csv);
       expect(moleculeDB.getDB()).toHaveLength(4);
     });
 
-    test('should call step for each molecule', () => {
+    it('should call step for each molecule', () => {
       var called = 0;
       function onStep(current, total) {
         expect(current).toBe(++called);
         expect(total).toBe(5);
       }
+      // eslint-disable-next-line jest/no-test-return-statement
       return MoleculeDB.parseCSV(csv, { onStep: onStep }).then(function () {
         expect(called).toBe(5);
       });
@@ -66,16 +68,16 @@ describe('DB', () => {
       });
     });
 
-    test('invalid arguments', () => {
+    it('invalid arguments', () => {
       expect(function () {
         db.search(null);
-      }).toThrowError(/toSearch must be a Molecule or string/);
+      }).toThrow(/toSearch must be a Molecule or string/);
       expect(function () {
         db.search('CCC', { mode: 'abc' });
-      }).toThrowError(/unknown search mode: abc/);
+      }).toThrow(/unknown search mode: abc/);
     });
 
-    test('exact with SMILES', () => {
+    it('exact with SMILES', () => {
       var result = db.search('CC', { format: 'smiles', mode: 'exact' });
       expect(result).toHaveLength(1);
       result = db.search('CCC', { format: 'smiles', mode: 'exact' });
@@ -86,7 +88,7 @@ describe('DB', () => {
       expect(result).toHaveLength(0);
     });
 
-    test('subStructure with SMILES', () => {
+    it('subStructure with SMILES', () => {
       var result = db.search('CC', { format: 'smiles', mode: 'substructure' });
       expect(result).toHaveLength(4);
       expect(result[0].data.name).toBe('Ethane');
@@ -100,7 +102,7 @@ describe('DB', () => {
       expect(result).toHaveLength(5);
     });
 
-    test('similarity with SMILES', () => {
+    it('similarity with SMILES', () => {
       var result = db.search('CC', { format: 'smiles', mode: 'similarity' });
       expect(result).toHaveLength(5);
       expect(result[0].data.name).toBe('Ethane');

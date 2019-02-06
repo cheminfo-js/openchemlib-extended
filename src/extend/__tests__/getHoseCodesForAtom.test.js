@@ -5,7 +5,7 @@ const OCLE = require('../..');
 
 
 describe('getHosesCodeForAtom test propane', () => {
-  test('minSphereSize:0, maxSphereSize:3', () => {
+  it('minSphereSize:0, maxSphereSize:3', () => {
     var molecule = OCLE.Molecule.fromSmiles('CCC');
     let results = molecule.getHoseCodesForAtom(0, {
       minSphereSize: 0,
@@ -15,7 +15,7 @@ describe('getHosesCodeForAtom test propane', () => {
     expect(results).toMatchSnapshot();
   });
 
-  test('minSphereSize:1, maxSphereSize:2', () => {
+  it('minSphereSize:1, maxSphereSize:2', () => {
     var molecule = OCLE.Molecule.fromSmiles('CCC');
     let results = molecule.getHoseCodesForAtom(0, {
       minSphereSize: 1,

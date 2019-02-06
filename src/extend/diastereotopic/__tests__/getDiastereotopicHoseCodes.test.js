@@ -3,7 +3,7 @@
 const OCLE = require('../../..');
 
 describe('getCouplings test propane', () => {
-  test('should yield the right table without atom filtering', () => {
+  it('should yield the right table without atom filtering', () => {
     var molecule = OCLE.Molecule.fromSmiles('CCC');
     var diaIDs = molecule.getDiastereotopicHoseCodes();
     expect(diaIDs).toHaveLength(3);

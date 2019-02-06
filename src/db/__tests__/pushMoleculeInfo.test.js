@@ -4,7 +4,7 @@ const MoleculeDB = require('../..').DB;
 
 describe('DB', () => {
   describe('pushMoleculeInfo', () => {
-    test('should add idCode molecule manually', async () => {
+    it('should add idCode molecule manually', async () => {
       let moleculeDB = new MoleculeDB();
       moleculeDB.pushMoleculeInfo({ idCode: 'gC`@Dij@@' });
       moleculeDB.pushMoleculeInfo({ idCode: 'gC`@Dij@@' });
@@ -12,7 +12,7 @@ describe('DB', () => {
       expect(db).toHaveLength(1);
     });
 
-    test('should add smiles molecule manually', async () => {
+    it('should add smiles molecule manually', async () => {
       let moleculeDB = new MoleculeDB();
       moleculeDB.pushMoleculeInfo({ smiles: 'CCCC' });
       moleculeDB.pushMoleculeInfo({ smiles: 'CCCC' });

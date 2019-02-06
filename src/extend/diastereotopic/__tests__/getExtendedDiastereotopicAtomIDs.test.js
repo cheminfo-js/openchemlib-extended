@@ -3,7 +3,7 @@
 const OCLE = require('../../..');
 
 describe('getExtendedDiastereotopicIDs test propane', () => {
-  test('should yield the right table - propane', () => {
+  it('should yield the right table - propane', () => {
     var molecule = OCLE.Molecule.fromSmiles('CCC');
     var diaIDs = molecule.getExtendedDiastereotopicAtomIDs();
 

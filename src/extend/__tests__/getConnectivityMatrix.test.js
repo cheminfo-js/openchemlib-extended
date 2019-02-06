@@ -3,12 +3,12 @@
 const OCLE = require('../..');
 
 describe('getConnectivityMatrix test propane', () => {
-  test('propane with expanded hydrogens', () => {
+  it('propane with expanded hydrogens', () => {
     var molecule = OCLE.Molecule.fromSmiles('CCC');
     molecule.addImplicitHydrogens();
 
     var connectivityMatrix = molecule.getConnectivityMatrix();
-    expect(connectivityMatrix).toEqual([
+    expect(connectivityMatrix).toStrictEqual([
       [1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0],
       [1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0],
       [0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1],
@@ -23,10 +23,10 @@ describe('getConnectivityMatrix test propane', () => {
     ]);
   });
 
-  test('benzene', () => {
+  it('benzene', () => {
     var molecule = OCLE.Molecule.fromSmiles('c1ccccc1');
     var connectivityMatrix = molecule.getConnectivityMatrix();
-    expect(connectivityMatrix).toEqual([
+    expect(connectivityMatrix).toStrictEqual([
       [1, 1, 0, 0, 0, 1],
       [1, 1, 1, 0, 0, 0],
       [0, 1, 1, 1, 0, 0],
@@ -36,12 +36,12 @@ describe('getConnectivityMatrix test propane', () => {
     ]);
   });
 
-  test('benzene with single, double, triple', () => {
+  it('benzene with single, double, triple', () => {
     var molecule = OCLE.Molecule.fromSmiles('c1ccccc1');
     var connectivityMatrix = molecule.getConnectivityMatrix({
       sdt: true
     });
-    expect(connectivityMatrix).toEqual([
+    expect(connectivityMatrix).toStrictEqual([
       [1, 2, 0, 0, 0, 1],
       [2, 1, 1, 0, 0, 0],
       [0, 1, 1, 2, 0, 0],
@@ -51,12 +51,12 @@ describe('getConnectivityMatrix test propane', () => {
     ]);
   });
 
-  test('benzene with mass diagonal', () => {
+  it('benzene with mass diagonal', () => {
     var molecule = OCLE.Molecule.fromSmiles('c1ccccc1');
     var connectivityMatrix = molecule.getConnectivityMatrix({
       mass: true
     });
-    expect(connectivityMatrix).toEqual([
+    expect(connectivityMatrix).toStrictEqual([
       [12, 1, 0, 0, 0, 1],
       [1, 12, 1, 0, 0, 0],
       [0, 1, 12, 1, 0, 0],
@@ -66,12 +66,12 @@ describe('getConnectivityMatrix test propane', () => {
     ]);
   });
 
-  test('benzene with atomic number on diagonal', () => {
+  it('benzene with atomic number on diagonal', () => {
     var molecule = OCLE.Molecule.fromSmiles('c1ccccc1');
     var connectivityMatrix = molecule.getConnectivityMatrix({
       atomicNo: true
     });
-    expect(connectivityMatrix).toEqual([
+    expect(connectivityMatrix).toStrictEqual([
       [6, 1, 0, 0, 0, 1],
       [1, 6, 1, 0, 0, 0],
       [0, 1, 6, 1, 0, 0],
@@ -81,10 +81,10 @@ describe('getConnectivityMatrix test propane', () => {
     ]);
   });
 
-  test('benzene pathLength matrix', () => {
+  it('benzene pathLength matrix', () => {
     var molecule = OCLE.Molecule.fromSmiles('c1ccccc1');
     var connectivityMatrix = molecule.getConnectivityMatrix({ pathLength: true });
-    expect(connectivityMatrix).toEqual([
+    expect(connectivityMatrix).toStrictEqual([
       [0, 1, 2, 3, 2, 1],
       [1, 0, 1, 2, 3, 2],
       [2, 1, 0, 1, 2, 3],

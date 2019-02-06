@@ -5,12 +5,12 @@ const OCLE = require('../..');
 
 
 describe('getAtomsInfo test propane', () => {
-  test('should yield the right table - methanol', () => {
+  it('should yield the right table - methanol', () => {
     var molecule = OCLE.Molecule.fromSmiles('CO');
     molecule.addImplicitHydrogens();
     var atoms = molecule.getAtomsInfo();
 
-    expect(atoms[0]).toEqual({ oclID: 'eFHBLCETGzRSaU@',
+    expect(atoms[0]).toStrictEqual({ oclID: 'eFHBLCETGzRSaU@',
       extra:
             { singleBonds: 4,
               doubleBonds: 0,
@@ -43,7 +43,7 @@ describe('getAtomsInfo test propane', () => {
       isSmallRing: false,
       isStabilized: false });
 
-    expect(atoms[5]).toEqual({ oclID: 'eMJHfTf`_iHHeT',
+    expect(atoms[5]).toStrictEqual({ oclID: 'eMJHfTf`_iHHeT',
       extra:
             { singleBonds: 1,
               doubleBonds: 0,
@@ -80,11 +80,11 @@ describe('getAtomsInfo test propane', () => {
       isStabilized: false });
   });
 
-  test('should yield the right table', () => {
+  it('should yield the right table', () => {
     var molecule = OCLE.Molecule.fromSmiles('C=CC');
     // molecule.addImplicitHydrogens();
     var atoms = molecule.getAtomsInfo();
-    expect(atoms[2]).toEqual({ oclID: 'eM@DfPXb`RP\\Jh',
+    expect(atoms[2]).toStrictEqual({ oclID: 'eM@DfPXb`RP\\Jh',
       extra:
             { singleBonds: 4,
               doubleBonds: 0,

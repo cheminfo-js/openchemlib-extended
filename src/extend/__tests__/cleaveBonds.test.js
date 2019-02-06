@@ -5,7 +5,7 @@ const OCLE = require('../..');
 
 
 describe('cleaveBonds test propane', () => {
-  test('default', () => {
+  it('default', () => {
     var molecule = OCLE.Molecule.fromSmiles('CCC');
     let results = molecule.cleaveBonds({
 
@@ -13,7 +13,7 @@ describe('cleaveBonds test propane', () => {
     expect(results).toMatchSnapshot();
   });
 
-  test('charged', () => {
+  it('charged', () => {
     var molecule = OCLE.Molecule.fromSmiles('CC[CH2+]');
     let results = molecule.cleaveBonds({
 

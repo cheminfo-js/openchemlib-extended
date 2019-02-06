@@ -30,7 +30,7 @@ JME 2017-03-21 Wed Jun 14 14:53:08 GMT+200 2017
 M  END`;
 
 describe('getCouplings test propane', () => {
-  test.skip('should yield the right table without atom filtering', () => {
+  it.skip('should yield the right table without atom filtering', () => {
     var molecule = OCLE.Molecule.fromMolfile(molfile);
     //   var molecule = OCLE.Molecule.fromSmiles('CCCC');
     // molecule.addImplicitHydrogens();

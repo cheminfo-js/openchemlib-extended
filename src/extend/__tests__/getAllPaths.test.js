@@ -5,7 +5,7 @@ const OCLE = require('../..');
 
 
 describe('getAllPaths test propane', () => {
-  test('min:1, max:2', () => {
+  it('min:1, max:2', () => {
     var molecule = OCLE.Molecule.fromSmiles('CCC');
     molecule.addImplicitHydrogens();
 
@@ -16,7 +16,7 @@ describe('getAllPaths test propane', () => {
       maxLength: 2
     });
 
-    expect(paths).toEqual([
+    expect(paths).toStrictEqual([
       { fromDiaID: 'eM@Df`Xb`RP\\Jh',
         toDiaID: 'gC`HALiKT@RHDRj@',
         fromAtoms: [0, 2],
@@ -48,7 +48,7 @@ describe('getAllPaths test propane', () => {
     ]);
   });
 
-  test('min:2, max:2', () => {
+  it('min:2, max:2', () => {
     var molecule = OCLE.Molecule.fromSmiles('CCC');
     molecule.addImplicitHydrogens();
 
@@ -58,6 +58,6 @@ describe('getAllPaths test propane', () => {
       minLength: 2,
       maxLength: 2
     });
-    expect(paths[1].toAtoms).toEqual([3, 4, 5, 8, 9, 10]);
+    expect(paths[1].toAtoms).toStrictEqual([3, 4, 5, 8, 9, 10]);
   });
 });
