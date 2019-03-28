@@ -74,7 +74,7 @@ function parseCSV(csv, options = {}) {
         return;
       }
       options.onStep(++i, l);
-      setImmediate(parseNext);
+      setTimeout(parseNext, 0);
     }
   });
 }

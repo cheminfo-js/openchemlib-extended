@@ -44,7 +44,7 @@ function parseSDF(sdf, options = {}) {
         return;
       }
       options.onStep(++i, l);
-      setImmediate(parseNext);
+      setTimeout(parseNext, 0);
     }
   });
 }
