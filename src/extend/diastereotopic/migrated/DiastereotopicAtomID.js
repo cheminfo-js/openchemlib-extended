@@ -41,12 +41,12 @@ function addMissingChirality(molecule, esrType = Molecule.cESRTypeAnd) {
       // changed from from handling below; TLS 9.Nov.2015
       if (
         tempMolecule.isAtomStereoCenter(i) &&
-        tempMolecule.getStereoBond(i) == -1
+        tempMolecule.getStereoBond(i) === -1
       ) {
         let stereoBond = tempMolecule.getAtomPreferredStereoBond(i);
-        if (stereoBond != -1) {
+        if (stereoBond !== -1) {
           molecule.setBondType(stereoBond, Molecule.cBondTypeUp);
-          if (molecule.getBondAtom(1, stereoBond) == i) {
+          if (molecule.getBondAtom(1, stereoBond) === i) {
             let connAtom = molecule.getBondAtom(0, stereoBond);
             molecule.setBondAtom(0, stereoBond, i);
             molecule.setBondAtom(1, stereoBond, connAtom);
@@ -66,7 +66,7 @@ function changeAtomForStereo(molecule, iAtom) {
 
 function changeAtom(molecule, iAtom) {
   molecule.setAtomCustomLabel(iAtom, `${molecule.getAtomLabel(iAtom)}*`);
-  if (molecule.getAtomicNo(iAtom) == 1) {
+  if (molecule.getAtomicNo(iAtom) === 1) {
     molecule.setAtomicNo(iAtom, xAtomicNumber);
   } else {
     // we can not use X because we would have problems with valencies if it is
@@ -94,7 +94,7 @@ function makeRacemic(molecule) {
  */
 function markDiastereotopicAtoms(molecule) {
   // changed from markDiastereo(); TLS 9.Nov.2015
-  let ids = getAtomIds(molecule);
+  let ids = getAtomIDs(molecule);
   let analyzed = {};
   let group = 0;
   for (let id of ids) {
