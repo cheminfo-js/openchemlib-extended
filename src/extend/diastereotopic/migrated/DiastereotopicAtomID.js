@@ -4,7 +4,6 @@ const OCLE = require('../../../..');
 
 const changeAtom = require('./changeAtom');
 
-const Canonizer = OCLE.Canonizer;
 const Molecule = OCLE.Molecule;
 
 const xAtomicNumber = OCLE.Molecule.getAtomicNoFromLabel('X');
@@ -19,10 +18,9 @@ function getAtomIDs(molecule) {
     changeAtom(tempMolecule, iAtom);
     makeRacemic(tempMolecule);
     // We need to ensure the helper array in order to get correctly the result of racemisation
-    ids[iAtom] = new Canonizer(
-      tempMolecule,
-      Canonizer.ENCODE_ATOM_CUSTOM_LABELS
-    ).getIDCode();
+    ids[iAtom] = tempMolecule.getCanonizedIDCode(
+      OCLE.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
+    );
   }
   return ids;
 }
