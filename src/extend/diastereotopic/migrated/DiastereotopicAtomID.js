@@ -2,6 +2,8 @@
 
 const OCLE = require('../../../..');
 
+const changeAtom = require('./changeAtom');
+
 const Canonizer = OCLE.Canonizer;
 const Molecule = OCLE.Molecule;
 
@@ -51,7 +53,7 @@ function addMissingChirality(molecule, esrType = Molecule.cESRTypeAnd) {
             molecule.setBondAtom(0, stereoBond, i);
             molecule.setBondAtom(1, stereoBond, connAtom);
           }
-          // To me it seems that we have to add all stereo centers into AND group 0.	TLS 9.Nov.2015
+          // To me it seems that we have to add all stereo centers into AND group 0. TLS 9.Nov.2015
           molecule.setAtomESR(i, esrType, 0);
         }
       }
@@ -64,24 +66,12 @@ function changeAtomForStereo(molecule, iAtom) {
   molecule.setAtomicNo(iAtom, xAtomicNumber);
 }
 
-function changeAtom(molecule, iAtom) {
-  molecule.setAtomCustomLabel(iAtom, `${molecule.getAtomLabel(iAtom)}*`);
-  if (molecule.getAtomicNo(iAtom) === 1) {
-    molecule.setAtomicNo(iAtom, xAtomicNumber);
-  } else {
-    // we can not use X because we would have problems with valencies if it is
-    // expanded hydrogens or not
-    // we can not only use a custom label because it does not cound for the canonisation
-    molecule.setAtomMass(iAtom, molecule.getAtomMass(iAtom) + 5);
-  }
-}
-
 function makeRacemic(molecule) {
   // if we don't calculate this we have 2 epimers
   molecule.ensureHelperArrays(Molecule.cHelperParities);
   // we need to make one group "AND" for chiral (to force to racemic, this means diastereotopic and not enantiotopic)
   for (let i = 0; i < molecule.getAllAtoms(); i++) {
-    if (molecule.getAtomParity(i) != Molecule.cAtomParityNone) {
+    if (molecule.getAtomParity(i) !== Molecule.cAtomParityNone) {
       molecule.setAtomESR(i, Molecule.cESRTypeAnd, 0); // changed to group 0; TLS 9.Nov.2015
     }
   }
