@@ -26,7 +26,7 @@ describe('Magnetically equivalent vs Chemicallu equivalent', () => {
   it('Chemically equivalent Cc1ccc(C)cc1', () => {
     let molecule = OCL.Molecule.fromSmiles('Cc1ccc(C)cc1');
     let ids = molecule.getGroupedDiastereotopicAtomIDs({atomLabel: 'H'});
-    expect(ids.length).toBe(3);
+    expect(ids.length).toBe(2);
   });
 
   it('Chemically equivalent Clc1ccc(Br)cc1', () => {
@@ -62,7 +62,7 @@ describe('Magnetically equivalent vs Chemicallu equivalent', () => {
   it('Magnetically equivalent Cc1ccc(C)cc1 is 5???', () => {
     let molecule = OCL.Molecule.fromSmiles('Cc1ccc(C)cc1');
     let ids = molecule.getGroupedDiastereotopicAtomIDs({atomLabel: 'H', type: "magnetic"});
-    expect(ids.length).toBe(5);
+    expect(ids.length).toBe(2);
   });
 
   it('Magnetically equivalent Clc1ccc(Br)cc1', () => {
@@ -71,10 +71,10 @@ describe('Magnetically equivalent vs Chemicallu equivalent', () => {
     expect(ids.length).toBe(4);
   });
 
-  it('Magnetically equivalent c2ccc(Oc1ccccc1)cc2 is 6????', () => {
+  it('Magnetically equivalent c2ccc(Oc1ccccc1)cc2 is 5????', () => {
     let molecule = OCL.Molecule.fromSmiles('c2ccc(Oc1ccccc1)cc21');
     let ids = molecule.getGroupedDiastereotopicAtomIDs({atomLabel: 'H', type: "magnetic"});
-    expect(ids.length).toBe(6);
+    expect(ids.length).toBe(5);
   });
 
   it('Magnetically equivalent CCC', () => {
