@@ -59,7 +59,7 @@ describe('Magnetically equivalent vs Chemicallu equivalent', () => {
     expect(ids.length).toBe(1);
   });
 
-  it('Magnetically equivalent Cc1ccc(C)cc1', () => {
+  it('Magnetically equivalent Cc1ccc(C)cc1 is 5???', () => {
     let molecule = OCL.Molecule.fromSmiles('Cc1ccc(C)cc1');
     let ids = molecule.getGroupedDiastereotopicAtomIDs({type: "magnetic"});
     expect(ids.length).toBe(5);
