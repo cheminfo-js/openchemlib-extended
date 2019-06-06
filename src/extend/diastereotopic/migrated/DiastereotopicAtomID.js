@@ -86,7 +86,7 @@ function markDiastereotopicAtoms(molecule) {
   let analyzed = {};
   let group = 0;
   for (let id of ids) {
-    console.log(`${id} - ${group}`);
+    // console.log(`${id} - ${group}`);
     if (!analyzed.contains(id)) {
       analyzed[id] = true;
       for (let iAtom = 0; iAtom < ids.length; iAtom++) {

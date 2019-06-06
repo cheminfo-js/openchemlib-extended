@@ -4301,12 +4301,11 @@ class svd_SingularValueDecomposition {
     value = WrapperMatrix2D_WrapperMatrix2D.checkMatrix(value);
     var m = value.rows;
     var n = value.columns;
-    const _options$computeLeftS = options.computeLeftSingularVectors,
-          computeLeftSingularVectors = _options$computeLeftS === void 0 ? true : _options$computeLeftS,
-          _options$computeRight = options.computeRightSingularVectors,
-          computeRightSingularVectors = _options$computeRight === void 0 ? true : _options$computeRight,
-          _options$autoTranspos = options.autoTranspose,
-          autoTranspose = _options$autoTranspos === void 0 ? false : _options$autoTranspos;
+    const {
+      computeLeftSingularVectors = true,
+      computeRightSingularVectors = true,
+      autoTranspose = false
+    } = options;
     var wantu = Boolean(computeLeftSingularVectors);
     var wantv = Boolean(computeRightSingularVectors);
     var swapped = false;
@@ -7530,8 +7529,9 @@ class WrapperMatrix1D_WrapperMatrix1D extends AbstractMatrix() {
    */
   constructor(data) {
     let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    const _options$rows = options.rows,
-          rows = _options$rows === void 0 ? 1 : _options$rows;
+    const {
+      rows = 1
+    } = options;
 
     if (data.length % rows !== 0) {
       throw new Error('the data length is not divisible by the number of rows');
@@ -7905,10 +7905,10 @@ function dependenciesOneRow(error, matrix, index) {
 
 function linearDependencies(matrix) {
   let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  const _options$thresholdVal = options.thresholdValue,
-        thresholdValue = _options$thresholdVal === void 0 ? 10e-10 : _options$thresholdVal,
-        _options$thresholdErr = options.thresholdError,
-        thresholdError = _options$thresholdErr === void 0 ? 10e-10 : _options$thresholdErr;
+  const {
+    thresholdValue = 10e-10,
+    thresholdError = 10e-10
+  } = options;
   var n = matrix.rows;
   var results = new matrix_Matrix(n, n);
 
@@ -7937,8 +7937,9 @@ function linearDependencies(matrix) {
 class evd_EigenvalueDecomposition {
   constructor(matrix) {
     let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    const _options$assumeSymmet = options.assumeSymmetric,
-          assumeSymmetric = _options$assumeSymmet === void 0 ? false : _options$assumeSymmet;
+    const {
+      assumeSymmetric = false
+    } = options;
     matrix = WrapperMatrix2D_WrapperMatrix2D.checkMatrix(matrix);
 
     if (!matrix.isSquare()) {
@@ -9042,6 +9043,7 @@ const moleculePrototypeMethodsNeedOCL = {
 };
 
 module.exports = function extend(OCL) {
+  console.log("Here 2");
   let key;
 
   for (key in staticMethods) {
@@ -9080,8 +9082,9 @@ module.exports = function (OCL) {
   class MoleculeDB {
     constructor() {
       let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      const _options$computePrope = options.computeProperties,
-            computeProperties = _options$computePrope === void 0 ? false : _options$computePrope;
+      const {
+        computeProperties = false
+      } = options;
       this.db = {};
       this.statistics = null;
       this.computeProperties = computeProperties;
@@ -9281,16 +9284,13 @@ module.exports = pushMoleculeInfo;
 
 function search(query) {
   let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  const _options$format = options.format,
-        format = _options$format === void 0 ? 'idCode' : _options$format,
-        _options$mode = options.mode,
-        mode = _options$mode === void 0 ? 'substructure' : _options$mode,
-        _options$flattenResul = options.flattenResult,
-        flattenResult = _options$flattenResul === void 0 ? true : _options$flattenResul,
-        _options$keepMolecule = options.keepMolecule,
-        keepMolecule = _options$keepMolecule === void 0 ? false : _options$keepMolecule,
-        _options$limit = options.limit,
-        limit = _options$limit === void 0 ? Number.MAX_SAFE_INTEGER : _options$limit;
+  const {
+    format = 'idCode',
+    mode = 'substructure',
+    flattenResult = true,
+    keepMolecule = false,
+    limit = Number.MAX_SAFE_INTEGER
+  } = options;
 
   if (typeof query === 'string') {
     const getMoleculeCreators = __webpack_require__(5);
@@ -9410,12 +9410,11 @@ function getMW(query) {
 
 function processResult(entries) {
   let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  const _options$flattenResul2 = options.flattenResult,
-        flattenResult = _options$flattenResul2 === void 0 ? true : _options$flattenResul2,
-        _options$keepMolecule2 = options.keepMolecule,
-        keepMolecule = _options$keepMolecule2 === void 0 ? false : _options$keepMolecule2,
-        _options$limit2 = options.limit,
-        limit = _options$limit2 === void 0 ? Number.MAX_SAFE_INTEGER : _options$limit2;
+  const {
+    flattenResult = true,
+    keepMolecule = false,
+    limit = Number.MAX_SAFE_INTEGER
+  } = options;
   let results = [];
 
   if (flattenResult) {
@@ -10355,15 +10354,14 @@ parse.stream = stream;
 
 function parse(sdf) {
   let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  const include = options.include,
-        exclude = options.exclude,
-        filter = options.filter,
-        _options$modifiers = options.modifiers,
-        modifiers = _options$modifiers === void 0 ? {} : _options$modifiers,
-        _options$forEach = options.forEach,
-        forEach = _options$forEach === void 0 ? {} : _options$forEach,
-        _options$dynamicTypin = options.dynamicTyping,
-        dynamicTyping = _options$dynamicTypin === void 0 ? true : _options$dynamicTypin;
+  const {
+    include,
+    exclude,
+    filter,
+    modifiers = {},
+    forEach = {},
+    dynamicTyping = true
+  } = options;
 
   if (typeof sdf !== 'string') {
     throw new TypeError('Parameter "sdf" must be a string');
@@ -13581,9 +13579,14 @@ module.exports = {
 
 "use strict";
 
+/**
+ * This function groups the diasterotopic atomIds of the molecule based of equivalence of atoms. This 
+ * equivalente can be at the level of chemical equivalente(Default) or at the level of magentic equivalence of protons
+ */
 
 module.exports = function getGroupedDiastereotopicAtomIDs() {
   let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  console.log("Here");
   var label = options.atomLabel;
   var diaIDs = this.getDiastereotopicAtomIDs(options);
   var diaIDsObject = {};
@@ -13874,9 +13877,7 @@ function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
     }
 
     if (C1 > C2) {
-      var _ref = [C2, C1];
-      C1 = _ref[0];
-      C2 = _ref[1];
+      [C1, C2] = [C2, C1];
     }
 
     if (possibleCouplings !== null) {
@@ -14486,14 +14487,12 @@ module.exports = function getNumberOfAtoms() {
 
 module.exports = function toDiastereotopicSVG() {
   let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var _options$width = options.width,
-      width = _options$width === void 0 ? 300 : _options$width,
-      _options$height = options.height,
-      height = _options$height === void 0 ? 200 : _options$height,
-      _options$prefix = options.prefix,
-      prefix = _options$prefix === void 0 ? 'ocl' : _options$prefix,
-      _options$heavyAtomHyd = options.heavyAtomHydrogen,
-      heavyAtomHydrogen = _options$heavyAtomHyd === void 0 ? false : _options$heavyAtomHyd;
+  var {
+    width = 300,
+    height = 200,
+    prefix = 'ocl',
+    heavyAtomHydrogen = false
+  } = options;
   var svg = options.svg;
   var diaIDs = [];
   var hydrogenInfo = {};
@@ -14997,12 +14996,11 @@ module.exports = function (OCL) {
     let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     let FULL_HOSE_CODE = 1;
     let HOSE_CODE_CUT_C_SP3_SP3 = 2;
-    const _options$minSphereSiz = options.minSphereSize,
-          minSphereSize = _options$minSphereSiz === void 0 ? 0 : _options$minSphereSiz,
-          _options$maxSphereSiz = options.maxSphereSize,
-          maxSphereSize = _options$maxSphereSiz === void 0 ? 4 : _options$maxSphereSiz,
-          _options$kind = options.kind,
-          kind = _options$kind === void 0 ? FULL_HOSE_CODE : _options$kind;
+    const {
+      minSphereSize = 0,
+      maxSphereSize = 4,
+      kind = FULL_HOSE_CODE
+    } = options;
     let molecule = this.getCompactCopy();
     molecule.setAtomCustomLabel(rootAtom, "".concat(molecule.getAtomLabel(rootAtom), "*"));
     molecule.setAtomicNo(rootAtom, OCL.Molecule.getAtomicNoFromLabel('X'));
@@ -15084,13 +15082,13 @@ module.exports = function (OCL) {
 module.exports = function (OCL) {
   return function cleaveBonds() {
     let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    const _options$filter = options.filter,
-          filter = _options$filter === void 0 ? bond => !bond.isAromatic && bond.kind === 1 && bond.ringSize === 0 : _options$filter,
-          _options$hose = options.hose,
-          hose = _options$hose === void 0 ? {
-      minSphereSize: 1,
-      maxSphereSize: 3
-    } : _options$hose;
+    const {
+      filter = bond => !bond.isAromatic && bond.kind === 1 && bond.ringSize === 0,
+      hose = {
+        minSphereSize: 1,
+        maxSphereSize: 3
+      }
+    } = options;
     var atoms = [];
 
     for (var i = 0; i < this.getAllAtoms(); i++) {
@@ -15231,8 +15229,9 @@ module.exports = function () {
 module.exports = function () {
   return function addMoleculeAndAlign(molecule) {
     let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    const _options$space = options.space,
-          space = _options$space === void 0 ? 2 : _options$space;
+    const {
+      space = 2
+    } = options;
     let boundary = this.getBoundary();
     let addBoundary = molecule.getBoundary();
     let y = (boundary.minY + boundary.maxY) / 2 - (addBoundary.minY + addBoundary.maxY) / 2;
