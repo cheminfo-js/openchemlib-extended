@@ -1,8 +1,10 @@
 'use strict';
 
 /**
- * This function groups the diasterotopic atomIds of the molecule based of equivalence of atoms. This
- * equivalente can be at the level of chemical equivalente(Default) or at the level of magentic equivalence of protons
+ * This function groups the diasterotopic atomIds of the molecule based on equivalence of atoms. The output object contains
+ * a set of chemically equivalent atoms(element.atoms) and the groups of magnetically equivalent atoms (element.magneticGroups)
+ * {object}[options={}]
+ * {string}[options.atomLabel] Return only the atoms of the given atomLabel. By default it returns all the explicit atoms in the molecule
  */
 module.exports = function getGroupedDiastereotopicAtomIDs(options = {}) {
   var label = options.atomLabel;
@@ -26,7 +28,7 @@ module.exports = function getGroupedDiastereotopicAtomIDs(options = {}) {
     }
   }
   // Find the Magnetically equivalent groups
-  let pathOptions = { maxLength: 9999 };
+  let pathOptions = { maxLength: Number.MAX_SAFE_INTEGER };
   if (label) {
     pathOptions.fromLabel = label;
     pathOptions.toLabel = label;
