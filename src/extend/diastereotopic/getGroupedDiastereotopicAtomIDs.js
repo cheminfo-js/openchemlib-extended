@@ -52,7 +52,7 @@ module.exports = function getGroupedDiastereotopicAtomIDs(options = {}) {
     let keys = Object.keys(hashTable);
     let groups = {};
     for (let atomID of keys) {
-      let uniqueColumn = JSON.stringify(hashTable[atomID]);
+      let uniqueColumn = Object.keys(hashTable[atomID]).sort().reduce((key, id) => `${key}${id}:${hashTable[atomID][id]},`, '');
       if (groups[uniqueColumn]) {
         groups[uniqueColumn].push(atomID);
       } else {

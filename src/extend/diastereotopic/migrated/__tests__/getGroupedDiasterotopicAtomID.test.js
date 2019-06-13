@@ -108,33 +108,4 @@ describe('Magnetically equivalent and Chemically equivalent', () => {
     });
     expect(magGroups).toBe(4);
   });
-
-  /*
-  it('Magnetically equivalent c2ccc(Oc1ccccc1)cc2 are 5', () => {
-    let molecule = OCL.Molecule.fromSmiles('c2ccc(Oc1ccccc1)cc21');
-    molecule.addImplicitHydrogens();
-    let ids = molecule.getGroupedDiastereotopicAtomIDs({ atomLabel: 'H', type: "magnetic" });
-    expect(ids.length).toBe(5);
-  });
-
-  it('Magnetically equivalent CCC are 2', () => {
-    let molecule = OCL.Molecule.fromSmiles('CCC');
-    molecule.addImplicitHydrogens();
-    let ids = molecule.getGroupedDiastereotopicAtomIDs({ atomLabel: 'H', type: "magnetic" });
-    expect(ids.length).toBe(2);
-  });
-
-  it('Magnetically equivalent CCOCC are 2', () => {
-    let molecule = OCL.Molecule.fromSmiles('CCOCC');
-    molecule.addImplicitHydrogens();
-    let ids = molecule.getGroupedDiastereotopicAtomIDs({ atomLabel: 'H', type: "magnetic" });
-    expect(ids.length).toBe(2);
-  });
-
-  it('Chemically equivalent O=C1CCC(=S)CC1', () => {
-    let molecule = OCL.Molecule.fromSmiles('O=C1CCC(=S)CC1');
-    molecule.addImplicitHydrogens();
-    let ids = molecule.getGroupedDiastereotopicAtomIDs({ atomLabel: 'H', type: "magnetic" });
-    expect(ids.length).toBe(4);
-  });*/
 });

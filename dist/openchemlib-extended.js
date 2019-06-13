@@ -9043,7 +9043,6 @@ const moleculePrototypeMethodsNeedOCL = {
 };
 
 module.exports = function extend(OCL) {
-  console.log("Here 2");
   let key;
 
   for (key in staticMethods) {
@@ -10667,6 +10666,13 @@ module.exports = parse;
 var floydWarshall = __webpack_require__(6);
 
 var Matrix = __webpack_require__(12).Matrix;
+/**
+ * This function exports a list of all shortest paths among each pair of atoms in the molecule.
+ * It is possible to filter out the list by atomLabel and min/max length. The resulting array will
+ * contains both, the diasterotopicAtomID and the atomIDs between the atom in the path. This is important
+ * because it allows to differentiate chemically equivalent atoms from magentically equivalent atoms.
+ */
+
 
 module.exports = function getAllPaths() {
   let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -10685,29 +10691,31 @@ module.exports = function getAllPaths() {
     for (var to = 0; to < this.getAllAtoms(); to++) {
       if (!fromLabel || this.getAtomLabel(from) === fromLabel) {
         if (!toLabel || this.getAtomLabel(to) === toLabel) {
-          var key = "".concat(diaIDs[from], "_").concat(diaIDs[to]);
           var pathLength = pathLengthMatrix[from][to];
+          var key = "".concat(diaIDs[from], "_").concat(diaIDs[to], "_").concat(pathLength);
 
           if (pathLength >= minLength && pathLength <= maxLength) {
             if (!results[key]) {
               results[key] = {
                 fromDiaID: diaIDs[from],
                 toDiaID: diaIDs[to],
-                fromAtoms: [],
-                toAtoms: [],
+                fromAtoms: [from],
+                toAtoms: [to],
                 fromLabel: this.getAtomLabel(from),
                 toLabel: this.getAtomLabel(to),
                 pathLength: pathLength
               };
-            }
-
-            if (results[key].fromAtoms.indexOf(from) === -1) {
+            } else {
               results[key].fromAtoms.push(from);
-            }
-
-            if (results[key].toAtoms.indexOf(to) === -1) {
               results[key].toAtoms.push(to);
             }
+            /* if (results[key].fromAtoms.indexOf(from) === -1) {
+              results[key].fromAtoms.push(from);
+            }
+            if (results[key].toAtoms.indexOf(to) === -1) {
+              results[key].toAtoms.push(to);
+            }*/
+
           }
         }
       }
@@ -10717,8 +10725,8 @@ module.exports = function getAllPaths() {
   var finalResults = [];
 
   for (let key in results) {
-    results[key].fromAtoms.sort((a, b) => a - b);
-    results[key].toAtoms.sort((a, b) => a - b);
+    // results[key].fromAtoms.sort((a, b) => a - b);
+    // results[key].toAtoms.sort((a, b) => a - b);
     finalResults.push(results[key]);
   }
 
@@ -13580,18 +13588,19 @@ module.exports = {
 "use strict";
 
 /**
- * This function groups the diasterotopic atomIds of the molecule based of equivalence of atoms. This 
- * equivalente can be at the level of chemical equivalente(Default) or at the level of magentic equivalence of protons
+ * This function groups the diasterotopic atomIds of the molecule based on equivalence of atoms. The output object contains
+ * a set of chemically equivalent atoms(element.atoms) and the groups of magnetically equivalent atoms (element.magneticGroups)
+ * {object}[options={}]
+ * {string}[options.atomLabel] Return only the atoms of the given atomLabel. By default it returns all the explicit atoms in the molecule
  */
 
 module.exports = function getGroupedDiastereotopicAtomIDs() {
   let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  console.log("Here");
   var label = options.atomLabel;
   var diaIDs = this.getDiastereotopicAtomIDs(options);
   var diaIDsObject = {};
 
-  for (var i = 0; i < diaIDs.length; i++) {
+  for (let i = 0; i < diaIDs.length; i++) {
     if (!label || this.getAtomLabel(i) === label) {
       var diaID = diaIDs[i];
 
@@ -13608,7 +13617,63 @@ module.exports = function getGroupedDiastereotopicAtomIDs() {
         diaIDsObject[diaID].atoms.push(i);
       }
     }
+  } // Find the Magnetically equivalent groups
+
+
+  let pathOptions = {
+    maxLength: Number.MAX_SAFE_INTEGER
+  };
+
+  if (label) {
+    pathOptions.fromLabel = label;
+    pathOptions.toLabel = label;
   }
+
+  let paths = this.getAllPaths(pathOptions);
+
+  for (let key of Object.keys(diaIDsObject)) {
+    let hashTable = {};
+
+    for (let i = 0; i < paths.length; i++) {
+      let pair = paths[i];
+
+      if (pair.fromDiaID === key && pair.toDiaID !== key) {
+        let groupB = pair.fromAtoms;
+        groupB.forEach((value, index) => {
+          if (!hashTable[value]) {
+            hashTable[value] = {};
+          }
+
+          hashTable[value][pair.toAtoms[index]] = pair.pathLength;
+        });
+      }
+    } // console.log(hashTable);
+
+
+    let keys = Object.keys(hashTable);
+    let groups = {};
+
+    for (let atomID of keys) {
+      let uniqueColumn = Object.keys(hashTable[atomID]).sort().reduce((key, id) => key + "," + id + ":" + hashTable[atomID][id], "");
+      console.log(uniqueColumn); //let uniqueColumn = JSON.stringify(hashTable[atomID]);
+
+      if (groups[uniqueColumn]) {
+        groups[uniqueColumn].push(atomID);
+      } else {
+        groups[uniqueColumn] = [atomID];
+      }
+    } // console.log(groups);
+
+
+    keys = Object.keys(groups);
+
+    if (keys.length === 0) {
+      diaIDsObject[key].magneticGroups = [diaIDsObject[key].atoms.slice()];
+    } else {
+      diaIDsObject[key].magneticGroups = Object.values(groups);
+    }
+  } // End of Magnetically equivalent groups
+
 
   var diaIDsTable = [];
 
