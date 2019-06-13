@@ -2,7 +2,12 @@
 
 var floydWarshall = require('ml-floyd-warshall');
 var Matrix = require('ml-matrix').Matrix;
-
+/**
+ * This function exports a list of all shortest paths among each pair of atoms in the molecule.
+ * It is possible to filter out the list by atomLabel and min/max length. The resulting array will
+ * contains both, the diasterotopicAtomID and the atomIDs between the atom in the path. This is important
+ * because it allows to differentiate chemically equivalent atoms from magentically equivalent atoms.
+ */
 module.exports = function getAllPaths(options = {}) {
   var fromLabel = options.fromLabel || '';
   var toLabel = options.toLabel || '';
@@ -21,26 +26,29 @@ module.exports = function getAllPaths(options = {}) {
     for (var to = 0; to < this.getAllAtoms(); to++) {
       if (!fromLabel || this.getAtomLabel(from) === fromLabel) {
         if (!toLabel || this.getAtomLabel(to) === toLabel) {
-          var key = `${diaIDs[from]}_${diaIDs[to]}`;
           var pathLength = pathLengthMatrix[from][to];
+          var key = `${diaIDs[from]}_${diaIDs[to]}_${pathLength}`;
           if (pathLength >= minLength && pathLength <= maxLength) {
             if (!results[key]) {
               results[key] = {
                 fromDiaID: diaIDs[from],
                 toDiaID: diaIDs[to],
-                fromAtoms: [],
-                toAtoms: [],
+                fromAtoms: [from],
+                toAtoms: [to],
                 fromLabel: this.getAtomLabel(from),
                 toLabel: this.getAtomLabel(to),
                 pathLength: pathLength
               };
+            } else {
+              results[key].fromAtoms.push(from);
+              results[key].toAtoms.push(to);
             }
-            if (results[key].fromAtoms.indexOf(from) === -1) {
+            /* if (results[key].fromAtoms.indexOf(from) === -1) {
               results[key].fromAtoms.push(from);
             }
             if (results[key].toAtoms.indexOf(to) === -1) {
               results[key].toAtoms.push(to);
-            }
+            }*/
           }
         }
       }
@@ -49,8 +57,8 @@ module.exports = function getAllPaths(options = {}) {
 
   var finalResults = [];
   for (let key in results) {
-    results[key].fromAtoms.sort((a, b) => a - b);
-    results[key].toAtoms.sort((a, b) => a - b);
+    // results[key].fromAtoms.sort((a, b) => a - b);
+    // results[key].toAtoms.sort((a, b) => a - b);
     finalResults.push(results[key]);
   }
   return finalResults;
