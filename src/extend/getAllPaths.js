@@ -3,11 +3,21 @@
 var floydWarshall = require('ml-floyd-warshall');
 var Matrix = require('ml-matrix').Matrix;
 
+/**
+ * Returns an array of all the different atom diaIDs that are connected
+ * {object} [options={}]
+ * {string} [options.fromLabel='']
+ * {string} [options.toLabel='']
+ * {number} [options.minLength=1]
+ * {number} [options.maxLength=4]
+ */
 module.exports = function getAllPaths(options = {}) {
-  var fromLabel = options.fromLabel || '';
-  var toLabel = options.toLabel || '';
-  var minLength = options.minLength === undefined ? 1 : options.minLength;
-  var maxLength = options.maxLength === undefined ? 4 : options.maxLength;
+  const {
+    fromLabel = '',
+    toLabel = '',
+    minLength = 1,
+    maxLength = 4
+  } = options;
 
   // we need to find all the atoms 'fromLabel' and 'toLabel'
   var results = {};

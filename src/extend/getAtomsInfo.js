@@ -5,6 +5,7 @@ module.exports = function (OCL) {
     this.ensureHelperArrays(OCL.Molecule.cHelperRings);
 
     var diaIDs = this.getDiastereotopicAtomIDs();
+console.log(diaIDs.join('\r\n'))
 
     var results = [];
     for (var i = 0; i < diaIDs.length; i++) {

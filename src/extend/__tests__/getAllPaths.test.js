@@ -1,8 +1,6 @@
 'use strict';
 
-
 const OCLE = require('../..');
-
 
 describe('getAllPaths test propane', () => {
   it('min:1, max:2', () => {
@@ -17,34 +15,42 @@ describe('getAllPaths test propane', () => {
     });
 
     expect(paths).toStrictEqual([
-      { fromDiaID: 'eM@Df`Xb`RP\\Jh',
+      {
+        fromDiaID: 'eM@Df`Xb`RP\\Jh',
         toDiaID: 'gC`HALiKT@RHDRj@',
         fromAtoms: [0, 2],
         toAtoms: [3, 4, 5, 8, 9, 10],
         fromLabel: 'C',
         toLabel: 'H',
-        pathLength: 1 },
-      { fromDiaID: 'eM@Df`Xb`RP\\Jh',
+        pathLength: 1
+      },
+      {
+        fromDiaID: 'eM@Df`Xb`RP\\Jh',
         toDiaID: 'gC`HALiMT@RHDRj@',
         fromAtoms: [0, 2],
         toAtoms: [6, 7],
         fromLabel: 'C',
         toLabel: 'H',
-        pathLength: 2 },
-      { fromDiaID: 'eM@HzAbJC}IApj`',
+        pathLength: 2
+      },
+      {
+        fromDiaID: 'eM@HzAbJC}IApj`',
         toDiaID: 'gC`HALiKT@RHDRj@',
         fromAtoms: [1],
         toAtoms: [3, 4, 5, 8, 9, 10],
         fromLabel: 'C',
         toLabel: 'H',
-        pathLength: 2 },
-      { fromDiaID: 'eM@HzAbJC}IApj`',
+        pathLength: 2
+      },
+      {
+        fromDiaID: 'eM@HzAbJC}IApj`',
         toDiaID: 'gC`HALiMT@RHDRj@',
         fromAtoms: [1],
         toAtoms: [6, 7],
         fromLabel: 'C',
         toLabel: 'H',
-        pathLength: 1 }
+        pathLength: 1
+      }
     ]);
   });
 
