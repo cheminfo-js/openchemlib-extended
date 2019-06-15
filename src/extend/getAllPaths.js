@@ -12,7 +12,7 @@ var Matrix = require('ml-matrix').Matrix;
  * because it allows to differentiate chemically equivalent atoms from magentically equivalent atoms.
 
  * {object} [options={}]
- * {string} [options.fromLabel='']
+ * {string} [options.fromLabel='']:q!
  * {string} [options.toLabel='']
  * {number} [options.minLength=1]
  * {number} [options.maxLength=4]
