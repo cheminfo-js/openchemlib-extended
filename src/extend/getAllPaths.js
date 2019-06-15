@@ -45,24 +45,14 @@ module.exports = function getAllPaths(options = {}) {
               results[key] = {
                 fromDiaID: diaIDs[from],
                 toDiaID: diaIDs[to],
-                //fromAtoms: [from],
-                //toAtoms: [to],
-                fromTo:[[from, to]],
+                fromTo: [[from, to]],
                 fromLabel: this.getAtomLabel(from),
                 toLabel: this.getAtomLabel(to),
                 pathLength: pathLength
               };
             } else {
-              //results[key].fromAtoms.push(from);
-              //results[key].toAtoms.push(to);
               results[key].fromTo.push([from, to]);
             }
-            /* if (results[key].fromAtoms.indexOf(from) === -1) {
-              results[key].fromAtoms.push(from);
-            }
-            if (results[key].toAtoms.indexOf(to) === -1) {
-              results[key].toAtoms.push(to);
-            }*/
           }
         }
       }
@@ -71,8 +61,6 @@ module.exports = function getAllPaths(options = {}) {
 
   var finalResults = [];
   for (let key in results) {
-    // results[key].fromAtoms.sort((a, b) => a - b);
-    // results[key].toAtoms.sort((a, b) => a - b);
     finalResults.push(results[key]);
   }
   return finalResults;
