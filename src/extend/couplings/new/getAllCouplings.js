@@ -25,41 +25,33 @@ function getAllCouplings(molecule, options = {}) {
     minLength,
     maxLength
   });
+
   let fragment = new OCLE.Molecule(0, 0);
-  console.log({ paths });
   for (let path of paths) {
     path.info = [];
-    for (let i = 0; i < path.fromAtoms.length; i++) {
-      for (let j = 0; j < path.toAtoms.length; j++) {
-        if (path.fromAtoms[i] !== path.toAtoms[j]) {
-          let atoms = [];
-          molecule.getPath(
-            atoms,
-            path.fromAtoms[i],
-            path.toAtoms[j],
-            path.pathLength
-          );
-          let torsion;
-          if (atoms.length === 4) {
-            torsion = molecule.calculateTorsion(atoms);
-          }
-          path.info.push({
-            atoms,
-            torsion
-          });
-          if (!path.code) {
-            let atomMask = new Array(molecule.getAllAtoms()).fill(false);
-            for (let atom of atoms) {
-              atomMask[atom] = true;
-            }
-            molecule.copyMoleculeByAtoms(fragment, atomMask, true, null);
-            path.code = fragment.getCanonizedIDCode();
-          }
+    for (let fromTo of path.fromTo) {
+      let atoms = [];
+      molecule.getPath(atoms, fromTo[0], fromTo[1], path.pathLength);
+      let torsion;
+      if (atoms.length === 4) {
+        torsion = molecule.calculateTorsion(atoms);
+      }
+      path.info.push({
+        atoms,
+        torsion
+      });
+
+      if (!path.code) {
+        let atomMask = new Array(molecule.getAllAtoms()).fill(false);
+        for (let atom of atoms) {
+          atomMask[atom] = true;
         }
+        molecule.copyMoleculeByAtoms(fragment, atomMask, true, null);
+        path.code = fragment.getCanonizedIDCode();
       }
     }
-    return paths;
   }
+  return paths;
 }
 
 module.exports = getAllCouplings;

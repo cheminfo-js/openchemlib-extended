@@ -34,6 +34,7 @@ describe('test getAllCouplings', () => {
   it('from CCC', () => {
     var molecule = OCLE.Molecule.fromMolfile(molfile);
     let result = getAllCouplings(molecule, {});
-       console.log(result);
+    expect(result).toHaveLength(5);
+    expect(result).toMatchSnapshot();
   });
 });
