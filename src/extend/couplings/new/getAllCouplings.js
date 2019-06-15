@@ -26,7 +26,7 @@ function getAllCouplings(molecule, options = {}) {
     maxLength
   });
   let fragment = new OCLE.Molecule(0, 0);
-
+  console.log({ paths });
   for (let path of paths) {
     path.info = [];
     for (let i = 0; i < path.fromAtoms.length; i++) {

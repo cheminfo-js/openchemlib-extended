@@ -93,7 +93,6 @@ function getCoupling(molecule, from, to, pathLength, diaIDto) {
     );
   }
 
-  console.log({ from, to, pathCodes });
   return {
     atoms,
     to,

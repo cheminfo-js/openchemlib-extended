@@ -67,6 +67,58 @@ describe('getAllPaths test propane', () => {
     expect(paths[1].toAtoms).toStrictEqual([3, 4, 5, 8, 9, 10]);
   });
 
+  it('CCC J-HH ', () => {
+    var molecule = OCLE.Molecule.fromSmiles('CCC');
+    molecule.addImplicitHydrogens();
+
+    var paths = molecule.getAllPaths({
+      fromLabel: 'H',
+      toLabel: 'H',
+      minLength: 1,
+      maxLength: 4
+    });
+    expect(paths).toStrictEqual({
+      paths: [
+        {
+          fromDiaID: 'gC`HALiKT@RHDRj@',
+          toDiaID: 'gC`HALiKT@RHDRj@',
+          fromAtoms: [Array],
+          toAtoms: [Array],
+          fromLabel: 'H',
+          toLabel: 'H',
+          pathLength: 2
+        },
+        {
+          fromDiaID: 'gC`HALiKT@RHDRj@',
+          toDiaID: 'gC`HALiMT@RHDRj@',
+          fromAtoms: [Array],
+          toAtoms: [Array],
+          fromLabel: 'H',
+          toLabel: 'H',
+          pathLength: 3
+        },
+        {
+          fromDiaID: 'gC`HALiKT@RHDRj@',
+          toDiaID: 'gC`HALiKT@RHDRj@',
+          fromAtoms: [Array],
+          toAtoms: [Array],
+          fromLabel: 'H',
+          toLabel: 'H',
+          pathLength: 4
+        },
+        {
+          fromDiaID: 'gC`HALiMT@RHDRj@',
+          toDiaID: 'gC`HALiMT@RHDRj@',
+          fromAtoms: [Array],
+          toAtoms: [Array],
+          fromLabel: 'H',
+          toLabel: 'H',
+          pathLength: 2
+        }
+      ]
+    });
+  });
+
   it('p-aromatic', () => {
     var molecule = OCLE.Molecule.fromSmiles('c1(Cl)ccc(Br)cc1');
     molecule.addImplicitHydrogens();
