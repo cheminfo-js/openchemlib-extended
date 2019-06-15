@@ -39,12 +39,12 @@ module.exports = function getGroupedDiastereotopicAtomIDs(options = {}) {
     for (let i = 0; i < paths.length; i++) {
       let pair = paths[i];
       if (pair.fromDiaID === key && pair.toDiaID !== key) {
-        let groupB = pair.fromAtoms;
+        let groupB = pair.fromTo;
         groupB.forEach((value, index) => {
-          if (!hashTable[value]) {
-            hashTable[value] = {};
+          if (!hashTable[value[0]]) {
+            hashTable[value[0]] = {};
           }
-          hashTable[value][pair.toAtoms[index]] = pair.pathLength;
+          hashTable[value[0]][value[1]] = pair.pathLength;
         });
       }
     }
