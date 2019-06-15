@@ -67,7 +67,7 @@ describe('getAllPaths test propane', () => {
     expect(paths[1].toAtoms).toStrictEqual([3, 4, 5, 8, 9, 10]);
   });
 
-  it('CCC J-HH ', () => {
+  it('CCC J-HH 1 to 4 ', () => {
     var molecule = OCLE.Molecule.fromSmiles('CCC');
     molecule.addImplicitHydrogens();
 
@@ -77,49 +77,57 @@ describe('getAllPaths test propane', () => {
       minLength: 1,
       maxLength: 4
     });
-    expect(paths).toStrictEqual({
-      paths: [
-        {
-          fromDiaID: 'gC`HALiKT@RHDRj@',
-          toDiaID: 'gC`HALiKT@RHDRj@',
-          fromAtoms: [Array],
-          toAtoms: [Array],
-          fromLabel: 'H',
-          toLabel: 'H',
-          pathLength: 2
-        },
-        {
-          fromDiaID: 'gC`HALiKT@RHDRj@',
-          toDiaID: 'gC`HALiMT@RHDRj@',
-          fromAtoms: [Array],
-          toAtoms: [Array],
-          fromLabel: 'H',
-          toLabel: 'H',
-          pathLength: 3
-        },
-        {
-          fromDiaID: 'gC`HALiKT@RHDRj@',
-          toDiaID: 'gC`HALiKT@RHDRj@',
-          fromAtoms: [Array],
-          toAtoms: [Array],
-          fromLabel: 'H',
-          toLabel: 'H',
-          pathLength: 4
-        },
-        {
-          fromDiaID: 'gC`HALiMT@RHDRj@',
-          toDiaID: 'gC`HALiMT@RHDRj@',
-          fromAtoms: [Array],
-          toAtoms: [Array],
-          fromLabel: 'H',
-          toLabel: 'H',
-          pathLength: 2
-        }
-      ]
-    });
+    console.log(JSON.stringify(paths));
+    expect(paths).toStrictEqual([
+      {
+        fromDiaID: 'gC`HALiKT@RHDRj@',
+        toDiaID: 'gC`HALiKT@RHDRj@',
+        fromAtoms: [3, 3, 4, 4, 5, 5, 8, 8, 9, 9, 10, 10],
+        toAtoms: [4, 5, 3, 5, 3, 4, 9, 10, 8, 10, 8, 9],
+        fromLabel: 'H',
+        toLabel: 'H',
+        pathLength: 2
+      },
+      {
+        fromDiaID: 'gC`HALiKT@RHDRj@',
+        toDiaID: 'gC`HALiMT@RHDRj@',
+        fromAtoms: [3, 3, 4, 4, 5, 5, 8, 8, 9, 9, 10, 10],
+        toAtoms: [6, 7, 6, 7, 6, 7, 6, 7, 6, 7, 6, 7],
+        fromLabel: 'H',
+        toLabel: 'H',
+        pathLength: 3
+      },
+      {
+        fromDiaID: 'gC`HALiKT@RHDRj@',
+        toDiaID: 'gC`HALiKT@RHDRj@',
+        fromAtoms: [3, 3, 3, 4, 4, 4, 5, 5, 5, 8, 8, 8, 9, 9, 9, 10, 10, 10],
+        toAtoms: [8, 9, 10, 8, 9, 10, 8, 9, 10, 3, 4, 5, 3, 4, 5, 3, 4, 5],
+        fromLabel: 'H',
+        toLabel: 'H',
+        pathLength: 4
+      },
+      {
+        fromDiaID: 'gC`HALiMT@RHDRj@',
+        toDiaID: 'gC`HALiKT@RHDRj@',
+        fromAtoms: [6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7],
+        toAtoms: [3, 4, 5, 8, 9, 10, 3, 4, 5, 8, 9, 10],
+        fromLabel: 'H',
+        toLabel: 'H',
+        pathLength: 3
+      },
+      {
+        fromDiaID: 'gC`HALiMT@RHDRj@',
+        toDiaID: 'gC`HALiMT@RHDRj@',
+        fromAtoms: [6, 7],
+        toAtoms: [7, 6],
+        fromLabel: 'H',
+        toLabel: 'H',
+        pathLength: 2
+      }
+    ]);
   });
 
-  it('p-aromatic', () => {
+  it.only('p-aromatic', () => {
     var molecule = OCLE.Molecule.fromSmiles('c1(Cl)ccc(Br)cc1');
     molecule.addImplicitHydrogens();
 
@@ -127,8 +135,9 @@ describe('getAllPaths test propane', () => {
       fromLabel: 'H',
       toLabel: 'H',
       minLength: 1,
-      maxLength: 4
+      maxLength: 5
     });
+    console.log(JSON.stringify(paths, undefined, 2));
     expect(paths).toStrictEqual([
       {
         fromDiaID: 'did@p@fRbAqDfYun``H@GzP`HeT',
