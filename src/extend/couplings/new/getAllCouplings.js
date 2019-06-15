@@ -58,7 +58,7 @@ function getAllCouplings(molecule, options = {}) {
         }
       }
     }
-    console.log(path);
+    return paths;
   }
 }
 
