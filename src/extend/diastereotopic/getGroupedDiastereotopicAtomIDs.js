@@ -40,7 +40,7 @@ module.exports = function getGroupedDiastereotopicAtomIDs(options = {}) {
       let pair = paths[i];
       if (pair.fromDiaID === key && pair.toDiaID !== key) {
         let groupB = pair.fromTo;
-        groupB.forEach((value, index) => {
+        groupB.forEach((value) => {
           if (!hashTable[value[0]]) {
             hashTable[value[0]] = {};
           }
@@ -52,7 +52,9 @@ module.exports = function getGroupedDiastereotopicAtomIDs(options = {}) {
     let keys = Object.keys(hashTable);
     let groups = {};
     for (let atomID of keys) {
-      let uniqueColumn = Object.keys(hashTable[atomID]).sort().reduce((key, id) => `${key}${id}:${hashTable[atomID][id]},`, '');
+      let uniqueColumn = Object.keys(hashTable[atomID])
+        .sort()
+        .reduce((key, id) => `${key}${id}:${hashTable[atomID][id]},`, '');
       if (groups[uniqueColumn]) {
         groups[uniqueColumn].push(atomID);
       } else {

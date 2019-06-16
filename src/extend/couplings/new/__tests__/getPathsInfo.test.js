@@ -15,6 +15,6 @@ describe('getPathsInfo test propane', () => {
       maxLength: 3
     });
 
-    expect(true).toBe(true);
+    expect(pathsInfo).toMatchSnapshot();
   });
 });
