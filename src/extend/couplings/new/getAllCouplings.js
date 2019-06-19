@@ -1,6 +1,8 @@
 'use strict';
 
 const OCLE = require('../../..');
+const changeAtom = require('../../diastereotopic/migrated/changeAtom');
+const makeRacemic = require('../../diastereotopic/migrated/makeRacemic');
 
 /**
  * Returns an array of all the different atom diaIDs that are connected
@@ -26,6 +28,9 @@ function getAllCouplings(molecule, options = {}) {
     maxLength
   });
 
+  const minSphereSize = 0;
+  const maxSphereSize = 2;
+
   let fragment = new OCLE.Molecule(0, 0);
   for (let path of paths) {
     path.info = [];
@@ -42,12 +47,45 @@ function getAllCouplings(molecule, options = {}) {
       });
 
       if (!path.code) {
-        let atomMask = new Array(molecule.getAllAtoms()).fill(false);
-        for (let atom of atoms) {
-          atomMask[atom] = true;
+        path.code = [];
+
+        let tmpMolecule = molecule.getCompactCopy();
+        changeAtom(tmpMolecule, atoms[0]);
+        changeAtom(tmpMolecule, atoms[atoms.length - 1]);
+
+        let atomMask = new Array(tmpMolecule.getAllAtoms()).fill(false);
+        let atomList = [];
+        let max = 0;
+        let min = 0;
+        for (var sphere = 0; sphere <= maxSphereSize; sphere++) {
+          if (max === 0) {
+            for (let atom of atoms) {
+              atomMask[atom] = true;
+              atomList.push(atom);
+              max++;
+            }
+          } else {
+            let newMax = max;
+            for (let i = min; i < max; i++) {
+              let atom = atomList[i];
+              for (let j = 0; j < tmpMolecule.getConnAtoms(atom); j++) {
+                let connAtom = tmpMolecule.getConnAtom(atom, j);
+                atomMask[connAtom] = true;
+                atomList[newMax++] = connAtom;
+              }
+            }
+            min = max;
+            max = newMax;
+          }
+          tmpMolecule.copyMoleculeByAtoms(fragment, atomMask, true, null);
+          if (sphere >= minSphereSize) {
+            path.code.push(
+              fragment.getCanonizedIDCode(
+                OCLE.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
+              )
+            );
+          }
         }
-        molecule.copyMoleculeByAtoms(fragment, atomMask, true, null);
-        path.code = fragment.getCanonizedIDCode();
       }
     }
   }

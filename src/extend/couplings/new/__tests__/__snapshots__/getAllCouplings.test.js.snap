@@ -3,7 +3,11 @@
 exports[`test getAllCouplings from CCC 1`] = `
 Array [
   Object {
-    "code": "fH@Ok@",
+    "code": Array [
+      "eMABYYeIhOzJBIUJIU@",
+      "gC\`DALjYRZhC~bPHeTdRj@",
+      "gJPDALjYR[j\`OzI@bURQJh",
+    ],
     "fromDiaID": "gC\`HALiKT@RHDRj@",
     "fromLabel": "H",
     "fromTo": Array [
@@ -159,7 +163,11 @@ Array [
     "toLabel": "H",
   },
   Object {
-    "code": "eF@Hp_IE@",
+    "code": Array [
+      "eMBBYRZCzhRPQJh",
+      "gJPDALfYRYjiDOhhQHDRjJIU@",
+      "gJPDALfYRYjiDOhhQHDRjJIU@",
+    ],
     "fromDiaID": "gC\`HALiKT@RHDRj@",
     "fromLabel": "H",
     "fromTo": Array [
@@ -327,7 +335,11 @@ Array [
     "toLabel": "H",
   },
   Object {
-    "code": "eM@HzCyhX@",
+    "code": Array [
+      "gC\`HALiKTA}IGzQ@bUP",
+      "gJPDALfYRUj\`OiHQHDRjJIU@",
+      "gJPDALfYRUj\`OiHQHDRjJIU@",
+    ],
     "fromDiaID": "gC\`HALiKT@RHDRj@",
     "fromLabel": "H",
     "fromTo": Array [
@@ -591,7 +603,11 @@ Array [
     "toLabel": "H",
   },
   Object {
-    "code": "eF@Hp_IE@",
+    "code": Array [
+      "eMBBYRZCzhRPQJh",
+      "gJPDALfYRYjiDOhhQHDRjJIU@",
+      "gJPDALfYRYjiDOhhQHDRjJIU@",
+    ],
     "fromDiaID": "gC\`HALiMT@RHDRj@",
     "fromLabel": "H",
     "fromTo": Array [
@@ -759,7 +775,11 @@ Array [
     "toLabel": "H",
   },
   Object {
-    "code": "fH@Ok@",
+    "code": Array [
+      "eLAJ@X@@\`",
+      "gJPDALjYRZj\`OilQHDRjRIU@",
+      "gJPDALjYRZj\`OilQHDRjRIU@",
+    ],
     "fromDiaID": "gC\`HALiMT@RHDRj@",
     "fromLabel": "H",
     "fromTo": Array [
