@@ -1,7 +1,7 @@
-
 // This is a javascript COPY of the java class !!!!
 'use strict';
 
+const changeAtom = require('./diastereotopic/migrated/changeAtom');
 
 module.exports = function (OCL) {
   return function getHoseCodesForAtom(rootAtom, options = {}) {
@@ -10,13 +10,12 @@ module.exports = function (OCL) {
     const {
       minSphereSize = 0,
       maxSphereSize = 4,
-      kind = FULL_HOSE_CODE,
+      kind = FULL_HOSE_CODE
     } = options;
 
     let molecule = this.getCompactCopy();
 
-    molecule.setAtomCustomLabel(rootAtom, `${molecule.getAtomLabel(rootAtom)}*`);
-    molecule.setAtomicNo(rootAtom, OCL.Molecule.getAtomicNoFromLabel('X'));
+    changeAtom(molecule, rootAtom);
 
     let fragment = new OCL.Molecule(0, 0);
     let results = [];
@@ -59,7 +58,11 @@ module.exports = function (OCL) {
       }
       molecule.copyMoleculeByAtoms(fragment, atomMask, true, null);
       if (sphere >= minSphereSize) {
-        results.push(fragment.getCanonizedIDCode(OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS));
+        results.push(
+          fragment.getCanonizedIDCode(
+            OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
+          )
+        );
       }
     }
     return results;
@@ -68,7 +71,12 @@ module.exports = function (OCL) {
   function isCsp3(molecule, atomID) {
     if (molecule.getAtomicNo(atomID) !== 6) return false;
     if (molecule.getAtomCharge(atomID) !== 0) return false;
-    if ((molecule.getImplicitHydrogens(atomID) + molecule.getConnAtoms(atomID)) !== 4) return false;
+    if (
+      molecule.getImplicitHydrogens(atomID) + molecule.getConnAtoms(atomID) !==
+      4
+    ) {
+      return false;
+    }
     return true;
   }
 };

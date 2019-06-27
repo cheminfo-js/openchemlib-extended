@@ -32,7 +32,7 @@ function getAllCouplings(molecule, options = {}) {
   const maxSphereSize = 2;
 
   let fragment = new OCLE.Molecule(0, 0);
-  for (let path of paths) {
+  for (let path of paths.slice(0, 1)) {
     path.info = [];
     for (let fromTo of path.fromTo) {
       let atoms = [];
@@ -50,9 +50,10 @@ function getAllCouplings(molecule, options = {}) {
         path.code = [];
 
         let tmpMolecule = molecule.getCompactCopy();
+        makeRacemic(tmpMolecule);
         changeAtom(tmpMolecule, atoms[0]);
         changeAtom(tmpMolecule, atoms[atoms.length - 1]);
-
+        console.log(atoms);
         let atomMask = new Array(tmpMolecule.getAllAtoms()).fill(false);
         let atomList = [];
         let max = 0;
