@@ -1,9 +1,11 @@
 // This is a javascript COPY of the java class !!!!
 'use strict';
 
+const OCL = require('openchemlib');
+
 const changeAtom = require('./diastereotopic/migrated/changeAtom');
 
-module.exports = function (OCL) {
+module.exports = function () {
   return function getHoseCodesForAtom(rootAtom, options = {}) {
     let FULL_HOSE_CODE = 1;
     let HOSE_CODE_CUT_C_SP3_SP3 = 2;
@@ -15,7 +17,33 @@ module.exports = function (OCL) {
 
     let molecule = this.getCompactCopy();
 
+    molecule = OCL.Molecule.fromSmiles('CCC');
+    molecule.setAtomCustomLabel(0, 'XX');
+    molecule.setAtomMass(0, 17);
+    molecule.setAtomCharge(0, 1);
+    console.log(
+      'xx',
+      molecule.getCanonizedIDCode(
+        OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
+      )
+    );
+
     changeAtom(molecule, rootAtom);
+
+    console.log(molecule.getAtomCustomLabel(rootAtom));
+
+    console.log(
+      molecule.getCanonizedIDCode(
+        OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
+      )
+    );
+    console.log(OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS);
+    molecule.setFragment(true);
+    console.log(
+      molecule.getCanonizedIDCode(
+        OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
+      )
+    );
 
     let fragment = new OCL.Molecule(0, 0);
     let results = [];

@@ -1,8 +1,8 @@
 'use strict';
 
-const OCLE = require('../../../..');
+const OCL = require('openchemlib');
 
-const xAtomicNumber = OCLE.Molecule.getAtomicNoFromLabel('X');
+const xAtomicNumber = OCL.Molecule.getAtomicNoFromLabel('X');
 
 function changeAtom(molecule, iAtom) {
   molecule.setAtomCustomLabel(iAtom, `${molecule.getAtomLabel(iAtom)}*`);

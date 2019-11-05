@@ -5,7 +5,7 @@ const OCLE = require('../..');
 
 
 describe('getHosesCodeForAtom test propane', () => {
-  it('minSphereSize:0, maxSphereSize:3', () => {
+  it.only('minSphereSize:0, maxSphereSize:3', () => {
     var molecule = OCLE.Molecule.fromSmiles('CCC');
     let results = molecule.getHoseCodesForAtom(0, {
       minSphereSize: 0,

@@ -1,13 +1,13 @@
 'use strict';
 
-const OCLE = require('../../../..');
+const OCL = require('openchemlib');
 
 const changeAtom = require('./changeAtom');
 const makeRacemic = require('./makeRacemic');
 
-const Molecule = OCLE.Molecule;
+const Molecule = OCL.Molecule;
 
-const xAtomicNumber = OCLE.Molecule.getAtomicNoFromLabel('X');
+const xAtomicNumber = OCL.Molecule.getAtomicNoFromLabel('X');
 
 function getAtomIDs(molecule) {
   addMissingChirality(molecule);
@@ -20,7 +20,7 @@ function getAtomIDs(molecule) {
     makeRacemic(tempMolecule);
     // We need to ensure the helper array in order to get correctly the result of racemisation
     ids[iAtom] = tempMolecule.getCanonizedIDCode(
-      OCLE.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
+      OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
     );
   }
   return ids;
@@ -36,8 +36,9 @@ function addMissingChirality(molecule, esrType = Molecule.cESRTypeAnd) {
     let tempMolecule = molecule.getCompactCopy();
     changeAtomForStereo(tempMolecule, iAtom);
     // After copy, helpers must be recalculated
-    tempMolecule.ensureHelperArrays(Molecule.cHelperParities);
+    tempMolecule.ensureHelperArrays(Molecule.cHelperBitsStereo);
     // We need to have >0 and not >1 because there could be unspecified chirality in racemate
+
     for (let i = 0; i < tempMolecule.getAtoms(); i++) {
       // changed from from handling below; TLS 9.Nov.2015
       if (
@@ -91,5 +92,6 @@ function markDiastereotopicAtoms(molecule) {
 
 module.exports = {
   getAtomIDs,
-  markDiastereotopicAtoms
+  markDiastereotopicAtoms,
+  addMissingChirality
 };
