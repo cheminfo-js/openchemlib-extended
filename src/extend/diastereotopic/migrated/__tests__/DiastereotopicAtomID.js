@@ -14,29 +14,13 @@ describe('DiastereotopicAtomID', () => {
       .split('\n')
       .slice(0, 50);
     // for each predict all atomIDs, expands Hydroges do the same using bot versions of the library
-    smiles.forEach((line) => {
+    smiles.forEach(line => {
       let row = line.split('\t');
       let value = row[0];
       if (value && value.length > 0) {
         let molecule = OCL.Molecule.fromSmiles(value);
         let newIds = getAtomIDs(molecule);
-        /*
-        let oldIDs = molecule.getDiastereotopicAtomIDs();
-        let snapshotIDs = JSON.parse(row[1]);
-        for (let i = 0; i < newIds.length; i++) {
-          if (oldIDs[i] !== newIds[i]) {
-            console.log(
-              oldIDs[i] === newIds[i],
-              oldIDs[i] === snapshotIDs[i],
-              oldIDs[i],
-              newIds[i]
-            );
-          }
-        }
-        */
-
-        if (JSON.stringify(newIds) !== row[1]) console.log(row[0], row[1]);
-        // expect(JSON.stringify(newIds)).toBe(row[1]);
+        expect(JSON.stringify(newIds)).toBe(row[1]);
       }
     });
   });
@@ -55,7 +39,7 @@ describe('DiastereotopicAtomID', () => {
       .split('\n')
       .slice(0, 50);
     // for each predict all atomIDs, expands Hydroges do the same using bot versions of the library
-    smiles.forEach((line) => {
+    smiles.forEach(line => {
       let row = line.split('\t');
       let value = row[0];
       if (value && value.length > 0) {
