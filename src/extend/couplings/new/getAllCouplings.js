@@ -53,7 +53,7 @@ function getAllCouplings(molecule, options = {}) {
         makeRacemic(tmpMolecule);
         changeAtom(tmpMolecule, atoms[0]);
         changeAtom(tmpMolecule, atoms[atoms.length - 1]);
-        console.log(atoms);
+
         let atomMask = new Array(tmpMolecule.getAllAtoms()).fill(false);
         let atomList = [];
         let max = 0;

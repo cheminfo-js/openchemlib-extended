@@ -163,11 +163,6 @@ Array [
     "toLabel": "H",
   },
   Object {
-    "code": Array [
-      "eMBBYRZCzhRPQJh",
-      "gJPDALfYRYjiDOhhQHDRjJIU@",
-      "gJPDALfYRYjiDOhhQHDRjJIU@",
-    ],
     "fromDiaID": "gC\`HALiKT@RHDRj@",
     "fromLabel": "H",
     "fromTo": Array [
@@ -219,127 +214,12 @@ Array [
         10,
         7,
       ],
-    ],
-    "info": Array [
-      Object {
-        "atoms": Array [
-          3,
-          2,
-          1,
-          6,
-        ],
-        "torsion": -1.0444725145366742,
-      },
-      Object {
-        "atoms": Array [
-          3,
-          2,
-          1,
-          7,
-        ],
-        "torsion": 1.0442910348920351,
-      },
-      Object {
-        "atoms": Array [
-          4,
-          2,
-          1,
-          6,
-        ],
-        "torsion": -3.1378383810878643,
-      },
-      Object {
-        "atoms": Array [
-          4,
-          2,
-          1,
-          7,
-        ],
-        "torsion": -1.0490748316591552,
-      },
-      Object {
-        "atoms": Array [
-          5,
-          2,
-          1,
-          6,
-        ],
-        "torsion": 1.0491888452455438,
-      },
-      Object {
-        "atoms": Array [
-          5,
-          2,
-          1,
-          7,
-        ],
-        "torsion": 3.137952394674253,
-      },
-      Object {
-        "atoms": Array [
-          8,
-          0,
-          1,
-          6,
-        ],
-        "torsion": 1.0443616068994523,
-      },
-      Object {
-        "atoms": Array [
-          8,
-          0,
-          1,
-          7,
-        ],
-        "torsion": -1.0444007904007009,
-      },
-      Object {
-        "atoms": Array [
-          9,
-          0,
-          1,
-          6,
-        ],
-        "torsion": -1.0491445638129124,
-      },
-      Object {
-        "atoms": Array [
-          9,
-          0,
-          1,
-          7,
-        ],
-        "torsion": -3.1379069611130657,
-      },
-      Object {
-        "atoms": Array [
-          10,
-          0,
-          1,
-          6,
-        ],
-        "torsion": 3.1377997262676036,
-      },
-      Object {
-        "atoms": Array [
-          10,
-          0,
-          1,
-          7,
-        ],
-        "torsion": 1.0490373289674506,
-      },
     ],
     "pathLength": 3,
     "toDiaID": "gC\`HALiMT@RHDRj@",
     "toLabel": "H",
   },
   Object {
-    "code": Array [
-      "gC\`HALiKTA}IGzQ@bUP",
-      "gJPDALfYRUj\`OiHQHDRjJIU@",
-      "gJPDALfYRUj\`OiHQHDRjJIU@",
-    ],
     "fromDiaID": "gC\`HALiKT@RHDRj@",
     "fromLabel": "H",
     "fromTo": Array [
@@ -416,198 +296,11 @@ Array [
         5,
       ],
     ],
-    "info": Array [
-      Object {
-        "atoms": Array [
-          3,
-          2,
-          1,
-          0,
-          8,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          3,
-          2,
-          1,
-          0,
-          9,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          3,
-          2,
-          1,
-          0,
-          10,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          4,
-          2,
-          1,
-          0,
-          8,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          4,
-          2,
-          1,
-          0,
-          9,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          4,
-          2,
-          1,
-          0,
-          10,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          5,
-          2,
-          1,
-          0,
-          8,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          5,
-          2,
-          1,
-          0,
-          9,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          5,
-          2,
-          1,
-          0,
-          10,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          8,
-          0,
-          1,
-          2,
-          3,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          8,
-          0,
-          1,
-          2,
-          4,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          8,
-          0,
-          1,
-          2,
-          5,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          9,
-          0,
-          1,
-          2,
-          3,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          9,
-          0,
-          1,
-          2,
-          4,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          9,
-          0,
-          1,
-          2,
-          5,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          10,
-          0,
-          1,
-          2,
-          3,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          10,
-          0,
-          1,
-          2,
-          4,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          10,
-          0,
-          1,
-          2,
-          5,
-        ],
-        "torsion": undefined,
-      },
-    ],
     "pathLength": 4,
     "toDiaID": "gC\`HALiKT@RHDRj@",
     "toLabel": "H",
   },
   Object {
-    "code": Array [
-      "eMBBYRZCzhRPQJh",
-      "gJPDALfYRYjiDOhhQHDRjJIU@",
-      "gJPDALfYRYjiDOhhQHDRjJIU@",
-    ],
     "fromDiaID": "gC\`HALiMT@RHDRj@",
     "fromLabel": "H",
     "fromTo": Array [
@@ -659,127 +352,12 @@ Array [
         7,
         10,
       ],
-    ],
-    "info": Array [
-      Object {
-        "atoms": Array [
-          6,
-          1,
-          2,
-          3,
-        ],
-        "torsion": -1.0444725145366742,
-      },
-      Object {
-        "atoms": Array [
-          6,
-          1,
-          2,
-          4,
-        ],
-        "torsion": -3.1378383810878643,
-      },
-      Object {
-        "atoms": Array [
-          6,
-          1,
-          2,
-          5,
-        ],
-        "torsion": 1.0491888452455438,
-      },
-      Object {
-        "atoms": Array [
-          6,
-          1,
-          0,
-          8,
-        ],
-        "torsion": 1.0443616068994523,
-      },
-      Object {
-        "atoms": Array [
-          6,
-          1,
-          0,
-          9,
-        ],
-        "torsion": -1.0491445638129124,
-      },
-      Object {
-        "atoms": Array [
-          6,
-          1,
-          0,
-          10,
-        ],
-        "torsion": 3.1377997262676036,
-      },
-      Object {
-        "atoms": Array [
-          7,
-          1,
-          2,
-          3,
-        ],
-        "torsion": 1.0442910348920353,
-      },
-      Object {
-        "atoms": Array [
-          7,
-          1,
-          2,
-          4,
-        ],
-        "torsion": -1.0490748316591552,
-      },
-      Object {
-        "atoms": Array [
-          7,
-          1,
-          2,
-          5,
-        ],
-        "torsion": 3.137952394674253,
-      },
-      Object {
-        "atoms": Array [
-          7,
-          1,
-          0,
-          8,
-        ],
-        "torsion": -1.0444007904007009,
-      },
-      Object {
-        "atoms": Array [
-          7,
-          1,
-          0,
-          9,
-        ],
-        "torsion": -3.1379069611130657,
-      },
-      Object {
-        "atoms": Array [
-          7,
-          1,
-          0,
-          10,
-        ],
-        "torsion": 1.0490373289674506,
-      },
     ],
     "pathLength": 3,
     "toDiaID": "gC\`HALiKT@RHDRj@",
     "toLabel": "H",
   },
   Object {
-    "code": Array [
-      "eLAJ@X@@\`",
-      "gJPDALjYRZj\`OilQHDRjRIU@",
-      "gJPDALjYRZj\`OilQHDRjRIU@",
-    ],
     "fromDiaID": "gC\`HALiMT@RHDRj@",
     "fromLabel": "H",
     "fromTo": Array [
@@ -791,24 +369,6 @@ Array [
         7,
         6,
       ],
-    ],
-    "info": Array [
-      Object {
-        "atoms": Array [
-          6,
-          1,
-          7,
-        ],
-        "torsion": undefined,
-      },
-      Object {
-        "atoms": Array [
-          7,
-          1,
-          6,
-        ],
-        "torsion": undefined,
-      },
     ],
     "pathLength": 2,
     "toDiaID": "gC\`HALiMT@RHDRj@",
