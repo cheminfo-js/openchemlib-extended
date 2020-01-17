@@ -22,7 +22,9 @@ function pushMoleculeInfo(moleculeInfo, data = {}) {
       molecule = this.moleculeDB.db[moleculeInfo.idCode].molecule;
     } else {
       molecule = Molecule.fromIDCode(
-        moleculeInfo.idCode, moleculeInfo.coordinates || false);
+        moleculeInfo.idCode,
+        moleculeInfo.coordinates || false,
+      );
     }
   }
 

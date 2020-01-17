@@ -1,23 +1,23 @@
 'use strict';
 
-
 const OCLE = require('../..');
-
 
 describe('getAtomsInfo test propane', () => {
   it('should yield the right table - methanol', () => {
-    var molecule = OCLE.Molecule.fromSmiles('CO');
+    let molecule = OCLE.Molecule.fromSmiles('CO');
     molecule.addImplicitHydrogens();
-    var atoms = molecule.getAtomsInfo();
+    let atoms = molecule.getAtomsInfo();
 
-    expect(atoms[0]).toStrictEqual({ oclID: 'eFHBLCETGzRSaU@',
-      extra:
-            { singleBonds: 4,
-              doubleBonds: 0,
-              tripleBonds: 0,
-              aromaticBonds: 0,
-              cnoHybridation: 3,
-              totalBonds: 4 },
+    expect(atoms[0]).toStrictEqual({
+      oclID: 'eFHBLCETGzRSaU@',
+      extra: {
+        singleBonds: 4,
+        doubleBonds: 0,
+        tripleBonds: 0,
+        aromaticBonds: 0,
+        cnoHybridation: 3,
+        totalBonds: 4,
+      },
       abnormalValence: -1,
       charge: 0,
       cipParity: 0,
@@ -41,19 +41,21 @@ describe('getAtomsInfo test propane', () => {
       isStereoCenter: false,
       isRing: false,
       isSmallRing: false,
-      isStabilized: false });
+      isStabilized: false,
+    });
 
-    expect(atoms[5]).toStrictEqual({ oclID: 'eMJHfTf`_iHHeT',
-      extra:
-            { singleBonds: 1,
-              doubleBonds: 0,
-              tripleBonds: 0,
-              aromaticBonds: 0,
-              cnoHybridation: 0,
-              totalBonds: 1,
-              hydrogenOnAtomicNo: 8,
-              labileHydrogen: true
-            },
+    expect(atoms[5]).toStrictEqual({
+      oclID: 'eMJHfTf`_iHHeT',
+      extra: {
+        singleBonds: 1,
+        doubleBonds: 0,
+        tripleBonds: 0,
+        aromaticBonds: 0,
+        cnoHybridation: 0,
+        totalBonds: 1,
+        hydrogenOnAtomicNo: 8,
+        labileHydrogen: true,
+      },
       abnormalValence: -1,
       charge: 0,
       cipParity: 0,
@@ -77,21 +79,24 @@ describe('getAtomsInfo test propane', () => {
       isStereoCenter: false,
       isRing: false,
       isSmallRing: false,
-      isStabilized: false });
+      isStabilized: false,
+    });
   });
 
   it('should yield the right table', () => {
-    var molecule = OCLE.Molecule.fromSmiles('C=CC');
+    let molecule = OCLE.Molecule.fromSmiles('C=CC');
     // molecule.addImplicitHydrogens();
-    var atoms = molecule.getAtomsInfo();
-    expect(atoms[2]).toStrictEqual({ oclID: 'eM@DfPXb`RP\\Jh',
-      extra:
-            { singleBonds: 4,
-              doubleBonds: 0,
-              tripleBonds: 0,
-              aromaticBonds: 0,
-              cnoHybridation: 3,
-              totalBonds: 4 },
+    let atoms = molecule.getAtomsInfo();
+    expect(atoms[2]).toStrictEqual({
+      oclID: 'eM@DfPXb`RP\\Jh',
+      extra: {
+        singleBonds: 4,
+        doubleBonds: 0,
+        tripleBonds: 0,
+        aromaticBonds: 0,
+        cnoHybridation: 3,
+        totalBonds: 4,
+      },
       abnormalValence: -1,
       charge: 0,
       cipParity: 0,
@@ -115,7 +120,8 @@ describe('getAtomsInfo test propane', () => {
       isStereoCenter: false,
       isRing: false,
       isSmallRing: false,
-      isStabilized: false });
+      isStabilized: false,
+    });
 
     // console.log(atoms);
   });

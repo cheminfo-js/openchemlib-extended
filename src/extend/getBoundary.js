@@ -4,7 +4,7 @@
  * @returns {object} : minX, maxX, minY, maxY, minZ, maxZ, width, height, depth
  */
 
-module.exports = function () {
+module.exports = function() {
   return function getBoundary() {
     let minX = Number.POSITIVE_INFINITY;
     let maxX = Number.NEGATIVE_INFINITY;
@@ -34,7 +34,7 @@ module.exports = function () {
       minZ,
       width: maxX - minX,
       height: maxY - minY,
-      depth: maxZ - minZ
+      depth: maxZ - minZ,
     };
   };
 };

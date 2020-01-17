@@ -1,8 +1,8 @@
 'use strict';
 
-var OCLE = require('../../..');
+let OCLE = require('../../..');
 
-var molfile = `CCC
+let molfile = `CCC
 JME 2017-03-21 Wed Jun 14 14:53:08 GMT+200 2017
 
  11 10  0  0  0  0  0  0  0  0999 V2000
@@ -31,7 +31,7 @@ M  END`;
 
 describe('getCouplings test propane', () => {
   it.skip('should yield the right table without atom filtering', () => {
-    var molecule = OCLE.Molecule.fromMolfile(molfile);
+    let molecule = OCLE.Molecule.fromMolfile(molfile);
     //   var molecule = OCLE.Molecule.fromSmiles('CCCC');
     // molecule.addImplicitHydrogens();
     molecule.getCouplings();

@@ -12,7 +12,7 @@ module.exports = function() {
     const {
       minSphereSize = 0,
       maxSphereSize = 4,
-      kind = FULL_HOSE_CODE
+      kind = FULL_HOSE_CODE,
     } = options;
 
     const molecule = this.getCompactCopy();
@@ -28,7 +28,7 @@ module.exports = function() {
     let atomMask = new Array(molecule.getAllAtoms());
     let atomList = new Array(molecule.getAllAtoms());
 
-    for (var sphere = 0; sphere <= maxSphereSize; sphere++) {
+    for (let sphere = 0; sphere <= maxSphereSize; sphere++) {
       if (max === 0) {
         atomList[0] = rootAtom;
         atomMask[rootAtom] = true;
@@ -64,8 +64,8 @@ module.exports = function() {
       if (sphere >= minSphereSize) {
         results.push(
           fragment.getCanonizedIDCode(
-            OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
-          )
+            OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS,
+          ),
         );
       }
     }

@@ -6,9 +6,9 @@ const defaultCSVOptions = {
   header: true,
   dynamicTyping: true,
   skipEmptyLines: true,
-  onStep: function (/* current, total*/) {
+  onStep: function(/* current, total*/) {
     // empty function
-  }
+  },
 };
 
 /**
@@ -34,7 +34,7 @@ function parseCSV(csv, options = {}) {
   options = Object.assign({}, defaultCSVOptions, options);
 
   let db = new this.MoleculeDB(options);
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     const parsed = Papa.parse(csv, options);
     const fields = parsed.meta.fields;
     const stats = new Array(fields.length);
@@ -43,7 +43,7 @@ function parseCSV(csv, options = {}) {
     for (let i = 0; i < fields.length; i++) {
       stats[i] = {
         label: fields[i],
-        isNumeric: typeof firstElement[fields[i]] === 'number'
+        isNumeric: typeof firstElement[fields[i]] === 'number',
       };
       const lowerField = fields[i].toLowerCase();
       if (moleculeCreators.has(lowerField)) {
@@ -67,7 +67,7 @@ function parseCSV(csv, options = {}) {
       try {
         db.pushEntry(
           moleculeCreator(parsed.data[i][moleculeField]),
-          parsed.data[i]
+          parsed.data[i],
         );
       } catch (e) {
         reject(e);

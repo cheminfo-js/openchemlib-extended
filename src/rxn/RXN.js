@@ -1,29 +1,29 @@
 'use strict';
 
-var parseRXN = require('rxn-parser');
+let parseRXN = require('rxn-parser');
 
-module.exports = function (OCL) {
+module.exports = function(OCL) {
   function RXN(rxn) {
     if (!rxn) {
       this.reagents = [];
       this.products = [];
     } else {
-      var parsed = parseRXN(rxn);
+      let parsed = parseRXN(rxn);
       this.reagents = generateInfo(parsed.reagents);
       this.products = generateInfo(parsed.products);
     }
   }
 
-  RXN.prototype.addReagent = function (molfile) {
+  RXN.prototype.addReagent = function(molfile) {
     this.reagents.push(getMolfileInfo(molfile));
   };
 
-  RXN.prototype.addProduct = function (molfile) {
+  RXN.prototype.addProduct = function(molfile) {
     this.products.push(getMolfileInfo(molfile));
   };
 
-  RXN.prototype.toRXN = function () {
-    var result = [];
+  RXN.prototype.toRXN = function() {
+    let result = [];
     result.push('$RXN');
     result.push('');
     result.push('');
@@ -40,32 +40,33 @@ module.exports = function (OCL) {
     return result.join('\n');
   };
 
-
   function getMolfile(molfile) {
-    var lines = (~molfile.indexOf('\r\n')) ? molfile.split('\r\n') : molfile.split(/[\r\n]/);
+    let lines = ~molfile.indexOf('\r\n')
+      ? molfile.split('\r\n')
+      : molfile.split(/[\r\n]/);
     return lines.join('\n');
   }
 
   function format3(number) {
-    var length = (`${number}`).length;
+    let length = `${number}`.length;
     return '   '.substring(0, 3 - length) + number;
   }
 
   function generateInfo(molecules) {
-    for (var i = 0; i < molecules.length; i++) {
+    for (let i = 0; i < molecules.length; i++) {
       molecules[i] = getMolfileInfo(molecules[i]);
     }
     return molecules;
   }
 
   function getMolfileInfo(molfile) {
-    var ocl = OCL.Molecule.fromMolfile(molfile);
+    let ocl = OCL.Molecule.fromMolfile(molfile);
     return {
       molfile: molfile,
       smiles: ocl.toSmiles(),
       mf: ocl.getMolecularFormula().formula,
       mw: ocl.getMolecularFormula().relativeWeight,
-      idCode: ocl.getIDCode
+      idCode: ocl.getIDCode,
     };
   }
 

@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function (OCL) {
+module.exports = function(OCL) {
   return function getExtendedDiastereotopicAtomIDs() {
     const molecule = this.getCompactCopy();
     molecule.addImplicitHydrogens();
@@ -10,14 +10,14 @@ module.exports = function (OCL) {
     const diaIDs = molecule.getDiastereotopicAtomIDs();
     const newDiaIDs = [];
 
-    for (var i = 0; i < diaIDs.length; i++) {
+    for (let i = 0; i < diaIDs.length; i++) {
       const diaID = diaIDs[i];
       const newDiaID = {
         oclID: diaID,
         hydrogenOCLIDs: [],
-        nbHydrogens: 0
+        nbHydrogens: 0,
       };
-      for (var j = 0; j < molecule.getAllConnAtoms(i); j++) {
+      for (let j = 0; j < molecule.getAllConnAtoms(i); j++) {
         const atom = molecule.getConnAtom(i, j);
         if (molecule.getAtomicNo(atom) === 1) {
           newDiaID.nbHydrogens++;

@@ -20,7 +20,7 @@ function getAtomIDs(molecule) {
     makeRacemic(tempMolecule);
     // We need to ensure the helper array in order to get correctly the result of racemisation
     ids[iAtom] = tempMolecule.getCanonizedIDCode(
-      OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
+      OCL.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS,
     );
   }
   return ids;
@@ -93,5 +93,5 @@ function markDiastereotopicAtoms(molecule) {
 module.exports = {
   getAtomIDs,
   markDiastereotopicAtoms,
-  addMissingChirality
+  addMissingChirality,
 };

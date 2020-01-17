@@ -1,18 +1,17 @@
 'use strict';
 
 module.exports = function toDiastereotopicSVG(options = {}) {
-  var {
+  let {
     width = 300,
     height = 200,
     prefix = 'ocl',
-    heavyAtomHydrogen = false
-
+    heavyAtomHydrogen = false,
   } = options;
-  var svg = options.svg;
-  var diaIDs = [];
+  let svg = options.svg;
+  let diaIDs = [];
 
-  var hydrogenInfo = {};
-  this.getExtendedDiastereotopicAtomIDs().forEach(function (line) {
+  let hydrogenInfo = {};
+  this.getExtendedDiastereotopicAtomIDs().forEach(function(line) {
     hydrogenInfo[line.oclID] = line;
   });
 
@@ -21,8 +20,11 @@ module.exports = function toDiastereotopicSVG(options = {}) {
       diaIDs.push([]);
     }
     let groupedDiaIDs = this.getGroupedDiastereotopicAtomIDs();
-    groupedDiaIDs.forEach(function (diaID) {
-      if (hydrogenInfo[diaID.oclID] && hydrogenInfo[diaID.oclID].nbHydrogens > 0) {
+    groupedDiaIDs.forEach(function(diaID) {
+      if (
+        hydrogenInfo[diaID.oclID] &&
+        hydrogenInfo[diaID.oclID].nbHydrogens > 0
+      ) {
         diaID.atoms.forEach((atom) => {
           hydrogenInfo[diaID.oclID].hydrogenOCLIDs.forEach((id) => {
             if (!diaIDs[atom * 1].includes(id)) diaIDs[atom].push(id);
@@ -36,11 +38,10 @@ module.exports = function toDiastereotopicSVG(options = {}) {
 
   if (!svg) svg = this.toSVG(width, height, prefix);
 
-  svg = svg.replace(/Atom:[0-9]+"/g, function (value) {
-    var atom = value.replace(/[^0-9]/g, '');
+  svg = svg.replace(/Atom:[0-9]+"/g, function(value) {
+    let atom = value.replace(/[^0-9]/g, '');
     return `${value} data-atomid="${diaIDs[atom].join(',')}"`;
   });
 
   return svg;
 };
-

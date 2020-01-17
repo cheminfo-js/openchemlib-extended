@@ -32,7 +32,7 @@ M  END`;
 
 describe('test getAllCouplings', () => {
   it('from CCC', () => {
-    var molecule = OCLE.Molecule.fromMolfile(molfile);
+    let molecule = OCLE.Molecule.fromMolfile(molfile);
     let result = getAllCouplings(molecule, {});
     expect(result).toHaveLength(5);
 

@@ -1,63 +1,64 @@
+/* eslint-disable camelcase */
 /* eslint-disable quote-props */
 
 'use strict';
 
 module.exports = {
   'gJQLBEeKNVTfjh@': {
-    name: 'tertiary alcohol'
+    name: 'tertiary alcohol',
   },
   'eF@HxP': {
-    name: 'alkyne'
+    name: 'alkyne',
   },
   'eF@HhP': {
-    name: 'alkene'
+    name: 'alkene',
   },
   'eM`BN`p`': {
-    name: 'secondary amine'
+    name: 'secondary amine',
   },
   'gC``@deZ@~d\\': {
-    name: 'ester'
+    name: 'ester',
   },
   'eMHBN``': {
-    name: 'ether'
+    name: 'ether',
   },
   'gC``Adij@pf}IX': {
-    name: 'hemiacetal'
+    name: 'hemiacetal',
   },
   'gJP`AdizhCzRp': {
-    name: 'acetal'
+    name: 'acetal',
   },
   'gCh@AGj@`': {
-    name: 'tertiary amine'
+    name: 'tertiary amine',
   },
   'gJP`AdizhCzQp': {
-    name: 'cetal'
+    name: 'cetal',
   },
   'gJP`AdizhCzSP': {
-    name: 'acetal'
+    name: 'acetal',
   },
   'gJY@DDefhCzQp': {
-    name: 'tertiary amide'
+    name: 'tertiary amide',
   },
   'eMJDVTfP@': {
-    name: 'aldehyde'
+    name: 'aldehyde',
   },
   'gCaDLEeKJST`@': {
-    name: 'ketone'
+    name: 'ketone',
   },
   'eF`BLFD@': {
-    name: 'primary amine'
+    name: 'primary amine',
   },
   'eFHBLFD@': {
-    name: ''
+    name: '',
   },
   'eMJDVTf`@': {
-    name: 'primary alcohol'
+    name: 'primary alcohol',
   },
   'gCaDLEeKJSU@@': {
-    name: 'secondary alcohol'
+    name: 'secondary alcohol',
   },
-  'eMDARVCB_Tx': {
-    name: 'carboxylic acid'
-  }
+  eMDARVCB_Tx: {
+    name: 'carboxylic acid',
+  },
 };

@@ -20,7 +20,7 @@ function search(query, options = {}) {
     mode = 'substructure',
     flattenResult = true,
     keepMolecule = false,
-    limit = Number.MAX_SAFE_INTEGER
+    limit = Number.MAX_SAFE_INTEGER,
   } = options;
 
   if (typeof query === 'string') {
@@ -81,11 +81,10 @@ function subStructureSearch(moleculeDB, query) {
     }
   }
 
-
-  searchResult.sort(function (a, b) {
+  searchResult.sort(function(a, b) {
     return (
-      Math.abs(queryMW - a.properties.mw) -
-        Math.abs(queryMW - b.properties.mw));
+      Math.abs(queryMW - a.properties.mw) - Math.abs(queryMW - b.properties.mw)
+    );
   });
 
   if (resetFragment) {
@@ -107,14 +106,14 @@ function similaritySearch(moleculeDB, OCL, query) {
     if (entry.idCode === queryIdCode) {
       similarity = Number.MAX_SAFE_INTEGER;
     } else {
-      similarity = OCL.SSSearcherWithIndex.getSimilarityTanimoto(
-        queryIndex, entry.index) *
-              1000000 -
-          Math.abs(queryMW - entry.properties.mw) / 10000;
+      similarity =
+        OCL.SSSearcherWithIndex.getSimilarityTanimoto(queryIndex, entry.index) *
+          1000000 -
+        Math.abs(queryMW - entry.properties.mw) / 10000;
     }
     searchResult.push({ similarity, entry });
   }
-  searchResult.sort(function (a, b) {
+  searchResult.sort(function(a, b) {
     return b.similarity - a.similarity;
   });
   return searchResult.map((entry) => entry.entry);
@@ -130,7 +129,7 @@ function processResult(entries, options = {}) {
   const {
     flattenResult = true,
     keepMolecule = false,
-    limit = Number.MAX_SAFE_INTEGER
+    limit = Number.MAX_SAFE_INTEGER,
   } = options;
   let results = [];
 
@@ -141,7 +140,7 @@ function processResult(entries, options = {}) {
           data,
           idCode: entry.idCode,
           properties: entry.properties,
-          molecule: keepMolecule ? entry.molecule : undefined
+          molecule: keepMolecule ? entry.molecule : undefined,
         });
       }
     }
@@ -151,7 +150,7 @@ function processResult(entries, options = {}) {
         data: entry.data,
         idCode: entry.idCode,
         properties: entry.properties,
-        molecule: keepMolecule ? entry.molecule : undefined
+        molecule: keepMolecule ? entry.molecule : undefined,
       });
     }
   }

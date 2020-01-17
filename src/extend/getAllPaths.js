@@ -1,7 +1,7 @@
 'use strict';
 
-var floydWarshall = require('ml-floyd-warshall');
-var Matrix = require('ml-matrix').Matrix;
+let floydWarshall = require('ml-floyd-warshall');
+let Matrix = require('ml-matrix').Matrix;
 
 /**
  * Returns an array of all the different atom diaIDs that are connected
@@ -23,23 +23,23 @@ module.exports = function getAllPaths(options = {}) {
     fromLabel = '',
     toLabel = '',
     minLength = 1,
-    maxLength = 4
+    maxLength = 4,
   } = options;
 
   // we need to find all the atoms 'fromLabel' and 'toLabel'
-  var results = {};
-  var diaIDs = this.getDiastereotopicAtomIDs();
+  let results = {};
+  let diaIDs = this.getDiastereotopicAtomIDs();
 
-  var connectivityMatrix = this.getConnectivityMatrix();
+  let connectivityMatrix = this.getConnectivityMatrix();
   // TODO have a package that allows to convert the connectivityMatrix to a distanceMatrix
-  var pathLengthMatrix = floydWarshall(new Matrix(connectivityMatrix));
+  let pathLengthMatrix = floydWarshall(new Matrix(connectivityMatrix));
 
-  for (var from = 0; from < this.getAllAtoms(); from++) {
-    for (var to = 0; to < this.getAllAtoms(); to++) {
+  for (let from = 0; from < this.getAllAtoms(); from++) {
+    for (let to = 0; to < this.getAllAtoms(); to++) {
       if (!fromLabel || this.getAtomLabel(from) === fromLabel) {
         if (!toLabel || this.getAtomLabel(to) === toLabel) {
-          var pathLength = pathLengthMatrix[from][to];
-          var key = `${diaIDs[from]}_${diaIDs[to]}_${pathLength}`;
+          let pathLength = pathLengthMatrix[from][to];
+          let key = `${diaIDs[from]}_${diaIDs[to]}_${pathLength}`;
           if (pathLength >= minLength && pathLength <= maxLength) {
             if (!results[key]) {
               results[key] = {
@@ -48,7 +48,7 @@ module.exports = function getAllPaths(options = {}) {
                 fromTo: [[from, to]],
                 fromLabel: this.getAtomLabel(from),
                 toLabel: this.getAtomLabel(to),
-                pathLength: pathLength
+                pathLength: pathLength,
               };
             } else {
               results[key].fromTo.push([from, to]);
@@ -59,7 +59,7 @@ module.exports = function getAllPaths(options = {}) {
     }
   }
 
-  var finalResults = [];
+  let finalResults = [];
   for (let key in results) {
     finalResults.push(results[key]);
   }

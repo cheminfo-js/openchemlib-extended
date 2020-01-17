@@ -7,16 +7,16 @@
 module.exports = function(OCL) {
   return function cleaveBonds(options = {}) {
     const {
-      filter = bond =>
+      filter = (bond) =>
         !bond.isAromatic && bond.kind === 1 && bond.ringSize === 0,
       hose = {
         minSphereSize: 1,
-        maxSphereSize: 3
-      }
+        maxSphereSize: 3,
+      },
     } = options;
 
-    var atoms = [];
-    for (var i = 0; i < this.getAllAtoms(); i++) {
+    let atoms = [];
+    for (let i = 0; i < this.getAllAtoms(); i++) {
       const atom = {};
       atoms.push(atom);
       atom.i = i;
@@ -42,7 +42,7 @@ module.exports = function(OCL) {
       }
     }
 
-    for (var bond of bonds) {
+    for (let bond of bonds) {
       bond.fragments = breakMolecule(this, atoms, bond, hose);
     }
     return bonds;
@@ -52,15 +52,15 @@ module.exports = function(OCL) {
     let brokenMolecule = molecule.getCompactCopy();
     brokenMolecule.markBondForDeletion(bond.i);
     brokenMolecule.deleteMarkedAtomsAndBonds();
-    var fragmentMap = [];
-    var nbFragments = brokenMolecule.getFragmentNumbers(fragmentMap);
-    var results = [];
-    for (var i = 0; i < nbFragments; i++) {
-      var result = {};
+    let fragmentMap = [];
+    let nbFragments = brokenMolecule.getFragmentNumbers(fragmentMap);
+    let results = [];
+    for (let i = 0; i < nbFragments; i++) {
+      let result = {};
       result.atomMap = [];
-      var includeAtom = fragmentMap.map(id => id === i); // eslint-disable-line no-loop-func
-      var fragment = new OCL.Molecule(0, 0);
-      var atomMap = [];
+      let includeAtom = fragmentMap.map((id) => id === i); // eslint-disable-line no-loop-func
+      let fragment = new OCL.Molecule(0, 0);
+      let atomMap = [];
       brokenMolecule.copyMoleculeByAtoms(fragment, includeAtom, false, atomMap);
       // we will add some R groups at the level of the broken bonds
       fragment.setFragment(false);

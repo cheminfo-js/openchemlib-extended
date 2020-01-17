@@ -1,6 +1,6 @@
 'use strict';
 
-var OCL = require('openchemlib');
+let OCL = require('openchemlib');
 
 require('./extend')(OCL);
 

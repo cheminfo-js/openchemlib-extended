@@ -11,7 +11,6 @@ const OCL = require('../../../..');
 
 // let smiles = ['c1ccccc1', 'Cc1ccc(C)cc1', 'Clc1ccc(Br)cc1', 'c2ccc(Oc1ccccc1)cc2', 'CCC', 'CCOCC', 'O=C1CCC(=S)CC1'];
 
-
 describe('Magnetically equivalent and Chemically equivalent', () => {
   it('Chemically equivalent c1ccccc1', () => {
     let molecule = OCL.Molecule.fromSmiles('c1ccccc1');

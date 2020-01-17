@@ -1,10 +1,10 @@
 'use strict';
 
-module.exports = function (OCL) {
+module.exports = function(OCL) {
   const Util = OCL.Util;
   return function getGroupedHOSECodes(options = {}) {
     const diaIDs = this.getGroupedDiastereotopicAtomIDs(options);
-    diaIDs.forEach(function (diaID) {
+    diaIDs.forEach(function(diaID) {
       const hoses = Util.getHoseCodesFromDiastereotopicID(diaID.oclID, options);
 
       diaID.hoses = [];
@@ -12,7 +12,7 @@ module.exports = function (OCL) {
       for (const hose of hoses) {
         diaID.hoses.push({
           level: level++,
-          oclID: hose
+          oclID: hose,
         });
       }
     });

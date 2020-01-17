@@ -1,24 +1,24 @@
 'use strict';
 
-module.exports = function (OCL) {
+module.exports = function(OCL) {
   return function getAtomsInfo() {
     this.ensureHelperArrays(OCL.Molecule.cHelperRings);
 
-    var diaIDs = this.getDiastereotopicAtomIDs();
+    let diaIDs = this.getDiastereotopicAtomIDs();
 
-    var results = [];
-    for (var i = 0; i < diaIDs.length; i++) {
-      var result = {
+    let results = [];
+    for (let i = 0; i < diaIDs.length; i++) {
+      let result = {
         oclID: diaIDs[i],
         extra: {
           singleBonds: 0,
           doubleBonds: 0,
           tripleBonds: 0,
           aromaticBonds: 0,
-          cnoHybridation: 0 // should be 1 (sp), 2 (sp2) or 3 (sp3)
-        }
+          cnoHybridation: 0, // should be 1 (sp), 2 (sp2) or 3 (sp3)
+        },
       };
-      var extra = result.extra;
+      let extra = result.extra;
       results.push(result);
       result.abnormalValence = this.getAtomAbnormalValence(i); // -1 is normal otherwise specified
       result.charge = this.getAtomCharge(i);
@@ -61,9 +61,9 @@ module.exports = function (OCL) {
       // todo HACK to circumvent bug in OCL that consider than an hydrogen is connected to itself
       result.extra.singleBonds =
         result.atomicNo === 1 ? 0 : result.implicitHydrogens;
-      for (var j = 0; j < this.getAllConnAtoms(i); j++) {
-        var bond = this.getConnBond(i, j);
-        var bondOrder = this.getBondOrder(bond);
+      for (let j = 0; j < this.getAllConnAtoms(i); j++) {
+        let bond = this.getConnBond(i, j);
+        let bondOrder = this.getBondOrder(bond);
         if (this.isAromaticBond(bond)) {
           extra.aromaticBonds++;
         } else if (bondOrder === 1) {
@@ -88,7 +88,7 @@ module.exports = function (OCL) {
       } else if (result.atomicNo === 8) {
         result.extra.cnoHybridation = result.extra.totalBonds + 1;
       } else if (result.atomicNo === 1) {
-        var connectedAtom =
+        let connectedAtom =
           this.getAllConnAtoms(i) === 0
             ? 0
             : this.getAtomicNo(this.getConnAtom(i, 0));

@@ -3,9 +3,9 @@
 const sdfParser = require('sdf-parser');
 
 const defaultSDFOptions = {
-  onStep: function (/* current, total*/) {
+  onStep: function(/* current, total*/) {
     // empty function
-  }
+  },
 };
 
 /**
@@ -25,7 +25,7 @@ function parseSDF(sdf, options = {}) {
   let Molecule = this.OCL.Molecule;
   options = Object.assign({}, defaultSDFOptions, options);
   let db = new this.MoleculeDB(options);
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     const parsed = sdfParser(sdf);
     const molecules = parsed.molecules;
     db.statistics = parsed.statistics;

@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function (OCL) {
+module.exports = function(OCL) {
   /*
     this.db is an object with properties 'oclID' that has as value
     an object that contains the following properties:
@@ -25,7 +25,7 @@ module.exports = function (OCL) {
         { moleculeDB: this, OCL },
         molecule,
         data,
-        moleculeInfo
+        moleculeInfo,
       );
     }
 
@@ -34,7 +34,7 @@ module.exports = function (OCL) {
       return pushMoleculeInfo.call(
         { moleculeDB: this, OCL },
         moleculeInfo,
-        data
+        data,
       );
     }
 
@@ -43,7 +43,7 @@ module.exports = function (OCL) {
       return search.call(
         { moleculeDB: this, OCL, searcher: this.searcher },
         query,
-        options
+        options,
       );
     }
 
@@ -52,12 +52,12 @@ module.exports = function (OCL) {
     }
   }
 
-  MoleculeDB.parseCSV = function (csv, options) {
+  MoleculeDB.parseCSV = function(csv, options) {
     const parseCSV = require('./parseCSV');
     return parseCSV.call({ OCL, MoleculeDB }, csv, options);
   };
 
-  MoleculeDB.parseSDF = function (sdf, options) {
+  MoleculeDB.parseSDF = function(sdf, options) {
     const parseSDF = require('./parseSDF');
     return parseSDF.call({ OCL, MoleculeDB }, sdf, options);
   };

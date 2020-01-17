@@ -7,19 +7,19 @@
  * {string}[options.atomLabel] Return only the atoms of the given atomLabel. By default it returns all the explicit atoms in the molecule
  */
 module.exports = function getGroupedDiastereotopicAtomIDs(options = {}) {
-  var label = options.atomLabel;
-  var diaIDs = this.getDiastereotopicAtomIDs(options);
-  var diaIDsObject = {};
+  let label = options.atomLabel;
+  let diaIDs = this.getDiastereotopicAtomIDs(options);
+  let diaIDsObject = {};
   for (let i = 0; i < diaIDs.length; i++) {
     if (!label || this.getAtomLabel(i) === label) {
-      var diaID = diaIDs[i];
+      let diaID = diaIDs[i];
       if (!diaIDsObject[diaID]) {
         diaIDsObject[diaID] = {
           counter: 1,
           atoms: [i],
           oclID: diaID,
           atomLabel: this.getAtomLabel(i),
-          _highlight: [diaID]
+          _highlight: [diaID],
         };
       } else {
         diaIDsObject[diaID].counter++;
@@ -71,8 +71,8 @@ module.exports = function getGroupedDiastereotopicAtomIDs(options = {}) {
   }
   // End of Magnetically equivalent groups
 
-  var diaIDsTable = [];
-  for (var key of Object.keys(diaIDsObject)) {
+  let diaIDsTable = [];
+  for (let key of Object.keys(diaIDsObject)) {
     diaIDsTable.push(diaIDsObject[key]);
   }
   return diaIDsTable;

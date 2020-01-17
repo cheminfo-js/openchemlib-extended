@@ -24,7 +24,7 @@ describe('DB', () => {
         format: 'smiles',
         mode: 'substructure',
         flattenResult: false,
-        keepMolecule: false
+        keepMolecule: false,
       });
       expect(result).toHaveLength(2);
       expect(result).toMatchSnapshot();

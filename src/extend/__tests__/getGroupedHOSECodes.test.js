@@ -4,9 +4,9 @@ const OCLE = require('../..');
 
 describe('getGroupedHOSECodes test propane', () => {
   it('should yield the right table without atom filtering', () => {
-    var molecule = OCLE.Molecule.fromSmiles('CCC');
+    let molecule = OCLE.Molecule.fromSmiles('CCC');
     molecule.addImplicitHydrogens();
-    var diaIDs = molecule.getGroupedHOSECodes();
+    let diaIDs = molecule.getGroupedHOSECodes();
     expect(diaIDs).toHaveLength(4);
     expect(diaIDs[0].counter).toBe(2);
     expect(diaIDs[0].atoms).toHaveLength(2);
@@ -15,10 +15,10 @@ describe('getGroupedHOSECodes test propane', () => {
   });
 
   it('should yield the right table only C', () => {
-    var molecule = OCLE.Molecule.fromSmiles('CCC');
+    let molecule = OCLE.Molecule.fromSmiles('CCC');
     molecule.addImplicitHydrogens();
-    var diaIDs = molecule.getGroupedHOSECodes({
-      atomLabel: 'C'
+    let diaIDs = molecule.getGroupedHOSECodes({
+      atomLabel: 'C',
     });
     expect(diaIDs).toHaveLength(2);
     expect(diaIDs[0].counter).toBe(2);
@@ -28,10 +28,10 @@ describe('getGroupedHOSECodes test propane', () => {
   });
 
   it('should yield the right table only H', () => {
-    var molecule = OCLE.Molecule.fromSmiles('CCC');
+    let molecule = OCLE.Molecule.fromSmiles('CCC');
     molecule.addImplicitHydrogens();
-    var diaIDs = molecule.getGroupedHOSECodes({
-      atomLabel: 'H'
+    let diaIDs = molecule.getGroupedHOSECodes({
+      atomLabel: 'H',
     });
     expect(diaIDs).toHaveLength(2);
     expect(diaIDs[0].counter).toBe(6);

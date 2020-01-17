@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function (Molecule) {
+module.exports = function(Molecule) {
   const fields = new Map();
 
   fields.set('oclid', Molecule.fromIDCode);

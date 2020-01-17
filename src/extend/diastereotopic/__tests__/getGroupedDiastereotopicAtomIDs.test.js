@@ -4,9 +4,9 @@ const OCLE = require('../../..');
 
 describe('getGroupedDiastereotopicIDs test propane', () => {
   it('should yield the right table for all atoms', () => {
-    var molecule = OCLE.Molecule.fromSmiles('CCC');
+    let molecule = OCLE.Molecule.fromSmiles('CCC');
     molecule.addImplicitHydrogens();
-    var diaIDs = molecule.getGroupedDiastereotopicAtomIDs();
+    let diaIDs = molecule.getGroupedDiastereotopicAtomIDs();
     expect(diaIDs).toHaveLength(4);
     expect(diaIDs[0].counter).toBe(2);
     expect(diaIDs[0].atoms).toHaveLength(2);
@@ -14,10 +14,10 @@ describe('getGroupedDiastereotopicIDs test propane', () => {
   });
 
   it('should yield the right table for carbons', () => {
-    var molecule = OCLE.Molecule.fromSmiles('CCC');
+    let molecule = OCLE.Molecule.fromSmiles('CCC');
     molecule.addImplicitHydrogens();
-    var diaIDs = molecule.getGroupedDiastereotopicAtomIDs({
-      atomLabel: 'C'
+    let diaIDs = molecule.getGroupedDiastereotopicAtomIDs({
+      atomLabel: 'C',
     });
     expect(diaIDs).toHaveLength(2);
     expect(diaIDs[0].counter).toBe(2);
@@ -26,10 +26,10 @@ describe('getGroupedDiastereotopicIDs test propane', () => {
   });
 
   it('should yield the right table for hydrogens', () => {
-    var molecule = OCLE.Molecule.fromSmiles('CCC');
+    let molecule = OCLE.Molecule.fromSmiles('CCC');
     molecule.addImplicitHydrogens();
-    var diaIDs = molecule.getGroupedDiastereotopicAtomIDs({
-      atomLabel: 'H'
+    let diaIDs = molecule.getGroupedDiastereotopicAtomIDs({
+      atomLabel: 'H',
     });
     expect(diaIDs).toHaveLength(2);
     expect(diaIDs[0].counter).toBe(6);

@@ -1,14 +1,14 @@
 'use strict';
 
-var floydWarshall = require('ml-floyd-warshall');
-var Matrix = require('ml-matrix').Matrix;
+let floydWarshall = require('ml-floyd-warshall');
+let Matrix = require('ml-matrix').Matrix;
 
-module.exports = function (OCL) {
+module.exports = function(OCL) {
   return function getConnectivityMatrix(options = {}) {
     this.ensureHelperArrays(OCL.Molecule.cHelperNeighbours);
-    var nbAtoms = this.getAllAtoms();
-    var i, j, l;
-    var result = new Array(nbAtoms).fill();
+    let nbAtoms = this.getAllAtoms();
+    let i, j, l;
+    let result = new Array(nbAtoms).fill();
     result = result.map(() => new Array(nbAtoms).fill(0));
 
     if (!options.pathLength) {

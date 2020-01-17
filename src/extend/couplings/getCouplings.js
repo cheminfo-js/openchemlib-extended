@@ -4,11 +4,11 @@ const electronegativities = require('./electronegativities');
 const fragments = require('./fragments');
 
 module.exports = function getAllCouplings() {
-  var molecule = this.getCompactCopy();
-  var diaIDs = molecule.getDiastereotopicAtomIDs();
-  var matchFragments = molecule.getFragments();
-  var fragmentsId = {};
-  var couplings = [];
+  let molecule = this.getCompactCopy();
+  let diaIDs = molecule.getDiastereotopicAtomIDs();
+  let matchFragments = molecule.getFragments();
+  let fragmentsId = {};
+  let couplings = [];
   for (let i = 0; i < molecule.getAllAtoms(); i++) {
     if (molecule.getAtomLabel(i) === 'H') {
       for (let j = i + 1; j < molecule.getAllAtoms(); j++) {
@@ -18,12 +18,12 @@ module.exports = function getAllCouplings() {
             !isAttachedToHeteroAtom(molecule, j)
           ) {
             if (!(diaIDs[i].toLowerCase() === diaIDs[j].toLowerCase())) {
-              var atoms = [];
-              var xyz = []; // TODO
+              let atoms = [];
+              let xyz = []; // TODO
               getPath(molecule, i, i, j, 0, atoms, xyz);
               if (atoms.length !== 0) {
-                var fragmentId = -1;
-                var coupling = {};
+                let fragmentId = -1;
+                let coupling = {};
                 coupling.atoms = atoms;
                 coupling.xyz = xyz;
                 coupling.fromDiaID = diaIDs[j];
@@ -37,7 +37,7 @@ module.exports = function getAllCouplings() {
                     molecule,
                     coupling,
                     fragmentsId,
-                    matchFragments
+                    matchFragments,
                   )
                 ) {
                   couplings.push(coupling);
@@ -56,10 +56,10 @@ function getPath(molecule, parent, idInit, idEnd, pathLength, atoms, xyz) {
   if (pathLength > 3) {
     return;
   }
-  var nbConnectedAtoms = molecule.getAllConnAtoms(idInit);
+  let nbConnectedAtoms = molecule.getAllConnAtoms(idInit);
   for (let i = 0; i < nbConnectedAtoms; i++) {
     if (molecule.getConnAtom(idInit, i) === idEnd) {
-      var coordinates = new Array(3);
+      let coordinates = new Array(3);
       coordinates[0] = molecule.getAtomX(idEnd);
       coordinates[1] = molecule.getAtomY(idEnd);
       coordinates[2] = molecule.getAtomZ(idEnd);
@@ -80,7 +80,7 @@ function getPath(molecule, parent, idInit, idEnd, pathLength, atoms, xyz) {
   pathLength++;
 
   for (let i = 0; i < nbConnectedAtoms; i++) {
-    var connectivityAtom = molecule.getConnAtom(idInit, i);
+    let connectivityAtom = molecule.getConnAtom(idInit, i);
     if (connectivityAtom !== parent) {
       getPath(
         molecule,
@@ -89,10 +89,10 @@ function getPath(molecule, parent, idInit, idEnd, pathLength, atoms, xyz) {
         idEnd,
         pathLength,
         atoms,
-        xyz
+        xyz,
       );
       if (atoms.length !== 0) {
-        coordinates = new Array(3);
+        let coordinates = new Array(3);
         coordinates[0] = molecule.getAtomX(idInit);
         coordinates[1] = molecule.getAtomY(idInit);
         coordinates[2] = molecule.getAtomZ(idInit);
@@ -105,9 +105,9 @@ function getPath(molecule, parent, idInit, idEnd, pathLength, atoms, xyz) {
 }
 
 function couplingBelongToFragment(atoms, matchFragments) {
-  var match;
-  var result = -1;
-  var index = atoms.length - 1;
+  let match;
+  let result = -1;
+  let index = atoms.length - 1;
   for (let i = 0; i < matchFragments.length; i++) {
     match = 0;
     for (let j = 0; j < matchFragments[i].length; j++) {
@@ -127,16 +127,16 @@ function couplingBelongToFragment(atoms, matchFragments) {
 }
 
 function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
-  var atoms = coupling.atoms;
-  var bondLength = atoms.length - 1;
-  var fragmentId = coupling.fragmentId;
+  let atoms = coupling.atoms;
+  let bondLength = atoms.length - 1;
+  let fragmentId = coupling.fragmentId;
   if (fragmentId !== -1) {
     coupling.type = 0;
-    var C1 = -1;
-    var C2 = -1;
-    var possibleCouplings = fragments[fragmentsId[fragmentId]];
+    let C1 = -1;
+    let C2 = -1;
+    let possibleCouplings = fragments[fragmentsId[fragmentId]];
 
-    for (var i = 0; i < matchFragments[coupling.getFragmentId()].length; i++) {
+    for (let i = 0; i < matchFragments[coupling.getFragmentId()].length; i++) {
       if (atoms[1] === matchFragments[fragmentId][i]) {
         C1 = i;
       }
@@ -166,7 +166,7 @@ function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
       }
       break;
     case 3: {
-      var angle, xyz, coords;
+      let angle, xyz, coords;
       if (isDoubleBond(molecule, atoms[1], atoms[2])) {
         // coupling
         // through
@@ -193,7 +193,7 @@ function calculatedCoupling(molecule, coupling, fragmentsId, matchFragments) {
           coupling.value = doubleBondCoupling(molecule, 1, atoms);
         }
       } else {
-        var sumZ = 0;
+        let sumZ = 0;
         angle = 0.0;
         xyz = coupling.xyz;
         coords = new Array(3);
@@ -279,10 +279,10 @@ function getDihedralAngle(xyz) {
    * double sum=0; //Check if we have the Z coordinate for (int
    * i=0;i<xyz.length;i++) sum+=Math.abs(xyz[i][2]); if(sum==0) return 60;
    */
-  var cosAng, P, Q;
-  var distances = new Array(6);
-  var Sdistances = new Array(6);
-  var k = 0;
+  let cosAng, P, Q;
+  let distances = new Array(6);
+  let Sdistances = new Array(6);
+  let k = 0;
 
   for (let i = 0; i < xyz.length; i++) {
     for (let j = i + 1; j < xyz.length; j++) {
@@ -321,12 +321,12 @@ function getDihedralAngle(xyz) {
 }
 
 function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
-  var J = 0.0;
-  var delta;
-  var nbConnectedAtoms;
-  var electH = electronegativities.H;
-  var direction = [1, -1, 1, -1];
-  var p = [];
+  let J = 0.0;
+  let delta;
+  let nbConnectedAtoms;
+  let electH = electronegativities.H;
+  let direction = [1, -1, 1, -1];
+  let p = [];
   switch (model) {
     case 1:
       // type = "karplus";
@@ -355,10 +355,10 @@ function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
             (p[3] +
               p[4] *
                 Math.cos(
-                  direction[j] * dihedralAngle + p[5] * Math.abs(delta)
+                  direction[j] * dihedralAngle + p[5] * Math.abs(delta),
                 ) *
                 Math.cos(
-                  direction[j] * dihedralAngle + p[5] * Math.abs(delta)
+                  direction[j] * dihedralAngle + p[5] * Math.abs(delta),
                 ));
         }
       }
@@ -369,41 +369,43 @@ function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
       break;
 
     case 3:
-      // type = "Karplus-altona beta effect";
-      p = [13.7, -0.73, 0, 0.56, -2.47, 16.9, -0.14];
-      var I;
-      var atom2;
-      var nbConnectedAtoms2;
+      {
+        // type = "Karplus-altona beta effect";
+        p = [13.7, -0.73, 0, 0.56, -2.47, 16.9, -0.14];
+        let I;
+        let atom2;
+        let nbConnectedAtoms2;
 
-      for (let j = 1; j < atoms.length - 1; j++) {
-        nbConnectedAtoms = molecule.getAllConnAtoms(j);
-        I = 0;
-        for (let i = 0; i < nbConnectedAtoms; i++) {
-          atom2 = molecule.getConnAtom(j, i);
-          delta = electronegativities[molecule.getAtomLabel(atom2)] - electH;
-          atom2 = molecule.getConnAtom(j, i);
-          nbConnectedAtoms2 = molecule.getAllConnAtoms(atom2);
-          for (let k = 0; k < nbConnectedAtoms2; k++) {
-            // i = (Ca -CH) + p7 S ( Cb -CH)
-            I +=
-              electronegativities[
-                molecule.getAtomLabel(molecule.getConnAtom(atom2, k))
-              ] - electH;
+        for (let j = 1; j < atoms.length - 1; j++) {
+          nbConnectedAtoms = molecule.getAllConnAtoms(j);
+          I = 0;
+          for (let i = 0; i < nbConnectedAtoms; i++) {
+            atom2 = molecule.getConnAtom(j, i);
+            delta = electronegativities[molecule.getAtomLabel(atom2)] - electH;
+            atom2 = molecule.getConnAtom(j, i);
+            nbConnectedAtoms2 = molecule.getAllConnAtoms(atom2);
+            for (let k = 0; k < nbConnectedAtoms2; k++) {
+              // i = (Ca -CH) + p7 S ( Cb -CH)
+              I +=
+                electronegativities[
+                  molecule.getAtomLabel(molecule.getConnAtom(atom2, k))
+                ] - electH;
+            }
+            I = delta + p[6] * I;
           }
-          I = delta + p[6] * I;
-        }
 
+          J +=
+            I *
+            (p[3] +
+              p[4] *
+                (Math.cos(direction[j] * dihedralAngle + p[5] * Math.abs(I)) *
+                  Math.cos(direction[j] * dihedralAngle + p[5] * Math.abs(I))));
+        }
         J +=
-          I *
-          (p[3] +
-            p[4] *
-              (Math.cos(direction[j] * dihedralAngle + p[5] * Math.abs(I)) *
-                Math.cos(direction[j] * dihedralAngle + p[5] * Math.abs(I))));
+          p[0] * Math.cos(dihedralAngle) * Math.cos(dihedralAngle) +
+          p[1] * Math.cos(dihedralAngle) +
+          p[2];
       }
-      J +=
-        p[0] * Math.cos(dihedralAngle) * Math.cos(dihedralAngle) +
-        p[1] * Math.cos(dihedralAngle) +
-        p[2];
       break;
     default:
       J = 0.0;
@@ -412,7 +414,7 @@ function jCouplingVicinal(molecule, dihedralAngle, model, atoms) {
 }
 
 function vinylCoupling(phi) {
-  var J = 0.0;
+  let J = 0.0;
   if (phi <= 90) {
     J =
       6.6 * Math.cos(phi) * Math.cos(phi) + 2.6 * Math.sin(phi) * Math.sin(phi);
@@ -429,8 +431,8 @@ function geminalCoupling() {
 }
 
 function doubleBondCoupling(molecule, type, atoms) {
-  var x = 0;
-  var nbConnectedAtoms;
+  let x = 0;
+  let nbConnectedAtoms;
   for (let j = 1; j < atoms.length - 1; j++) {
     nbConnectedAtoms = molecule.getAllConnAtoms(j);
     for (let i = 0; i < nbConnectedAtoms; i++) {
@@ -440,7 +442,7 @@ function doubleBondCoupling(molecule, type, atoms) {
     }
   }
 
-  var result;
+  let result;
   switch (type) {
     case 1: // cis, empirical formula from a sample of experimental spectra
       result = -4.724 * x + 13.949;
@@ -457,9 +459,9 @@ function doubleBondCoupling(molecule, type, atoms) {
 }
 
 function checkVynilicCoupling(molecule, atoms) {
-  var nbConnectedAtoms;
-  var result = false;
-  for (var j = 1, l = atoms.length - 1; j < l; j++) {
+  let nbConnectedAtoms;
+  let result = false;
+  for (let j = 1, l = atoms.length - 1; j < l; j++) {
     nbConnectedAtoms = molecule.getAllConnAtoms(atoms[j]);
     if (nbConnectedAtoms < 4) {
       result = true;
@@ -470,32 +472,32 @@ function checkVynilicCoupling(molecule, atoms) {
 }
 
 function isDoubleBond(molecule, atom1, atom2) {
-  var bond = molecule.getBond(atom1, atom2);
-  var bondType = molecule.getBondType(bond);
+  let bond = molecule.getBond(atom1, atom2);
+  let bondType = molecule.getBondType(bond);
   return bondType === 2;
 }
 
 function isDoubleOrTripleBond(molecule, atom1, atom2) {
-  var bond = molecule.getBond(atom1, atom2);
-  var bondType = molecule.getBondType(bond);
+  let bond = molecule.getBond(atom1, atom2);
+  let bondType = molecule.getBondType(bond);
   return bondType === 2 || bondType === 4;
 }
 
 function isNotAromatic(molecule, atom1, atom2) {
-  var bond = molecule.getBond(atom1, atom2);
+  let bond = molecule.getBond(atom1, atom2);
   return !molecule.isAromaticBond(bond);
 }
 
 function isAromatic(molecule, atom1, atom2) {
-  var bond = molecule.getBond(atom1, atom2);
+  let bond = molecule.getBond(atom1, atom2);
   return molecule.isAromaticBond(bond);
 }
 
 function isAttachedToHeteroAtom(molecule, atom) {
-  var result = false;
-  var nbConnectedAtoms = molecule.getAllConnAtoms(atom);
-  for (var j = 0; j < nbConnectedAtoms; j++) {
-    var connAtom = molecule.getConnAtom(atom, j);
+  let result = false;
+  let nbConnectedAtoms = molecule.getAllConnAtoms(atom);
+  for (let j = 0; j < nbConnectedAtoms; j++) {
+    let connAtom = molecule.getConnAtom(atom, j);
     if (!(molecule.getAtomLabel(connAtom) === 'C')) {
       result = true;
       j = nbConnectedAtoms;
@@ -505,9 +507,9 @@ function isAttachedToHeteroAtom(molecule, atom) {
 }
 
 function isOnlyAttachedToHC(molecule, atom) {
-  var nbConnectedAtoms = molecule.getAllConnAtoms(atom);
-  for (var j = 0; j < nbConnectedAtoms; j++) {
-    var connAtom = molecule.getConnAtom(atom, j);
+  let nbConnectedAtoms = molecule.getAllConnAtoms(atom);
+  for (let j = 0; j < nbConnectedAtoms; j++) {
+    let connAtom = molecule.getConnAtom(atom, j);
     if (
       !(
         molecule.getAtomLabel(connAtom) === 'C' ||

@@ -19,13 +19,13 @@ function getAllCouplings(molecule, options = {}) {
     fromLabel = 'H',
     toLabel = 'H',
     minLength = 1,
-    maxLength = 4
+    maxLength = 4,
   } = options;
   let paths = molecule.getAllPaths({
     fromLabel,
     toLabel,
     minLength,
-    maxLength
+    maxLength,
   });
 
   const minSphereSize = 0;
@@ -43,7 +43,7 @@ function getAllCouplings(molecule, options = {}) {
       }
       path.info.push({
         atoms,
-        torsion
+        torsion,
       });
 
       if (!path.code) {
@@ -58,7 +58,7 @@ function getAllCouplings(molecule, options = {}) {
         let atomList = [];
         let max = 0;
         let min = 0;
-        for (var sphere = 0; sphere <= maxSphereSize; sphere++) {
+        for (let sphere = 0; sphere <= maxSphereSize; sphere++) {
           if (max === 0) {
             for (let atom of atoms) {
               atomMask[atom] = true;
@@ -82,8 +82,8 @@ function getAllCouplings(molecule, options = {}) {
           if (sphere >= minSphereSize) {
             path.code.push(
               fragment.getCanonizedIDCode(
-                OCLE.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
-              )
+                OCLE.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS,
+              ),
             );
           }
         }

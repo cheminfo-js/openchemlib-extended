@@ -13,18 +13,18 @@ function getPathsInfo(molecule, options = {}) {
     fromLabel = 'H',
     toLabel = 'H',
     minLength = 1,
-    maxLength = 4
+    maxLength = 4,
   } = options;
 
   let fromAtomicNumber = OCLE.Molecule.getAtomicNoFromLabel(fromLabel);
   let toAtomicNumber = OCLE.Molecule.getAtomicNoFromLabel(toLabel);
 
   // we need to find all the atoms 'fromLabel' and 'toLabel'
-  var atomsInfo = molecule.getAtomsInfo();
+  let atomsInfo = molecule.getAtomsInfo();
 
-  var connectivityMatrix = molecule.getConnectivityMatrix();
+  let connectivityMatrix = molecule.getConnectivityMatrix();
   // TODO have a package that allows to convert the connectivityMatrix to a distanceMatrix
-  var pathLengthMatrix = floydWarshall(new Matrix(connectivityMatrix));
+  let pathLengthMatrix = floydWarshall(new Matrix(connectivityMatrix));
   for (let from = 0; from < molecule.getAllAtoms(); from++) {
     atomsInfo[from].couplings = [];
     for (let to = 0; to < molecule.getAllAtoms(); to++) {
@@ -34,7 +34,13 @@ function getPathsInfo(molecule, options = {}) {
             let pathLength = pathLengthMatrix[from][to];
             if (pathLength >= minLength && pathLength <= maxLength) {
               atomsInfo[from].couplings.push(
-                getCoupling(molecule, from, to, pathLength, atomsInfo[to].oclID)
+                getCoupling(
+                  molecule,
+                  from,
+                  to,
+                  pathLength,
+                  atomsInfo[to].oclID,
+                ),
               );
             }
           }
@@ -64,7 +70,7 @@ function getCoupling(molecule, from, to, pathLength, diaIDto) {
   let atomList = new Array(molecule.getAllAtoms()).fill(-1);
   let pathCodes = [];
 
-  for (var sphere = 0; sphere <= 2; sphere++) {
+  for (let sphere = 0; sphere <= 2; sphere++) {
     if (max === 0) {
       for (let atom of atoms) {
         atomMask[atom] = true;
@@ -88,8 +94,8 @@ function getCoupling(molecule, from, to, pathLength, diaIDto) {
     molecule.copyMoleculeByAtoms(fragment, atomMask, true, null);
     pathCodes.push(
       fragment.getCanonizedIDCode(
-        OCLE.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS
-      )
+        OCLE.Molecule.CANONIZER_ENCODE_ATOM_CUSTOM_LABELS,
+      ),
     );
   }
 
@@ -99,7 +105,7 @@ function getCoupling(molecule, from, to, pathLength, diaIDto) {
     torsion,
     pathCodes,
     diaIDto,
-    length: pathLength
+    length: pathLength,
   };
 }
 
