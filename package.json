@@ -42,20 +42,20 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "cheminfo-tools": "^1.23.2",
-    "eslint": "^5.15.3",
-    "eslint-config-cheminfo": "^1.20.1",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-jest": "^22.4.1",
-    "jest": "^24.5.0",
-    "rimraf": "^2.6.3"
+    "cheminfo-tools": "^1.23.3",
+    "eslint": "^6.8.0",
+    "eslint-config-cheminfo": "^2.0.4",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-jest": "^23.6.0",
+    "jest": "^24.9.0",
+    "rimraf": "^3.0.0"
   },
   "dependencies": {
     "ml-floyd-warshall": "^1.0.0",
-    "ml-matrix": "^5.3.0",
-    "openchemlib": "^7.2.1",
-    "papaparse": "^4.6.3",
+    "ml-matrix": "^6.4.1",
+    "openchemlib": "^7.2.3",
+    "papaparse": "^5.1.1",
     "rxn-parser": "0.1.0",
-    "sdf-parser": "^3.1.0"
+    "sdf-parser": "^4.0.1"
   }
 }

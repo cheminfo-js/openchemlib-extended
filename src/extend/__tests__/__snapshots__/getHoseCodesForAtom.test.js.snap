@@ -2,9 +2,9 @@
 
 exports[`getHosesCodeForAtom test propane minSphereSize:0, maxSphereSize:3 1`] = `
 Array [
-  "fHdrARapj\`",
-  "eFBBYcARP\\\\Jh",
-  "eMBBYRZA~d\`xUP",
-  "eMBBYRZA~d\`xUP",
+  "fH@NJ%60%7FRapj%60",
+  "eF@Hp%5CQP_iHNET",
+  "eM@Df%60xb%60%7FRP%5CJh",
+  "eM@Df%60xb%60%7FRP%5CJh",
 ]
 `;

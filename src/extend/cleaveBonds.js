@@ -4,10 +4,11 @@
  * @returns [array] array of extended bond bonds
  */
 
-module.exports = function (OCL) {
+module.exports = function(OCL) {
   return function cleaveBonds(options = {}) {
     const {
-      filter = (bond) => !bond.isAromatic && bond.kind === 1 && bond.ringSize === 0,
+      filter = bond =>
+        !bond.isAromatic && bond.kind === 1 && bond.ringSize === 0,
       hose = {
         minSphereSize: 1,
         maxSphereSize: 3
@@ -16,14 +17,14 @@ module.exports = function (OCL) {
 
     var atoms = [];
     for (var i = 0; i < this.getAllAtoms(); i++) {
-      var atom = {};
+      const atom = {};
       atoms.push(atom);
       atom.i = i;
       atom.mapNo = this.getAtomMapNo(i);
       atom.links = []; // we will store connected atoms of broken bonds
     }
 
-    var bonds = [];
+    const bonds = [];
     for (let i = 0; i < this.getAllBonds(); i++) {
       let bond = {};
       bond.i = i;
@@ -47,7 +48,6 @@ module.exports = function (OCL) {
     return bonds;
   };
 
-
   function breakMolecule(molecule, atoms, bond, hoseOptions) {
     let brokenMolecule = molecule.getCompactCopy();
     brokenMolecule.markBondForDeletion(bond.i);
@@ -58,7 +58,7 @@ module.exports = function (OCL) {
     for (var i = 0; i < nbFragments; i++) {
       var result = {};
       result.atomMap = [];
-      var includeAtom = fragmentMap.map((id) => id === i); // eslint-disable-line no-loop-func
+      var includeAtom = fragmentMap.map(id => id === i); // eslint-disable-line no-loop-func
       var fragment = new OCL.Molecule(0, 0);
       var atomMap = [];
       brokenMolecule.copyMoleculeByAtoms(fragment, includeAtom, false, atomMap);
@@ -66,11 +66,15 @@ module.exports = function (OCL) {
       fragment.setFragment(false);
       if (atomMap[bond.atom1] > -1) {
         fragment.addBond(atomMap[bond.atom1], fragment.addAtom(154), 1);
-        bond.hoses1 = fragment.getHoseCodesForAtom(atomMap[bond.atom1], hoseOptions).map((f, i) => ({ f, i }));
+        bond.hoses1 = fragment
+          .getHoseCodesForAtom(atomMap[bond.atom1], hoseOptions)
+          .map((f, i) => ({ f, i }));
       }
       if (atomMap[bond.atom2] > -1) {
         fragment.addBond(atomMap[bond.atom2], fragment.addAtom(154), 1);
-        bond.hoses2 = fragment.getHoseCodesForAtom(atomMap[bond.atom2], hoseOptions).map((f, i) => ({ f, i }));
+        bond.hoses2 = fragment
+          .getHoseCodesForAtom(atomMap[bond.atom2], hoseOptions)
+          .map((f, i) => ({ f, i }));
       }
       result.idCode = fragment.getIDCode();
       result.mf = fragment.getMF().mf.replace(/R([1-9]|(?=[A-Z(])|$)/, '');
