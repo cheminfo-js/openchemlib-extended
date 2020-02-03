@@ -31,7 +31,7 @@ function getPathsInfo(molecule, options = {}) {
       if (from !== to) {
         if (molecule.getAtomicNo(from) === fromAtomicNumber) {
           if (molecule.getAtomicNo(to) === toAtomicNumber) {
-            let pathLength = pathLengthMatrix[from][to];
+            let pathLength = pathLengthMatrix.get(from, to);
             if (pathLength >= minLength && pathLength <= maxLength) {
               atomsInfo[from].couplings.push(
                 getCoupling(

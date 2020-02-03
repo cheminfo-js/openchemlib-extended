@@ -38,7 +38,7 @@ module.exports = function getAllPaths(options = {}) {
     for (let to = 0; to < this.getAllAtoms(); to++) {
       if (!fromLabel || this.getAtomLabel(from) === fromLabel) {
         if (!toLabel || this.getAtomLabel(to) === toLabel) {
-          let pathLength = pathLengthMatrix[from][to];
+          let pathLength = pathLengthMatrix.get(from, to);
           let key = `${diaIDs[from]}_${diaIDs[to]}_${pathLength}`;
           if (pathLength >= minLength && pathLength <= maxLength) {
             if (!results[key]) {
